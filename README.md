@@ -1,6 +1,6 @@
-# RooCode Starter Template Setup
+# AI Assistant Starter Template Setup
 
-An automated setup script that makes it extremely easy for new users to get started with RooCode's comprehensive mode system and cognitive enhancement tools.
+An automated setup script that makes it extremely easy for new users to get started with a comprehensive mode system and cognitive enhancement tools.
 
 ## What This Setup Provides
 
@@ -30,7 +30,7 @@ An automated setup script that makes it extremely easy for new users to get star
 ## Quick Start
 
 ### Prerequisites
-- RooCode extension installed in VS Code
+- AI assistant extension installed in VS Code
 - Basic familiarity with terminal/command line
 
 ### Installation
@@ -55,17 +55,17 @@ An automated setup script that makes it extremely easy for new users to get star
 
 3. **Follow the interactive prompts:**
    - Confirm you want to proceed
-   - The script will find your RooCode config directory automatically
+   - The script will find your AI assistant config directory automatically
    - If not found, you'll be prompted to provide the path
 
-4. **Restart VS Code/RooCode** to load the new modes
+4. **Restart VS Code** to load the new modes
    - **Global availability**: All modes will be available in every VSCode project after restart
    - No additional setup needed per project
 
 ## What the Script Does
 
-### 🔍 1. Find RooCode Config Directory
-- **Primary location**: `~/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/`
+### 🔍 1. Find AI Assistant Config Directory
+- **Primary location**: `~/my_new_ai_assistant/`
 - **Fallback**: Interactive prompt if not found
 - **Validation**: Ensures directory exists before proceeding
 
@@ -113,7 +113,7 @@ memory/
 If you need to revert changes:
 ```bash
 # Navigate to your config directory
-cd ~/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/
+cd ~/my_new_ai_assistant/
 
 # Restore from backup (replace TIMESTAMP with actual timestamp)
 mv custom_modes_backup_TIMESTAMP.yaml custom_modes.yaml
@@ -192,7 +192,7 @@ mv dream_journal_backup_TIMESTAMP.md dream_journal.md
 
 ### Script Issues
 - **Permission denied**: Run `chmod +x setup.sh` first
-- **Directory not found**: Manually locate your RooCode settings directory
+- **Directory not found**: Manually locate your AI assistant settings directory
 - **Template files missing**: Ensure all files are in the same directory as the script
 
 ### After Installation
@@ -202,17 +202,19 @@ mv dream_journal_backup_TIMESTAMP.md dream_journal.md
 
 ## File Structure
 
-After successful installation, your RooCode config directory will contain:
+After successful installation, your AI assistant config directory will contain:
 
 ```
-settings/
+my_new_ai_assistant/
 ├── custom_modes.yaml           # Comprehensive mode definitions
 ├── dream_journal.md           # Cognitive evolution documentation
 ├── memory/                    # Memory system
 │   ├── people/               # People information & README
-│   ├── projects/             # Project documentation & README  
+│   ├── projects/             # Project documentation & README
 │   ├── patterns/             # Patterns and methodologies & README
-│   └── concepts/             # Technical concepts & README
+│   ├── concepts/             # Technical concepts & README
+│   ├── context_anchors.md    # Working memory pointers
+│   └── current_session.md    # Session notes
 └── [backup files]            # Timestamped backups of original files
 ```
 
@@ -241,6 +243,6 @@ For questions or issues, refer to the comprehensive mode definitions in `custom_
 ---
 
 **Version**: 1.0  
-**Compatibility**: RooCode Extension  
+**Compatibility**: AI Assistant Extensions
 **Safety**: Comprehensive backup and rollback support  
 **Experience Level**: Beginner to Advanced

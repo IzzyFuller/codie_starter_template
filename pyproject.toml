@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "ai-assistant-starter-template"
+version = "1.0.0"
+description = "AI Assistant Starter Template with Memory System and Mode Definitions"
+authors = ["FasterOutcomes <team@fasteroutcomes.com>"]
+readme = "README.md"
+packages = [{include = "tests"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--disable-warnings",
+    "--cov=tests",
+    "--cov-report=term-missing"
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
