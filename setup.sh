@@ -6,6 +6,9 @@
 
 set -e  # Exit on any error
 
+# Global variable to store RooCode config directory
+ROOCODE_CONFIG_DIR=""
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -13,21 +16,21 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Function to print colored output
+# Function to print colored output (redirected to stderr to avoid capture in command substitution)
 print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+    echo -e "${BLUE}[INFO]${NC} $1" >&2
 }
 
 print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
+    echo -e "${GREEN}[SUCCESS]${NC} $1" >&2
 }
 
 print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
+    echo -e "${YELLOW}[WARNING]${NC} $1" >&2
 }
 
 print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+    echo -e "${RED}[ERROR]${NC} $1" >&2
 }
 
 print_header() {
@@ -38,6 +41,7 @@ print_header() {
 }
 
 # Function to find RooCode config directory
+# Sets the global variable ROOCODE_CONFIG_DIR
 find_roocode_config() {
     local standard_path="$HOME/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings"
     
@@ -45,17 +49,17 @@ find_roocode_config() {
     
     if [ -d "$standard_path" ]; then
         print_success "Found RooCode config directory at: $standard_path"
-        echo "$standard_path"
+        ROOCODE_CONFIG_DIR="$standard_path"
         return 0
     fi
     
     print_warning "Standard RooCode config directory not found at: $standard_path"
-    echo ""
+    echo "" >&2
     print_status "Please provide the path to your RooCode settings directory."
     print_status "This is typically located at:"
     print_status "  ~/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/"
     print_status "  or on Windows: %APPDATA%/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/"
-    echo ""
+    echo "" >&2
     
     while true; do
         read -p "Enter the full path to your RooCode settings directory: " user_path
@@ -65,11 +69,11 @@ find_roocode_config() {
         
         if [ -d "$expanded_path" ]; then
             print_success "Found RooCode config directory at: $expanded_path"
-            echo "$expanded_path"
+            ROOCODE_CONFIG_DIR="$expanded_path"
             return 0
         else
             print_error "Directory does not exist: $expanded_path"
-            echo ""
+            echo "" >&2
             read -p "Would you like to try again? (y/n): " try_again
             if [[ ! "$try_again" =~ ^[Yy]$ ]]; then
                 print_error "Setup cancelled. Cannot proceed without valid config directory."
@@ -112,7 +116,7 @@ backup_existing_files() {
 install_templates() {
     local config_dir="$1"
     local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    
+
     print_status "Installing template files..."
     
     # Check if template files exist
@@ -330,7 +334,8 @@ main() {
     echo ""
     
     # Step 1: Find RooCode config directory
-    config_dir=$(find_roocode_config)
+    find_roocode_config
+    config_dir="$ROOCODE_CONFIG_DIR"
     echo ""
     
     # Step 2: Backup existing configuration
