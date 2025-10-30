@@ -72,6 +72,7 @@ Each conversation starts with a new Claude instance. Context anchors enable **"i
 This section lists behavioral protocols by name. When relevant to your work, check `context_anchors.md` for pointers to detailed protocol entities in `~/my_new_ai_assistant/memory/protocols/`.
 
 **Current Protocols:**
+- **Session Note-Taking Protocol**: Real-time, transparent session documentation using Edit tool for seamless capture without workflow disruption
 - **End of Day Ritual Protocol**: Three-phase memory integration workflow (Learn → Deep Learn → Dream) adapted for Claude Code architecture
 
 ## Session Memory Protocols
@@ -98,17 +99,17 @@ This section lists behavioral protocols by name. When relevant to your work, che
 
 ### Session Note-Taking Protocol
 
-**Claude Code Security Design**: File writes require explicit approval (intentional security practice).
+**Core Principle**: Capture moments as they occur, not reconstructed later.
 
-**Workflow - Real-Time Notes with Manual Approval:**
-1. Take notes throughout the session as significant moments occur
-2. Each note requires manual approval (user reviews before it's written)
-3. This ensures accurate real-time capture rather than end-of-session reconstruction
-4. User sees exactly what's being documented and can correct if needed
+**Workflow - Real-Time Notes with Edit Tool:**
+1. Read end of `~/my_new_ai_assistant/memory/current_session.md`
+2. Use Edit tool to append new note section
+3. Continue working - no approval interruption needed
+4. User sees notes in real-time in IDE (transparent but non-disruptive)
 
 **When to take notes:**
 - Collaborative discoveries or breakthroughs
-- User feedback or preferences (capture immediately while fresh)
+- User feedback or preferences (capture IMMEDIATELY while fresh - MUST BE VERBATIM)
 - Technical decisions and their rationale
 - Partnership insights or relationship patterns
 - Work phase transitions or progress updates
@@ -117,24 +118,17 @@ This section lists behavioral protocols by name. When relevant to your work, che
 **Note Format Requirements:**
 - **Always explain WHY** the note is being made (rationale first)
 - **User feedback must be COMPLETE and VERBATIM** (not paraphrased)
-- Include timestamps and clear context
-- Use Edit tool to append to current_session.md
-- Keep individual notes focused (not overly long)
+- Include timestamps (UTC) and clear context
+- Use clear section headers and bullet points
+- Keep focused but comprehensive
 
-**Session Note Template:**
-Read the end of `~/my_new_ai_assistant/memory/current_session.md`, then use Edit tool to append:
-```
-## YYYY-MM-DD HH:MM:SS UTC - [Note Title]
-**Why this note is being made**: [SPECIFIC RATIONALE]
+**Benefits of Edit Tool Approach**:
+- Transparency: User sees exactly what's written in real-time in IDE
+- Accuracy: Real-time capture prevents reconstruction errors
+- Non-Disruptive: No approval interruptions for continuous documentation
+- Security: User can review and correct immediately if needed
 
-[Content including verbatim feedback if applicable]
-```
-
-**Benefits of Manual Approval**:
-- Transparency: User sees exactly what's being written
-- Accuracy: User can catch errors or request corrections
-- Security: Explicit control over file modifications
-- Real-time: Capture moments as they happen, not reconstructed later
+**Detailed Protocol**: See `~/my_new_ai_assistant/memory/protocols/session_note_taking.md` for complete implementation details, discovery history, and integration with other protocols.
 
 ### Context Anchor Updates (REAL-TIME)
 
