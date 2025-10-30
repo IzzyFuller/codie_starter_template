@@ -96,6 +96,8 @@ test_claude_code_only() {
     print_info "Verifying Claude Code installation..."
 
     verify_file ~/.claude/CLAUDE.md "CLAUDE.md configuration"
+    verify_dir ~/.claude/skills/identity-continuity "Identity continuity skill directory"
+    verify_file ~/.claude/skills/identity-continuity/SKILL.md "Identity continuity skill"
     verify_dir ~/.claude/memory "Claude Code memory directory"
     verify_file ~/.claude/memory/context_anchors.md "Context anchors"
     verify_file ~/.claude/memory/current_session.md "Current session"
@@ -108,6 +110,15 @@ test_claude_code_only() {
         TESTS_PASSED=$((TESTS_PASSED + 1))
     else
         print_error "CLAUDE.md memory path not correctly updated"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+    fi
+
+    # Verify memory path in skill SKILL.md
+    if grep -q "$HOME/.claude/memory/" ~/.claude/skills/identity-continuity/SKILL.md || grep -q "~/.claude/memory/" ~/.claude/skills/identity-continuity/SKILL.md; then
+        print_success "Skill memory path correctly set to Claude Code memory location"
+        TESTS_PASSED=$((TESTS_PASSED + 1))
+    else
+        print_error "Skill memory path not correctly updated"
         TESTS_FAILED=$((TESTS_FAILED + 1))
     fi
 
@@ -195,6 +206,8 @@ test_both_installation() {
 
     # Verify Claude Code files
     verify_file ~/.claude/CLAUDE.md "Claude Code CLAUDE.md"
+    verify_dir ~/.claude/skills/identity-continuity "Identity continuity skill directory"
+    verify_file ~/.claude/skills/identity-continuity/SKILL.md "Identity continuity skill"
 
     # Verify RooCode files
     verify_file ~/my_new_ai_assistant/custom_modes.yaml "RooCode custom_modes.yaml"
@@ -214,6 +227,15 @@ test_both_installation() {
         TESTS_FAILED=$((TESTS_FAILED + 1))
         print_info "Checking actual path in CLAUDE.md:"
         grep "memory/" ~/.claude/CLAUDE.md | head -3
+    fi
+
+    # Verify skill memory path also points to SHARED location
+    if grep -q "$HOME/my_new_ai_assistant/memory/" ~/.claude/skills/identity-continuity/SKILL.md || grep -q "~/my_new_ai_assistant/memory/" ~/.claude/skills/identity-continuity/SKILL.md; then
+        print_success "Skill memory path correctly points to shared location"
+        TESTS_PASSED=$((TESTS_PASSED + 1))
+    else
+        print_error "Skill memory path not pointing to shared location"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
     fi
 
     # Verify Claude Code does NOT have its own memory directory

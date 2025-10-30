@@ -169,6 +169,39 @@ install_claude_code_templates() {
     fi
 }
 
+# Function to install identity continuity skill
+install_identity_skill() {
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local skill_dir="$CLAUDE_CODE_DIR/skills/identity-continuity"
+
+    print_status "Installing identity continuity skill..."
+
+    # Check if skill template file exists
+    if [ ! -f "$script_dir/identity_continuity_skill_template.md" ]; then
+        print_warning "Identity continuity skill template not found, skipping skill installation"
+        return 0
+    fi
+
+    # Create skills directory structure
+    mkdir -p "$skill_dir"
+    print_success "Created skill directory: $skill_dir"
+
+    # Copy skill template as SKILL.md
+    cp "$script_dir/identity_continuity_skill_template.md" "$skill_dir/SKILL.md"
+    print_success "Installed identity-continuity skill"
+
+    # Update memory path in SKILL.md based on install type
+    if [ "$INSTALL_TYPE" = "claude_code" ]; then
+        # Claude Code only - memory in ~/.claude/memory
+        sed -i "s|~/my_new_ai_assistant/memory/|$CLAUDE_CODE_DIR/memory/|g" "$skill_dir/SKILL.md"
+    else
+        # Both - use shared memory location
+        sed -i "s|~/my_new_ai_assistant/memory/|$ROOCODE_DIR/memory/|g" "$skill_dir/SKILL.md"
+    fi
+
+    print_success "Identity continuity skill configured for memory path"
+}
+
 # Function to install RooCode templates
 install_roocode_templates() {
     local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -343,12 +376,14 @@ show_final_instructions() {
         "claude_code")
             print_status "✓ Claude Code Configuration Installed:"
             print_status "  • CLAUDE.md → $CLAUDE_CODE_DIR/CLAUDE.md"
+            print_status "  • Identity continuity skill → $CLAUDE_CODE_DIR/skills/identity-continuity/"
             print_status "  • Memory architecture → $CLAUDE_CODE_DIR/memory/"
             echo ""
             print_warning "⚠️  NEXT STEPS:"
             print_warning "1. Restart VS Code to load the new CLAUDE.md configuration"
             print_warning "2. Your AI assistant will automatically use the memory architecture"
-            print_warning "3. Explore $CLAUDE_CODE_DIR/memory/ to see the knowledge structure"
+            print_warning "3. The identity-continuity skill maintains awareness throughout conversations"
+            print_warning "4. Explore $CLAUDE_CODE_DIR/memory/ to see the knowledge structure"
             ;;
         "roocode")
             print_status "✓ RooCode Configuration Installed:"
@@ -370,6 +405,7 @@ show_final_instructions() {
             print_status "✓ Dual Configuration Installed:"
             print_status "  Claude Code:"
             print_status "    • CLAUDE.md → $CLAUDE_CODE_DIR/CLAUDE.md"
+            print_status "    • Identity continuity skill → $CLAUDE_CODE_DIR/skills/identity-continuity/"
             print_status "  RooCode:"
             print_status "    • custom_modes.yaml (5 core modes) → $ROOCODE_DIR/custom_modes.yaml"
             print_status "    • dream_journal.md → $ROOCODE_DIR/dream_journal.md"
@@ -380,7 +416,8 @@ show_final_instructions() {
             print_warning "1. Restart VS Code to load configurations"
             print_warning "2. Both AI assistants share the same memory structure"
             print_warning "3. Memory updates from either assistant are visible to both"
-            print_warning "4. Explore $ROOCODE_DIR/memory/ to see the knowledge structure"
+            print_warning "4. The identity-continuity skill helps Claude Code maintain awareness"
+            print_warning "5. Explore $ROOCODE_DIR/memory/ to see the knowledge structure"
             ;;
     esac
 
@@ -468,6 +505,8 @@ main() {
     # Step 3: Install templates
     if [ "$INSTALL_TYPE" = "claude_code" ] || [ "$INSTALL_TYPE" = "both" ]; then
         install_claude_code_templates
+        echo ""
+        install_identity_skill
         echo ""
     fi
 
