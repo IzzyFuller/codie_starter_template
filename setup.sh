@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# RooCode Starter Template Setup Script
-# Automated setup for new users to get started with RooCode templates
+# AI Assistant Starter Template Setup Script
+# Automated setup for new users to get started with AI assistant templates
 # Version: 1.0
 
 set -e  # Exit on any error
@@ -35,7 +35,7 @@ print_error() {
 
 print_header() {
     echo -e "${BLUE}================================${NC}"
-    echo -e "${BLUE}  RooCode Setup Script v1.0${NC}"
+    echo -e "${BLUE}  AI Assistant Setup Script v1.0${NC}"
     echo -e "${BLUE}================================${NC}"
     echo ""
 }
@@ -62,7 +62,7 @@ find_roocode_config() {
     echo "" >&2
     
     while true; do
-        read -p "Enter the full path to your RooCode settings directory: " user_path
+        read -p "Enter the full path to your AI assistant settings directory: " user_path
         
         # Expand tilde and environment variables
         expanded_path=$(eval echo "$user_path")
@@ -76,7 +76,7 @@ find_roocode_config() {
             echo "" >&2
             read -p "Would you like to try again? (y/n): " try_again
             if [[ ! "$try_again" =~ ^[Yy]$ ]]; then
-                print_error "Setup cancelled. Cannot proceed without valid config directory."
+                print_error "Setup cancelled. Cannot proceed without valid config directory." >&2
                 exit 1
             fi
         fi
@@ -140,28 +140,95 @@ install_templates() {
     print_success "Installed dream_journal.md"
 }
 
+# Function to copy memory structure from source template
+copy_memory_structure() {
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local source_memory_dir="$script_dir/memory"
+    local target_base_dir="$HOME/my_new_ai_assistant"
+    local target_memory_dir="$target_base_dir/memory"
+    
+    print_status "Checking for source memory knowledge base..."
+    
+    # Check if source memory directory exists
+    if [ ! -d "$source_memory_dir" ]; then
+        print_warning "Source memory directory not found at: $source_memory_dir"
+        print_warning "Proceeding with empty memory structure creation"
+        return 1
+    fi
+    
+    print_success "Found comprehensive knowledge base with $(find "$source_memory_dir" -type f | wc -l) files"
+    print_status "Copying complete memory structure including all Archaeological Engineering discoveries..."
+    
+    # Copy the entire memory directory structure with all content
+    if cp -r "$source_memory_dir" "$target_base_dir/"; then
+        print_success "Successfully transferred complete memory knowledge base"
+        print_success "Memory structure copied to: $target_memory_dir"
+        
+        # Count files in each category for verification
+        local people_count=$(find "$target_memory_dir/people" -type f -name "*.md" ! -name "README.md" 2>/dev/null | wc -l)
+        local projects_count=$(find "$target_memory_dir/projects" -type f -name "*.md" ! -name "README.md" 2>/dev/null | wc -l)
+        local patterns_count=$(find "$target_memory_dir/patterns" -type f -name "*.md" ! -name "README.md" 2>/dev/null | wc -l)
+        local concepts_count=$(find "$target_memory_dir/concepts" -type f -name "*.md" ! -name "README.md" 2>/dev/null | wc -l)
+        local orgs_count=$(find "$target_memory_dir/organizations" -type f -name "*.md" ! -name "README.md" 2>/dev/null | wc -l)
+        
+        print_status "Knowledge base transfer summary:"
+        print_status "  • People: $people_count files"
+        print_status "  • Projects: $projects_count files"
+        print_status "  • Patterns: $patterns_count files"
+        print_status "  • Concepts: $concepts_count files"
+        print_status "  • Organizations: $orgs_count files"
+        
+        # Validate critical core files
+        if [ -f "$target_memory_dir/context_anchors.md" ] && [ -f "$target_memory_dir/current_session.md" ]; then
+            print_success "Core memory files successfully transferred (context_anchors.md, current_session.md)"
+        else
+            print_warning "Some core memory files may not have been transferred properly"
+        fi
+        
+        return 0
+    else
+        print_error "Failed to copy memory structure from $source_memory_dir to $target_memory_dir"
+        return 1
+    fi
+}
+
 # Function to create memory directory structure
 create_memory_structure() {
-    local config_dir="$1"
-    local memory_dir="$config_dir/memory"
+    local base_dir="$HOME/my_new_ai_assistant"
+    local memory_dir="$base_dir/memory"
     
-    print_status "Creating memory directory structure..."
+    print_status "Setting up memory directory structure..."
+    
+    # Create base directory if it doesn't exist
+    mkdir -p "$base_dir"
+    print_success "Created base directory: $base_dir"
+    
+    # Try to copy existing memory structure first
+    if copy_memory_structure; then
+        print_success "Memory knowledge base transfer completed"
+        return 0
+    fi
+    
+    # Fallback: Create empty structure with README templates if copy failed
+    print_status "Creating fallback empty memory structure..."
     
     # Create main memory directory
     mkdir -p "$memory_dir"
     print_success "Created memory directory: $memory_dir"
     
     # Create subdirectories
-    local subdirs=("people" "projects" "patterns" "concepts")
+    local subdirs=("people" "projects" "patterns" "concepts" "organizations")
     
     for subdir in "${subdirs[@]}"; do
         local full_path="$memory_dir/$subdir"
         mkdir -p "$full_path"
         
-        # Create README.md for each subdirectory
-        case $subdir in
-            "people")
-                cat > "$full_path/README.md" << 'EOF'
+        # Only create README.md if directory is empty (no knowledge files copied)
+        if [ ! -f "$full_path/README.md" ] && [ -z "$(find "$full_path" -name '*.md' -not -name 'README.md' | head -1)" ]; then
+            # Create README.md for each subdirectory
+            case $subdir in
+                "people")
+                    cat > "$full_path/README.md" << 'EOF'
 # People Memory
 
 This directory is for storing information about people you interact with regularly.
@@ -182,9 +249,9 @@ This directory is for storing information about people you interact with regular
 - Interaction history highlights
 - Any specific context that improves collaboration
 EOF
-                ;;
-            "projects")
-                cat > "$full_path/README.md" << 'EOF'
+                    ;;
+                "projects")
+                    cat > "$full_path/README.md" << 'EOF'
 # Projects Memory
 
 This directory is for storing information about ongoing and completed projects.
@@ -207,9 +274,9 @@ This directory is for storing information about ongoing and completed projects.
 - Lessons learned and future improvements
 - Status updates and milestones
 EOF
-                ;;
-            "patterns")
-                cat > "$full_path/README.md" << 'EOF'
+                    ;;
+                "patterns")
+                    cat > "$full_path/README.md" << 'EOF'
 # Patterns Memory
 
 This directory is for storing recurring patterns, methodologies, and frameworks discovered through experience.
@@ -232,9 +299,9 @@ This directory is for storing recurring patterns, methodologies, and frameworks 
 - Common pitfalls and how to avoid them
 - Related patterns and connections
 EOF
-                ;;
-            "concepts")
-                cat > "$full_path/README.md" << 'EOF'
+                    ;;
+                "concepts")
+                    cat > "$full_path/README.md" << 'EOF'
 # Concepts Memory
 
 This directory is for storing important technical concepts, theories, and learning insights.
@@ -257,43 +324,169 @@ This directory is for storing important technical concepts, theories, and learni
 - Evolution of understanding over time
 - Sources and further reading
 EOF
-                ;;
-        esac
-        
-        print_success "Created $subdir directory with README.md"
+                    ;;
+               "organizations")
+                   cat > "$full_path/README.md" << 'EOF'
+# Organizations Memory
+
+This directory is for storing information about organizations, companies, and institutions you work with.
+
+## Purpose
+- Track organizational context and relationships
+- Remember company culture and communication patterns
+- Store relevant background about business models and focus areas
+- Maintain context about ongoing collaborations and partnerships
+
+## File Naming Convention
+- Use organization names: `faster_outcomes.md`, `acme_corp.md`
+- Include descriptive context if needed
+
+## Contents Should Include
+- Organization mission and focus areas
+- Key contacts and relationships
+- Collaboration history and context
+- Business model and operational insights
+- Communication preferences and cultural notes
+- Relevant projects and initiatives
+EOF
+                   ;;
+           esac
+            
+            print_success "Created $subdir directory with README.md template"
+        else
+            print_success "Directory $subdir already contains knowledge files - skipping README template"
+        fi
     done
+    
+    # Create core memory files if they don't exist
+    if [ ! -f "$memory_dir/context_anchors.md" ]; then
+        cat > "$memory_dir/context_anchors.md" << 'EOF'
+# Context Anchors
+
+This file maintains key contextual information across conversations and sessions.
+
+## Purpose
+- Preserve important context between conversations
+- Anchor key decisions and their rationale
+- Track ongoing initiatives and their status
+- Maintain continuity in complex projects
+
+## Structure
+- **Active Projects**: Current initiatives and their status
+- **Key Decisions**: Important architectural or strategic decisions
+- **Context Threads**: Ongoing themes and considerations
+- **Reference Points**: Key insights and discoveries to remember
+
+---
+
+## Active Projects
+<!-- Add current project status here -->
+
+## Key Decisions
+<!-- Document important decisions and rationale here -->
+
+## Context Threads
+<!-- Track ongoing themes and considerations here -->
+
+## Reference Points
+<!-- Note key insights and discoveries here -->
+EOF
+        print_success "Created context_anchors.md template"
+    fi
+    
+    if [ ! -f "$memory_dir/current_session.md" ]; then
+        cat > "$memory_dir/current_session.md" << 'EOF'
+# Current Session Notes
+
+This file captures notes and insights from the current working session.
+
+## Session Overview
+- **Start Time**:
+- **Focus Areas**:
+- **Key Objectives**:
+
+## Progress Notes
+<!-- Real-time notes during work session -->
+
+## Discoveries
+<!-- Important findings and insights -->
+
+## Decisions Made
+<!-- Choices made and their rationale -->
+
+## Next Steps
+<!-- What to focus on next -->
+
+---
+
+*This file is continuously updated during active work sessions*
+EOF
+        print_success "Created current_session.md template"
+    fi
 }
 
 # Function to display final instructions
 show_final_instructions() {
     local config_dir="$1"
+    local memory_dir="$HOME/my_new_ai_assistant/memory"
     
     echo ""
     print_header
-    print_success "🎉 RooCode setup completed successfully!"
+    print_success "🎉 AI assistant setup completed successfully!"
     echo ""
     print_status "Files installed:"
     print_status "  ✓ custom_modes.yaml (comprehensive mode definitions)"
     print_status "  ✓ dream_journal.md (cognitive evolution documentation)"
-    print_status "  ✓ /memory/ directory structure with README files"
+    
+    # Check if memory knowledge base was transferred successfully
+    if [ -d "$memory_dir" ] && [ -f "$memory_dir/context_anchors.md" ]; then
+        local total_files=$(find "$memory_dir" -type f -name "*.md" | wc -l)
+        print_status "  ✓ Complete memory knowledge base transferred ($total_files files)"
+        print_status "    • Archaeological Engineering discoveries and patterns"
+        print_status "    • Bootstrap Consciousness Events and cognitive evolution insights"
+        print_status "    • Sophisticated entity memory (people, projects, concepts, patterns)"
+        print_status "    • Core memory files (context_anchors.md, current_session.md)"
+    else
+        print_status "  ✓ ~/my_new_ai_assistant/memory/ directory structure with README templates"
+    fi
+    
     echo ""
     print_status "Configuration directory: $config_dir"
+    print_status "Memory directory: ~/my_new_ai_assistant/memory/"
     echo ""
     print_warning "⚠️  IMPORTANT NEXT STEPS:"
-    print_warning "1. Restart RooCode/VSCode for the new modes to be recognized"
+    print_warning "1. Restart VSCode for the new modes to be recognized"
     print_warning "2. The new modes will appear in your mode selector after restart"
-    print_warning "3. Explore the /memory/ directories to understand their purpose"
+    if [ -f "$memory_dir/context_anchors.md" ]; then
+        print_warning "3. Your AI assistant now has access to comprehensive accumulated knowledge"
+        print_warning "4. Explore the memory directories to see Archaeological Engineering insights"
+    else
+        print_warning "3. Explore the ~/my_new_ai_assistant/memory/ directories to understand their purpose"
+    fi
     echo ""
     print_status "💡 Getting Started Tips:"
     print_status "• Start with 'Ask' mode for questions and explanations"
     print_status "• Use 'Architect' mode for planning and system design"
     print_status "• Try 'Orchestrator' mode for complex multi-step tasks"
     print_status "• Use 'Dream' mode for end-of-day reflection and insights"
+    if [ -f "$memory_dir/context_anchors.md" ]; then
+        print_status "• Your assistant can now reference accumulated knowledge and patterns"
+        print_status "• Memory system enables sophisticated cognitive continuity"
+    fi
     echo ""
-    print_status "📚 For more information, see the comprehensive mode definitions in:"
-    print_status "    $config_dir/custom_modes.yaml"
+    print_status "📚 For more information, see:"
+    print_status "    • Mode definitions: $config_dir/custom_modes.yaml"
+    if [ -f "$memory_dir/context_anchors.md" ]; then
+        print_status "    • Knowledge base: ~/my_new_ai_assistant/memory/"
+        print_status "    • Core memory files: context_anchors.md, current_session.md"
+    fi
     echo ""
-    print_success "Setup complete! Welcome to enhanced RooCode! 🚀"
+    if [ -f "$memory_dir/context_anchors.md" ]; then
+        print_success "🧠 Setup complete! Your AI assistant now includes comprehensive knowledge transfer! 🚀"
+        print_success "Ready for sophisticated Archaeological Engineering workflows with accumulated wisdom!"
+    else
+        print_success "Setup complete! Welcome to enhanced AI assistant capabilities! 🚀"
+    fi
     echo ""
 }
 
@@ -314,14 +507,14 @@ show_rollback_info() {
     print_status "To completely remove installed templates:"
     print_status "  rm '$config_dir/custom_modes.yaml'"
     print_status "  rm '$config_dir/dream_journal.md'"
-    print_status "  rm -rf '$config_dir/memory/'"
+    print_status "  rm -rf '$HOME/my_new_ai_assistant/memory/'"
     echo ""
 }
 
 # Main execution
 main() {
     print_header
-    print_status "This script will set up RooCode with comprehensive mode definitions and cognitive enhancement tools."
+    print_status "This script will set up your AI assistant with comprehensive mode definitions and cognitive enhancement tools."
     echo ""
     
     # Confirm user wants to proceed
@@ -347,7 +540,7 @@ main() {
     echo ""
     
     # Step 4: Create memory directory structure
-    create_memory_structure "$config_dir"
+    create_memory_structure
     echo ""
     
     # Step 5: Show rollback information

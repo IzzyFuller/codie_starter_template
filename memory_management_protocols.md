@@ -90,7 +90,7 @@ The proposed changes enhance rather than restrict the philosophical frameworks d
 
 **Primary Restoration Command:**
 ```bash
-cp /home/izzy_fo/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/custom_modes_backup_2025-09-10_18-07-35.yaml /home/izzy_fo/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/custom_modes.yaml
+cp ~/my_new_ai_assistant/custom_modes_backup_2025-09-10_18-07-35.yaml ~/my_new_ai_assistant/custom_modes.yaml
 ```
 
 **Success Criteria:**
