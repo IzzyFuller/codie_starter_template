@@ -1,0 +1,32 @@
+# Test environment for AI Assistant Starter Template
+# Provides a clean Ubuntu environment to test installation scripts
+
+FROM ubuntu:22.04
+
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install basic tools
+RUN apt-get update && apt-get install -y \
+    bash \
+    coreutils \
+    findutils \
+    grep \
+    sed \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a test user (similar to real user environment)
+RUN useradd -m -s /bin/bash testuser
+
+# Switch to test user
+USER testuser
+WORKDIR /home/testuser
+
+# Copy the template files into the container
+COPY --chown=testuser:testuser . /home/testuser/my-new-ai-assistant/
+
+# Set working directory to template location
+WORKDIR /home/testuser/my-new-ai-assistant
+
+# Default command - bash shell for interactive testing
+CMD ["/bin/bash"]

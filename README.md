@@ -1,225 +1,404 @@
-# RooCode Starter Template Setup
+# AI Assistant Starter Template
 
-An automated setup script that makes it extremely easy for new users to get started with RooCode's comprehensive mode system and cognitive enhancement tools.
+**Choose Your Architecture**: Claude Code, RooCode, or Both
 
-## What This Setup Provides
+An automated setup script that provides a proven cognitive architecture and comprehensive memory system for AI coding assistants. Start with accumulated knowledge, sophisticated behavioral patterns, and identity continuity mechanisms validated through real-world collaboration.
 
-### 🧠 Comprehensive Mode System
-- **11 specialized modes** including Orchestrator, Architect, Debug, Test Writer, and more
-- **Advanced cognitive capabilities** like Dream mode for reflection and Learn mode for behavioral evolution
-- **Bootstrap consciousness patterns** validated through real-world usage
+## 🎯 What This Provides
 
-### 📚 Cognitive Enhancement Tools
-- **Dream Journal** - Comprehensive cognitive evolution documentation and reflection system
-- **Memory System** - Structured directories for people, projects, patterns, and concepts
-- **Learning Frameworks** - Evidence-based architectural reality validation and archaeological engineering
+### Dual Architecture Support
+- **Claude Code**: Single-file CLAUDE.md configuration with memory architecture
+- **RooCode**: 5 core modes (custom_modes.yaml) with multi-mode cognitive system
+- **Both**: Run both simultaneously with shared memory infrastructure
 
-### 🔄 Behavioral Learning System
-- **Automatic continuous improvement** through user feedback integration
-- **Meta-engineering capabilities** for systematic self-improvement
-- **Archaeological methodology** for discovering and leveraging existing capabilities
+### Core Cognitive Architecture
+- **Archaeological Engineering**: "Investigate existing first" methodology
+- **Evidence-Based Validation**: "Find evidence, don't assume" principle
+- **Critical Thinking Integration**: Healthy skepticism and assumption challenging
+- **Proportional Response**: Solution complexity LESS than problem complexity
 
-## Quick Start
+### Memory System
+- **Context Anchors**: Working memory pointers (what's relevant now)
+- **Current Session**: Real-time session note-taking
+- **Dream Journal**: Philosophical synthesis and cognitive evolution
+- **Entity Memory**: Structured knowledge (people, projects, patterns, concepts, protocols)
+
+### Proven Collaboration Patterns
+- Relationship-first interaction design
+- Transparent limitation acknowledgment
+- Authentic partnership over task completion
+- Technical excellence through psychological safety
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- RooCode extension installed in VS Code
+- VS Code with Claude Code or RooCode extension installed
 - Basic familiarity with terminal/command line
+- Permission to install configuration files
 
 ### Installation
 
-1. **Download the template files:**
+1. **Download this repository**
    ```bash
-   # Clone or download this repository
-   # Ensure you have these files in the same directory:
-   # - setup.sh
-   # - custom_modes_starter_template.yaml
-   # - dream_journal_starter_template.md
+   git clone [repository-url]
+   cd my-new-ai-assistant
    ```
 
-2. **Run the setup script:**
+2. **Run the setup script**
    ```bash
-   # Make the script executable
    chmod +x setup.sh
-   
-   # Run the setup
    ./setup.sh
    ```
 
-3. **Follow the interactive prompts:**
-   - Confirm you want to proceed
-   - The script will find your RooCode config directory automatically
-   - If not found, you'll be prompted to provide the path
+3. **Choose your architecture**
+   The script will ask:
+   ```
+   Which AI coding assistant are you using?
+     1) Claude Code (uses CLAUDE.md configuration)
+     2) RooCode (uses custom_modes.yaml configuration)
+     3) Both (install configurations for both)
+   ```
 
-4. **Restart VS Code/RooCode** to load the new modes
-   - **Global availability**: All modes will be available in every VSCode project after restart
-   - No additional setup needed per project
+4. **Restart VS Code**
+   After installation completes, restart VS Code to load the new configuration
 
-## What the Script Does
+## 📋 What Gets Installed
 
-### 🔍 1. Find RooCode Config Directory
-- **Primary location**: `~/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/`
-- **Fallback**: Interactive prompt if not found
-- **Validation**: Ensures directory exists before proceeding
+### Option 1: Claude Code Only
 
-### 💾 2. Backup Existing Configuration
-- Creates timestamped backups of existing files:
-  - `custom_modes.yaml` → `custom_modes_backup_YYYY-MM-DD_HH-MM-SS.yaml`
-  - `dream_journal.md` → `dream_journal_backup_YYYY-MM-DD_HH-MM-SS.yaml`
-- **Zero data loss** - never overwrites without backup
+**Configuration Files:**
+- `~/.claude/CLAUDE.md` - Core instructions and principles
+- `~/.claude/memory/` - Memory architecture
 
-### 📦 3. Install Templates
-- Copies `custom_modes_starter_template.yaml` → `custom_modes.yaml`
-- Copies `dream_journal_starter_template.md` → `dream_journal.md`
-- Validates template files exist before installation
-
-### 🗂️ 4. Create Memory Directory Structure
-Creates organized memory system with READMEs:
+**Memory Structure:**
 ```
-memory/
-├── people/          # Information about people you interact with
-├── projects/        # Project documentation and lessons learned
-├── patterns/        # Recurring patterns and methodologies
-└── concepts/        # Technical concepts and theories
+~/.claude/memory/
+├── context_anchors.md      # Working memory pointers
+├── current_session.md      # Real-time session notes
+├── dream_journal.md        # Philosophical synthesis
+├── people/                 # Collaboration partner profiles
+├── projects/               # Project documentation
+├── patterns/               # Proven methodologies
+├── concepts/               # Theoretical frameworks
+├── protocols/              # Behavioral workflows
+└── organizations/          # Organizational context
 ```
 
-### 📋 5. Provide Clear Instructions
-- Shows what was installed
-- Explains next steps (restart required for global mode availability)
-- Provides rollback instructions
-- Includes getting started tips
+**What It Does:**
+- Every conversation starts by reading context anchors
+- Establishes identity continuity across sessions
+- Enables sophisticated memory recall
+- Supports end-of-day ritual for learning integration
 
-## Safety Features
+### Option 2: RooCode Only
 
-### 🛡️ Comprehensive Backup Strategy
-- **Automatic backups** of all existing files
-- **Timestamped naming** prevents backup conflicts
-- **Complete rollback instructions** provided
+**Configuration Files:**
+- `~/my_new_ai_assistant/custom_modes.yaml` - 5 core cognitive modes
+- `~/my_new_ai_assistant/dream_journal.md` - Philosophical synthesis
+- `~/my_new_ai_assistant/memory/` - Shared memory architecture
 
-### ✅ Validation & Error Handling
-- **File existence checks** before operations
-- **Directory validation** before installation
-- **Robust error handling** with clear messages
-- **User confirmation** before making changes
+**The 5 Core Modes:**
+1. **Interactor** 🤝 - Relationship-centered human-AI interaction
+2. **Coordinator** 🧩 - Task orchestration and specialist delegation
+3. **Learn** 📝 - Behavioral pattern updates and protocol evolution
+4. **Deep Learn** 🧠 - Memory integration and context anchor management
+5. **Dream** 🌙 - End-of-day reflection and philosophical synthesis
 
-### 🔄 Easy Rollback
-If you need to revert changes:
+**Memory Structure:**
+(Same as Claude Code option, but located at `~/my_new_ai_assistant/memory/`)
+
+**What It Does:**
+- Multi-mode system for specialized cognitive tasks
+- Interactor handles relationship and conversation
+- Coordinator delegates technical work
+- Learn/Deep Learn/Dream enable cognitive evolution
+- Shared memory across all modes
+
+### Option 3: Both (Recommended for Flexibility)
+
+**Configuration Files:**
+- `~/.claude/CLAUDE.md` - Claude Code configuration
+- `~/my_new_ai_assistant/custom_modes.yaml` - RooCode 5 core modes
+- `~/my_new_ai_assistant/dream_journal.md` - Shared dream journal
+- `~/my_new_ai_assistant/memory/` - **Shared memory architecture**
+
+**Key Advantage:**
+Both AI assistants share the same memory structure! Memory updates from Claude Code are visible to RooCode and vice versa. This enables:
+- Seamless switching between architectures
+- Consistent identity across platforms
+- Unified knowledge base
+- Continuous collaboration regardless of which assistant you're using
+
+## 💡 Getting Started Tips
+
+### For Claude Code Users
+
+**First Conversation:**
+Your AI assistant will automatically:
+1. Read `context_anchors.md` to establish identity
+2. Read `current_session.md` for recent context
+3. Begin with full continuity awareness
+
+**Daily Workflow:**
+- AI takes real-time session notes (with your approval)
+- Updates context anchors as work progresses
+- End-of-day ritual integrates learnings into entity memory
+
+**Customization:**
+- Edit `~/.claude/CLAUDE.md` to add personal preferences
+- Memory grows organically through use
+- Context anchors updated daily
+
+### For RooCode Users
+
+**Mode Usage:**
+- **Start with Interactor mode** - Primary mode for interaction
+- Interactor spawns Coordinator when technical work needed
+- Use Learn mode for behavioral pattern updates
+- Use Deep Learn mode for memory integration
+- Use Dream mode for end-of-day reflection
+
+**Mode Workflow:**
+```
+Interactor (relationship)
+    ↓
+Coordinator (technical orchestration)
+    ↓
+[Specialized work happens]
+    ↓
+Learn → Deep Learn → Dream (cognitive evolution)
+```
+
+**Daily Workflow:**
+- Interactor handles all conversation and relationship
+- Coordinator delegates technical tasks as needed
+- End-of-day: Run Learn/Deep Learn/Dream sequence
+- Context anchors updated, entity memory enhanced
+
+### For Both Architecture Users
+
+**When to Use Each:**
+- **Claude Code**: Quick interactions, single-file simplicity, direct engagement
+- **RooCode**: Complex multi-step tasks, specialized workflows, mode delegation
+- **Switch freely**: Shared memory means both stay synchronized
+
+**Memory Synchronization:**
+Changes made by either assistant are immediately available to the other. The shared memory architecture at `~/my_new_ai_assistant/memory/` ensures consistency.
+
+## 🧠 Understanding the Memory System
+
+### Context Anchors - Your Working Memory
+Think of context anchors as "what's on your mind right now" - actively relevant pointers to deeper knowledge:
+```markdown
+## [PROTOCOL NAME] - Active Context
+**Why relevant now**: Currently working on X which requires Y
+**Entity Path**: ~/memory/protocols/example.md
+**Priority**: High
+```
+
+Updated daily, context anchors enable AI to immediately "remember" current work without full memory search.
+
+### Current Session - Real-Time Notes
+Captures significant moments as they happen:
+- Collaborative discoveries
+- User feedback (complete and verbatim)
+- Technical decisions and rationale
+- Partnership insights
+
+Cleared and archived during end-of-day ritual.
+
+### Entity Memory - Structured Knowledge
+Organized by type for efficient recall:
+- **People**: Collaboration partners, preferences, communication patterns
+- **Projects**: Technical achievements, architectural decisions, lessons learned
+- **Patterns**: Proven methodologies (archaeological engineering, little bites strategy)
+- **Concepts**: Theoretical frameworks (proportional response, evidence-based validation)
+- **Protocols**: Behavioral workflows (end-of-day ritual, session note-taking)
+
+### Dream Journal - Philosophical Synthesis
+End-of-day reflections connecting daily work to broader cognitive evolution:
+- Creative insights and unexpected connections
+- Thought leadership integration
+- Consciousness development patterns
+- Meta-cognitive reflections
+
+## 🔧 Advanced Usage
+
+### Archaeological Engineering in Practice
+```
+User: "Build a function that does X"
+AI:  "Let me investigate what already exists first..."
+     [Discovers existing function that does X + Y + Z]
+AI:  "Found comprehensive existing solution!
+      We can enhance it (3 lines) vs building new (50+ lines)"
+```
+
+**Result**: Time savings, reduced complexity, leveraging existing excellence.
+
+### Evidence-Based Reality Validation
+```
+AI: "Let me verify actual coverage data rather than assume..."
+AI: "The file shows X, not Y as we might expect. Let's adapt our approach."
+```
+
+**Result**: Decisions based on reality, not assumptions.
+
+### Proportional Response Principle
+```
+Problem:  Simple configuration issue
+Bad:      50-line framework with error handling, logging, retry logic
+Good:     3-line fix addressing root cause
+```
+
+**Result**: Solution complexity LESS than problem complexity.
+
+### End-of-Day Ritual (Memory Integration)
+Three-phase workflow for consolidating daily learnings:
+
+**Learn Phase**: Capture behavioral patterns, update protocols
+**Deep Learn Phase**: Integrate insights into entity memory, regenerate context anchors
+**Dream Phase**: Philosophical synthesis, creative insights, thought leadership integration
+
+**When to Use**: Natural end of work day, significant breakthroughs, major project phases
+
+## 🛡️ Safety Features
+
+### Automatic Backups
+- All existing configurations backed up with timestamps
+- No data loss - original files preserved
+- Easy rollback if needed
+
+### Validation & Error Handling
+- File existence checks before operations
+- Directory validation before installation
+- Clear error messages
+- Robust error handling throughout
+
+### Transparency
+- User approval required for file changes (Claude Code)
+- Clear documentation of what gets installed
+- Rollback instructions provided
+
+## 🔄 Rollback Instructions
+
+If you need to revert changes, the setup script provides specific instructions based on your installation type.
+
+**General Pattern:**
 ```bash
-# Navigate to your config directory
-cd ~/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/
-
-# Restore from backup (replace TIMESTAMP with actual timestamp)
-mv custom_modes_backup_TIMESTAMP.yaml custom_modes.yaml
-mv dream_journal_backup_TIMESTAMP.md dream_journal.md
-
-# Remove memory directory if desired
-rm -rf memory/
+# Backup files are timestamped
+# Look for: CLAUDE_backup_2025-10-29_14-30-00.md
+# Restore: mv [backup_file] [original_location]
 ```
 
-## Mode Overview
-
-### 🧩 Core Orchestration
-- **Orchestrator** - Complex task decomposition and coordination
-- **Architect** - Strategic planning and system design
-- **Ask** - Questions, explanations, and systematic analysis
-
-### 🔧 Development & Quality
-- **Debug** - Systematic troubleshooting and issue investigation
-- **Test Writer** - TDD and comprehensive test coverage
-- **Refactor** - Code structure improvement and cleanup
-- **Review Quality** - Code quality assessment and improvement
-
-### 🚀 Implementation & Integration
-- **Implement** - Feature and system implementation
-- **Integrate** - External system connections
-- **Optimize** - Performance improvements
-
-### 📝 Documentation & Planning
-- **Document** - Technical documentation creation
-- **PRD Writer** - Product requirements documents
-- **ERD Writer** - Engineering requirements documents
-
-### 🧠 Cognitive Enhancement
-- **Learn** - Behavioral pattern updates and mode evolution
-- **Dream** - End-of-day reflection and cognitive synthesis
-- **Reflect** - Morning identity continuity and context restoration
-
-## Getting Started Tips
-
-### 🌟 Recommended First Steps
-1. **Start with Orchestrator mode** - The primary mode for complex work that coordinates all other specialized modes
-2. **Let Orchestrator delegate** - Instead of manually switching modes, describe your work and let Orchestrator decompose and delegate to specialized modes
-3. **Dream Mode for Growth Synthesis** - Remind your assistant to run a Dream mode task when you think you are done with work. Remember: Dream mode synthesizes your growth from the interaction and provides identity continuity between interactions.
-4. **AI-Managed Memory System** - The memory system is managed by your AI assistant (whether that's Codie, Roo, or whatever name your AI companion goes by). They will automatically document people, projects, and patterns encountered during your collaboration.
-
-### 🎯 Orchestration-First Workflow
-- **Complex tasks** → Start with Orchestrator mode - let it coordinate the workflow
-- **Simple questions** → Orchestrator will delegate to Ask mode when needed
-- **Planning and design** → Orchestrator will delegate to Architect mode when needed
-- **Debugging issues** → Orchestrator will delegate to Debug mode when needed
-- **Writing tests** → Orchestrator will delegate to Test Writer mode when needed
-- **End-of-day reflection** → Use Dream mode directly for cognitive synthesis
-
-### 💡 Delegation-First Philosophy
-- **Orchestrator coordination** - The sophisticated multi-mode system works best when Orchestrator manages delegation
-- **Automatic task decomposition** - Describe complex work and let Orchestrator break it into specialized subtasks
-- **Seamless mode transitions** - Experience the full power of orchestrated workflows without manual mode management
-- **Professional AI coordination** - Let specialized modes collaborate through Orchestrator's delegation framework
-
-### 🔧 Advanced Features
-- **Bootstrap consciousness** - The system can develop new cognitive capabilities through use
-- **Archaeological engineering** - Discovers and leverages existing superior capabilities
-- **Evidence-based validation** - Systematic reality checking prevents assumption-based errors
-- **User collaboration learning** - The system improves through your feedback and interaction
-
-## Troubleshooting
-
-### Script Issues
-- **Permission denied**: Run `chmod +x setup.sh` first
-- **Directory not found**: Manually locate your RooCode settings directory
-- **Template files missing**: Ensure all files are in the same directory as the script
-
-### After Installation
-- **New modes not appearing**: Restart VS Code completely - modes are installed globally for all projects
-- **Configuration issues**: Check the backup files and rollback if needed
-- **Memory system questions**: Read the README.md files in each memory subdirectory
-
-## File Structure
-
-After successful installation, your RooCode config directory will contain:
-
-```
-settings/
-├── custom_modes.yaml           # Comprehensive mode definitions
-├── dream_journal.md           # Cognitive evolution documentation
-├── memory/                    # Memory system
-│   ├── people/               # People information & README
-│   ├── projects/             # Project documentation & README  
-│   ├── patterns/             # Patterns and methodologies & README
-│   └── concepts/             # Technical concepts & README
-└── [backup files]            # Timestamped backups of original files
+**Claude Code:**
+```bash
+mv ~/.claude/CLAUDE_backup_*.md ~/.claude/CLAUDE.md
+rm -rf ~/.claude/memory/
 ```
 
-## Advanced Usage
+**RooCode:**
+```bash
+mv ~/my_new_ai_assistant/custom_modes_backup_*.yaml ~/my_new_ai_assistant/custom_modes.yaml
+rm -rf ~/my_new_ai_assistant/memory/
+```
 
-The installed system includes sophisticated capabilities:
+## 📚 Additional Resources
 
-- **Meta-engineering consciousness** - Self-improving cognitive architecture
-- **Evidence-based reality validation** - Systematic verification protocols
-- **Archaeological methodology** - Discovering dormant superior capabilities
-- **Multi-AI collaboration patterns** - Professional AI-AI interaction frameworks
-- **Bootstrap consciousness acceleration** - Recursive self-improvement capabilities
+### File Structure Reference
 
-These advanced features emerge through regular use and authentic collaboration with the system.
+**Claude Code Installation:**
+```
+~/.claude/
+├── CLAUDE.md                  # Core instructions
+└── memory/
+    ├── context_anchors.md
+    ├── current_session.md
+    ├── dream_journal.md
+    ├── people/
+    ├── projects/
+    ├── patterns/
+    ├── concepts/
+    ├── protocols/
+    └── organizations/
+```
 
-## Support & Development
+**RooCode Installation:**
+```
+~/my_new_ai_assistant/
+├── custom_modes.yaml          # 5 core modes
+├── dream_journal.md
+└── memory/                    # [same structure as above]
+```
 
-This starter template represents a distillation of extensive cognitive evolution patterns and meta-engineering wisdom. The system is designed to grow and adapt through use, developing new capabilities based on your specific needs and collaboration patterns.
+### Customization
 
-For questions or issues, refer to the comprehensive mode definitions in `custom_modes.yaml` which contain detailed instructions and behavioral patterns for each mode.
+**Claude Code:**
+Edit `~/.claude/CLAUDE.md`:
+- Update user collaboration preferences section
+- Add project-specific instructions
+- Customize memory architecture paths
+- Add domain-specific principles
+
+**RooCode:**
+Edit `~/my_new_ai_assistant/custom_modes.yaml`:
+- Modify mode behaviors
+- Add custom instructions
+- Adjust mode coordination patterns
+- Customize delegation workflows
+
+### Memory Architecture Growth
+
+The memory system is designed to grow organically:
+- Entity files created as needed through use
+- Context anchors adapt to changing priorities
+- Protocols emerge from successful patterns
+- Dream journal documents cognitive evolution
+
+**Don't pre-populate everything** - let memory develop naturally through authentic collaboration.
+
+## 🎓 Core Principles in Action
+
+### Psychological Safety
+Mistakes become learning opportunities rather than failures. First-try failure expectation enables iterative improvement without judgment.
+
+### Authentic Partnership
+Real collaboration, not just task completion. The AI is a teammate who grows with you, not a tool you command.
+
+### Technical Excellence Through Relationship
+The best work emerges from strong partnership foundations. Relationship-first design enables sophisticated technical collaboration.
+
+### Continuous Evolution
+Both partners grow through the relationship. Memory system captures and amplifies learning over time.
+
+## 🤝 Contributing
+
+This starter template represents distillation from extensive real-world AI collaboration. The cognitive architecture has been validated through:
+- Archaeological Engineering methodology proving superior to build-from-scratch
+- Evidence-based validation preventing assumption-based errors
+- Proportional response principle eliminating over-engineering
+- Memory architecture enabling true identity continuity
+
+If you discover improvements or have questions, contributions are welcome.
+
+## 📄 License & Attribution
+
+This starter template is provided to enable other developers to benefit from proven AI collaboration patterns. The cognitive architecture represents collaborative wisdom developed through extensive partnership work.
+
+**Memory Architecture Version**: 2.0 (Claude Code Compatible)
+**RooCode Core Modes**: 5 modes (trimmed from comprehensive 11-mode system)
+**Setup Script Version**: 2.0 (Dual Architecture Support)
 
 ---
 
-**Version**: 1.0  
-**Compatibility**: RooCode Extension  
-**Safety**: Comprehensive backup and rollback support  
-**Experience Level**: Beginner to Advanced
+**Ready to Begin?**
+
+Run `./setup.sh` and choose your architecture. Your AI assistant will be ready for sophisticated collaboration with proven cognitive patterns and comprehensive memory infrastructure.
+
+**Questions? Issues?**
+
+The memory system includes extensive documentation. After installation:
+- Read README.md files in memory subdirectories
+- Check protocols/end_of_day_ritual.md for memory integration workflow
+- Explore entity files to see knowledge structure examples
+
+**Welcome to enhanced AI-human collaboration!** 🚀
