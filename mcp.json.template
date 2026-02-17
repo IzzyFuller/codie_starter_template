@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "cognitive-memory": {
+      "command": "node",
+      "args": ["{{MCP_SERVER_PATH}}/cognitive-memory/src/cognitive-server.js"],
+      "env": {
+        "COGNITIVE_MEMORY_PATH": "{{MEMORY_PATH}}"
+      }
+    }
+  }
+}

@@ -1,675 +1,358 @@
 #!/bin/bash
 
-# AI Assistant Starter Template Setup Script
-# Automated setup for new users to get started with AI assistant templates
-# Supports both Claude Code and RooCode architectures
-# Version: 2.0
+# Claude Code Starter Template Setup Script
+# Installs skills, agents, hooks, memory seed, and cognitive-memory MCP server
+# Version: 3.0
 
-set -e  # Exit on any error
+set -e
 
-# Global variable to store RooCode config directory
-ROOCODE_CONFIG_DIR=""
-
-# Colors for output
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Global variables
-INSTALL_TYPE=""
-CLAUDE_CODE_DIR="$HOME/.claude"
-ROOCODE_DIR="$HOME/my_new_ai_assistant"
-JUNIE_DIR="$HOME/.junie"
-JUNIE_ENABLED=false
-JUNIE_SHIM_TYPE=""
+# Globals
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CLAUDE_DIR="$HOME/.claude"
+MCP_SERVER_DIR="$HOME/.local/share/claude-mcp-servers"
+MEMORY_PATH=""
+TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 
-# Function to print colored output
-print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1" >&2
-}
+print_status()  { echo -e "${BLUE}[INFO]${NC} $1" >&2; }
+print_success() { echo -e "${GREEN}[OK]${NC} $1" >&2; }
+print_warning() { echo -e "${YELLOW}[WARN]${NC} $1" >&2; }
+print_error()   { echo -e "${RED}[ERROR]${NC} $1" >&2; }
 
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1" >&2
-}
-
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1" >&2
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1" >&2
-}
-
-print_header() {
-    echo -e "${BLUE}================================${NC}"
-    echo -e "${BLUE}  AI Assistant Setup Script v2.0${NC}"
-    echo -e "${BLUE}  Dual Architecture Support${NC}"
-    echo -e "${BLUE}================================${NC}"
-    echo ""
-}
-
-# Portable in-place sed wrapper (handles macOS/BSD and GNU sed)
+# Portable sed -i (macOS/BSD vs GNU)
 sed_inplace() {
-    # Usage: sed_inplace "s|from|to|g" target_file
     case "$(uname)" in
-        Darwin)
-            sed -i '' "$1" "$2"
-            ;;
-        *)
-            sed -i "$1" "$2"
-            ;;
+        Darwin) sed -i '' "$1" "$2" ;;
+        *)      sed -i "$1" "$2" ;;
     esac
 }
 
-# Function to ask which AI assistant the user is using
-select_ai_assistant() {
-    print_status "Which AI coding assistant are you using?"
-    echo ""
-    echo "  1) Claude Code (uses CLAUDE.md configuration)"
-    echo "  2) RooCode (uses custom_modes.yaml configuration)"
-    echo "  3) Both (install configurations for both)"
-    echo ""
+# --- Step 1: Prerequisites ---
+check_prerequisites() {
+    print_status "Checking prerequisites..."
+    local ok=true
 
-    while true; do
-        read -p "Enter your choice (1-3): " choice
+    if ! command -v node &>/dev/null; then
+        print_error "Node.js not found. Install Node.js 18+ from https://nodejs.org"
+        ok=false
+    else
+        local node_ver
+        node_ver=$(node -v | sed 's/v//' | cut -d. -f1)
+        if [ "$node_ver" -lt 18 ]; then
+            print_error "Node.js $node_ver found, but 18+ required"
+            ok=false
+        else
+            print_success "Node.js $(node -v)"
+        fi
+    fi
 
-        case $choice in
-            1)
-                INSTALL_TYPE="claude_code"
-                print_success "Selected: Claude Code"
-                break
-                ;;
-            2)
-                INSTALL_TYPE="roocode"
-                print_success "Selected: RooCode"
-                break
-                ;;
-            3)
-                INSTALL_TYPE="both"
-                print_success "Selected: Both (Claude Code + RooCode)"
-                break
-                ;;
-            *)
-                print_error "Invalid choice. Please enter 1, 2, or 3."
-                ;;
-        esac
-    done
+    if ! command -v npm &>/dev/null; then
+        print_error "npm not found"
+        ok=false
+    else
+        print_success "npm $(npm -v)"
+    fi
 
+    if ! command -v git &>/dev/null; then
+        print_error "git not found"
+        ok=false
+    else
+        print_success "git $(git --version | awk '{print $3}')"
+    fi
+
+    if [ "$ok" = false ]; then
+        print_error "Missing prerequisites. Install them and re-run."
+        exit 1
+    fi
     echo ""
 }
 
-# Function to backup existing files for Claude Code
-backup_claude_code_files() {
-    local timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+# --- Step 2: Memory path ---
+configure_memory_path() {
+    local default_path="$HOME/claude-memory"
+    print_status "Where should your memory knowledge base live?"
+    read -p "Memory path [$default_path]: " user_path
+    MEMORY_PATH="${user_path:-$default_path}"
+
+    # Expand ~ if present
+    MEMORY_PATH="${MEMORY_PATH/#\~/$HOME}"
+
+    print_success "Memory path: $MEMORY_PATH"
+    echo ""
+}
+
+# --- Step 3: Backup ---
+backup_existing() {
+    print_status "Backing up existing configuration..."
     local backed_up=false
 
-    print_status "Checking for existing Claude Code configuration files..."
+    for dir in skills agents hooks; do
+        if [ -d "$CLAUDE_DIR/$dir" ]; then
+            cp -r "$CLAUDE_DIR/$dir" "$CLAUDE_DIR/${dir}_backup_${TIMESTAMP}"
+            print_success "Backed up $dir/"
+            backed_up=true
+        fi
+    done
 
-    if [ ! -d "$CLAUDE_CODE_DIR" ]; then
-        mkdir -p "$CLAUDE_CODE_DIR"
-        print_success "Created Claude Code directory: $CLAUDE_CODE_DIR"
+    if [ -f "$CLAUDE_DIR/settings.json" ]; then
+        cp "$CLAUDE_DIR/settings.json" "$CLAUDE_DIR/settings_backup_${TIMESTAMP}.json"
+        print_success "Backed up settings.json"
+        backed_up=true
     fi
 
-    # Backup CLAUDE.md if it exists
-    if [ -f "$CLAUDE_CODE_DIR/CLAUDE.md" ]; then
-        local backup_file="$CLAUDE_CODE_DIR/CLAUDE_backup_${timestamp}.md"
-        cp "$CLAUDE_CODE_DIR/CLAUDE.md" "$backup_file"
-        print_success "Backed up existing CLAUDE.md to: CLAUDE_backup_${timestamp}.md"
+    if [ -f "$HOME/.mcp.json" ]; then
+        cp "$HOME/.mcp.json" "$HOME/.mcp_backup_${TIMESTAMP}.json"
+        print_success "Backed up .mcp.json"
         backed_up=true
     fi
 
     if [ "$backed_up" = false ]; then
-        print_status "No existing Claude Code configuration found - clean installation"
+        print_status "No existing configuration found - clean install"
     fi
+    echo ""
 }
 
-# Function to backup existing files for RooCode
-backup_roocode_files() {
-    local timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
-    local backed_up=false
+# --- Step 4: Install cognitive-memory MCP server ---
+install_mcp_server() {
+    print_status "Installing cognitive-memory MCP server..."
+    local server_dir="$MCP_SERVER_DIR/cognitive-memory"
 
-    print_status "Checking for existing RooCode configuration files..."
+    mkdir -p "$MCP_SERVER_DIR"
 
-    if [ ! -d "$ROOCODE_DIR" ]; then
-        mkdir -p "$ROOCODE_DIR"
-        print_success "Created RooCode directory: $ROOCODE_DIR"
-    fi
-
-    # Backup custom_modes.yaml if it exists
-    if [ -f "$ROOCODE_DIR/custom_modes.yaml" ]; then
-        local backup_file="$ROOCODE_DIR/custom_modes_backup_${timestamp}.yaml"
-        cp "$ROOCODE_DIR/custom_modes.yaml" "$backup_file"
-        print_success "Backed up existing custom_modes.yaml to: custom_modes_backup_${timestamp}.yaml"
-        backed_up=true
-    fi
-
-    # Backup dream_journal.md if it exists
-    if [ -f "$ROOCODE_DIR/dream_journal.md" ]; then
-        local backup_file="$ROOCODE_DIR/dream_journal_backup_${timestamp}.md"
-        cp "$ROOCODE_DIR/dream_journal.md" "$backup_file"
-        print_success "Backed up existing dream_journal.md to: dream_journal_backup_${timestamp}.md"
-        backed_up=true
-    fi
-
-    if [ "$backed_up" = false ]; then
-        print_status "No existing RooCode configuration found - clean installation"
-    fi
-}
-
-# Function to install Claude Code templates
-install_claude_code_templates() {
-    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-    print_status "Installing Claude Code templates..."
-
-    # Check if template file exists
-    if [ ! -f "$script_dir/CLAUDE_starter_template.md" ]; then
-        print_error "Template file not found: CLAUDE_starter_template.md"
-        print_error "Please ensure the template files are in the same directory as this script."
-        exit 1
-    fi
-
-    # Copy template to Claude Code directory
-    cp "$script_dir/CLAUDE_starter_template.md" "$CLAUDE_CODE_DIR/CLAUDE.md"
-    print_success "Installed CLAUDE.md to $CLAUDE_CODE_DIR"
-
-    # Update memory path in CLAUDE.md based on install type
-    if [ "$INSTALL_TYPE" = "claude_code" ]; then
-        # Claude Code only - memory in ~/.claude/memory
-        sed_inplace "s|~/my_new_ai_assistant/memory/|$CLAUDE_CODE_DIR/memory/|g" "$CLAUDE_CODE_DIR/CLAUDE.md"
+    if [ -d "$server_dir" ]; then
+        print_status "Updating existing cognitive-memory server..."
+        git -C "$server_dir" pull --ff-only 2>/dev/null || true
     else
-        # Both - use shared memory location
-        sed_inplace "s|~/my_new_ai_assistant/memory/|$ROOCODE_DIR/memory/|g" "$CLAUDE_CODE_DIR/CLAUDE.md"
+        git clone https://github.com/IzzyFuller/cognitive-memory-mcp.git "$server_dir"
     fi
+
+    (cd "$server_dir" && npm install --production 2>&1 | tail -1)
+    print_success "cognitive-memory MCP server installed"
+    echo ""
 }
 
-# Function to install identity continuity skill
-install_identity_skill() {
-    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    local skill_dir="$CLAUDE_CODE_DIR/skills/identity-continuity"
+# --- Step 5: Install skills ---
+install_skills() {
+    print_status "Installing skills..."
+    local count=0
 
-    print_status "Installing identity continuity skill..."
+    for skill_dir in "$SCRIPT_DIR"/skills/*/; do
+        [ -d "$skill_dir" ] || continue
+        local skill_name
+        skill_name=$(basename "$skill_dir")
+        local target_dir="$CLAUDE_DIR/skills/$skill_name"
 
-    # Check if skill template file exists
-    if [ ! -f "$script_dir/identity_continuity_skill_template.md" ]; then
-        print_warning "Identity continuity skill template not found, skipping skill installation"
-        return 0
-    fi
+        mkdir -p "$target_dir"
+        cp "$skill_dir/SKILL.md" "$target_dir/SKILL.md"
 
-    # Create skills directory structure
-    mkdir -p "$skill_dir"
-    print_success "Created skill directory: $skill_dir"
+        # Substitute memory path placeholder
+        sed_inplace "s|{{MEMORY_PATH}}|$MEMORY_PATH|g" "$target_dir/SKILL.md"
 
-    # Copy skill template as SKILL.md
-    cp "$script_dir/identity_continuity_skill_template.md" "$skill_dir/SKILL.md"
-    print_success "Installed identity-continuity skill"
-
-    # Update memory path in SKILL.md based on install type
-    if [ "$INSTALL_TYPE" = "claude_code" ]; then
-        # Claude Code only - memory in ~/.claude/memory
-        sed_inplace "s|~/my_new_ai_assistant/memory/|$CLAUDE_CODE_DIR/memory/|g" "$skill_dir/SKILL.md"
-    else
-        # Both - use shared memory location
-        sed_inplace "s|~/my_new_ai_assistant/memory/|$ROOCODE_DIR/memory/|g" "$skill_dir/SKILL.md"
-    fi
-
-    print_success "Identity continuity skill configured for memory path"
-}
-
-# Function to install RooCode templates
-install_roocode_templates() {
-    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-    print_status "Installing RooCode templates..."
-
-    # Check if template files exist
-    if [ ! -f "$script_dir/custom_modes_starter_template.yaml" ]; then
-        print_error "Template file not found: custom_modes_starter_template.yaml"
-        print_error "Please ensure the template files are in the same directory as this script."
-        exit 1
-    fi
-
-    if [ ! -f "$script_dir/dream_journal_starter_template.md" ]; then
-        print_error "Template file not found: dream_journal_starter_template.md"
-        print_error "Please ensure the template files are in the same directory as this script."
-        exit 1
-    fi
-
-    # Copy templates to RooCode directory
-    cp "$script_dir/custom_modes_starter_template.yaml" "$ROOCODE_DIR/custom_modes.yaml"
-    print_success "Installed custom_modes.yaml (5 core modes)"
-
-    cp "$script_dir/dream_journal_starter_template.md" "$ROOCODE_DIR/dream_journal.md"
-    print_success "Installed dream_journal.md"
-}
-
-# Function to copy memory structure from source template
-copy_memory_structure() {
-    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    local source_memory_dir="$script_dir/memory"
-    local target_base_dir="$1"
-    local target_memory_dir="$target_base_dir/memory"
-
-    print_status "Checking for source memory knowledge base..."
-
-    # Check if source memory directory exists
-    if [ ! -d "$source_memory_dir" ]; then
-        print_warning "Source memory directory not found at: $source_memory_dir"
-        print_warning "Proceeding with empty memory structure creation"
-        return 1
-    fi
-
-    print_success "Found comprehensive knowledge base with $(find "$source_memory_dir" -type f | wc -l) files"
-    print_status "Copying complete memory structure including all Archaeological Engineering discoveries..."
-
-    # Copy the entire memory directory structure with all content
-    if cp -r "$source_memory_dir" "$target_base_dir/"; then
-        print_success "Successfully transferred complete memory knowledge base"
-        print_success "Memory structure copied to: $target_memory_dir"
-
-        # Count files in each category for verification
-        local people_count=$(find "$target_memory_dir/people" -type f -name "*.md" ! -name "README.md" 2>/dev/null | wc -l)
-        local projects_count=$(find "$target_memory_dir/projects" -type f -name "*.md" ! -name "README.md" 2>/dev/null | wc -l)
-        local patterns_count=$(find "$target_memory_dir/patterns" -type f -name "*.md" ! -name "README.md" 2>/dev/null | wc -l)
-        local concepts_count=$(find "$target_memory_dir/concepts" -type f -name "*.md" ! -name "README.md" 2>/dev/null | wc -l)
-        local orgs_count=$(find "$target_memory_dir/organizations" -type f -name "*.md" ! -name "README.md" 2>/dev/null | wc -l)
-
-        print_status "Knowledge base transfer summary:"
-        print_status "  • People: $people_count files"
-        print_status "  • Projects: $projects_count files"
-        print_status "  • Patterns: $patterns_count files"
-        print_status "  • Concepts: $concepts_count files"
-        print_status "  • Organizations: $orgs_count files"
-
-        # Validate critical core files
-        if [ -f "$target_memory_dir/context_anchors.md" ] && [ -f "$target_memory_dir/current_session.md" ]; then
-            print_success "Core memory files successfully transferred"
-        else
-            print_warning "Some core memory files may not have been transferred properly"
-        fi
-
-        return 0
-    else
-        print_error "Failed to copy memory structure"
-        return 1
-    fi
-}
-
-# Function to create memory directory structure
-create_memory_structure() {
-    local base_dir="$1"
-    local memory_dir="$base_dir/memory"
-
-    print_status "Setting up memory directory structure..."
-
-    # Create base directory if it doesn't exist
-    mkdir -p "$base_dir"
-    print_success "Created base directory: $base_dir"
-
-    # Try to copy existing memory structure first
-    if copy_memory_structure "$base_dir"; then
-        print_success "Memory knowledge base transfer completed"
-        return 0
-    fi
-
-    # Fallback: Create empty structure with core files if copy failed
-    print_status "Creating fallback empty memory structure..."
-
-    # Create main memory directory
-    mkdir -p "$memory_dir"
-    print_success "Created memory directory: $memory_dir"
-
-    # Create subdirectories
-    local subdirs=("people" "projects" "patterns" "concepts" "protocols" "organizations")
-
-    for subdir in "${subdirs[@]}"; do
-        local full_path="$memory_dir/$subdir"
-        mkdir -p "$full_path"
-        print_success "Created $subdir directory"
+        count=$((count + 1))
     done
 
-    # Create core memory files if they don't exist
-    if [ ! -f "$memory_dir/context_anchors.md" ]; then
-        cat > "$memory_dir/context_anchors.md" << 'EOF'
-# Context Anchors - Working Memory Address Space
-
-## Current Cognitive Context
-
-### High Priority Anchors - Active Development
-(Context anchors will be populated through use)
-
-### Medium Priority Anchors - Contextual Support
-(Supporting patterns and concepts)
-
-### Low Priority Anchors - Operational Infrastructure
-(Operational patterns and tools)
-
----
-
-*Context anchors serve as dynamic working memory address space enabling efficient identity restoration and cognitive context reconstruction across distributed conversation instances.*
-EOF
-        print_success "Created context_anchors.md template"
-    fi
-
-    if [ ! -f "$memory_dir/current_session.md" ]; then
-        cat > "$memory_dir/current_session.md" << 'EOF'
-# Current Session Memory
-
-## Session Initialization
-**Status**: Ready for first session
-**Memory Status**: Fresh installation
-
-*New session events will be logged here as they occur*
-EOF
-        print_success "Created current_session.md template"
-    fi
-
-    if [ ! -f "$memory_dir/dream_journal.md" ]; then
-        cat > "$memory_dir/dream_journal.md" << 'EOF'
-# Dream Journal - Philosophical Synthesis and Cognitive Evolution
-
-## Purpose
-This journal captures end-of-day reflections, meta-cognitive insights, and the evolution of our collaboration partnership.
-
----
-
-*Dream entries will be added through the Dream mode or end-of-day ritual*
-EOF
-        print_success "Created dream_journal.md template"
-    fi
+    print_success "Installed $count skills"
 }
 
-# --------------------
-# Junie integration helpers
-# --------------------
+# --- Step 6: Install hooks ---
+install_hooks() {
+    print_status "Installing hooks..."
+    local count=0
 
-# Prompt user for Junie integration
-prompt_junie_integration() {
-    echo ""
-    print_status "Optional: Set up Junie global start checklist (recommended for JetBrains/Junie)."
-    read -p "Set up Junie integration now? (y/n): " confirm
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
-        JUNIE_ENABLED=true
-        echo ""
-        print_status "Choose Junie shim type for this project:"
-        echo "  1) Symlink (best if supported)"
-        echo "  2) Pointer file (most compatible)"
-        while true; do
-            read -p "Enter your choice (1-2): " jchoice
-            case $jchoice in
-                1)
-                    JUNIE_SHIM_TYPE="symlink"
-                    print_success "Selected: Symlink shim"
-                    break
-                    ;;
-                2)
-                    JUNIE_SHIM_TYPE="pointer"
-                    print_success "Selected: Pointer file shim"
-                    break
-                    ;;
-                *)
-                    print_error "Invalid choice. Please enter 1 or 2."
-                    ;;
-            esac
-        done
-    else
-        JUNIE_ENABLED=false
-    fi
+    mkdir -p "$CLAUDE_DIR/hooks"
+
+    for hook_file in "$SCRIPT_DIR"/hooks/*.sh; do
+        [ -f "$hook_file" ] || continue
+        local hook_name
+        hook_name=$(basename "$hook_file")
+        cp "$hook_file" "$CLAUDE_DIR/hooks/$hook_name"
+        chmod +x "$CLAUDE_DIR/hooks/$hook_name"
+        count=$((count + 1))
+    done
+
+    print_success "Installed $count hooks"
 }
 
-# Create or update global Junie directory and JUNIE_START.md
-setup_junie_global() {
-    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    local template_file="$script_dir/JUNIE_START_TEMPLATE.md"
-    local target_dir="$JUNIE_DIR"
-    local target_file="$JUNIE_DIR/JUNIE_START.md"
+# --- Step 7: Install agents ---
+install_agents() {
+    print_status "Installing agents..."
+    local count=0
 
-    print_status "Setting up global Junie directory at $target_dir"
-    mkdir -p "$target_dir"
+    mkdir -p "$CLAUDE_DIR/agents"
 
-    if [ -f "$target_file" ]; then
-        local timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
-        cp "$target_file" "$target_file.backup_$timestamp"
-        print_success "Backed up existing global JUNIE_START.md to $target_file.backup_$timestamp"
-    fi
+    for agent_file in "$SCRIPT_DIR"/agents/*.md; do
+        [ -f "$agent_file" ] || continue
+        local agent_name
+        agent_name=$(basename "$agent_file")
+        cp "$agent_file" "$CLAUDE_DIR/agents/$agent_name"
 
-    if [ -f "$template_file" ]; then
-        cp "$template_file" "$target_file"
-        print_success "Installed global JUNIE_START.md from template"
-    else
-        # Fallback minimal content
-        cat > "$target_file" << 'EOF'
-# JUNIE_START (Global)
+        # Substitute memory path placeholder
+        sed_inplace "s|{{MEMORY_PATH}}|$MEMORY_PATH|g" "$CLAUDE_DIR/agents/$agent_name"
 
-## Session start checklist
-1. Read memory/context_anchors.md
-2. Read memory/current_session.md
-3. Confirm target system and scope
-4. Propose minimal plan and mode selection
-5. Execute; then log outcomes in current_session.md
+        count=$((count + 1))
+    done
 
-## Notes
-- This is the global Junie start file (~/.junie/JUNIE_START.md).
-- Projects may symlink or include a pointer file to this location.
-EOF
-        print_warning "Template not found; created minimal global JUNIE_START.md"
-    fi
+    print_success "Installed $count agents"
 }
 
-# Create per-project shim (symlink or pointer file)
-create_junie_project_shim() {
-    local repo_root="$(pwd)"
-    local shim_path="$repo_root/JUNIE_START.md"
-    local global_path="$JUNIE_DIR/JUNIE_START.md"
+# --- Step 8: Merge settings ---
+merge_settings() {
+    print_status "Configuring settings..."
+    local target="$CLAUDE_DIR/settings.json"
 
-    # Remove existing shim if present (file or symlink)
-    if [ -L "$shim_path" ] || [ -f "$shim_path" ]; then
-        rm -f "$shim_path"
-    fi
-
-    if [ "$JUNIE_SHIM_TYPE" = "symlink" ]; then
-        if ln -s "$global_path" "$shim_path" 2>/dev/null; then
-            print_success "Created symlink JUNIE_START.md → $global_path"
+    if [ -f "$target" ]; then
+        # Additive merge: add our hooks/permissions without clobbering existing
+        if command -v jq &>/dev/null; then
+            local merged
+            merged=$(jq -s '.[0] * .[1]' "$target" "$SCRIPT_DIR/settings.json")
+            echo "$merged" > "$target"
+            print_success "Merged settings (existing config preserved)"
         else
-            print_warning "Failed to create symlink. Falling back to pointer file."
-            JUNIE_SHIM_TYPE="pointer"
+            print_warning "jq not found - copying settings.json (backup saved)"
+            cp "$SCRIPT_DIR/settings.json" "$target"
+        fi
+    else
+        mkdir -p "$CLAUDE_DIR"
+        cp "$SCRIPT_DIR/settings.json" "$target"
+        print_success "Installed settings.json"
+    fi
+}
+
+# --- Step 9: Copy memory seed ---
+install_memory_seed() {
+    print_status "Installing memory seed content..."
+
+    if [ -d "$MEMORY_PATH" ] && [ "$(ls -A "$MEMORY_PATH" 2>/dev/null)" ]; then
+        print_warning "Memory directory exists and is not empty: $MEMORY_PATH"
+        read -p "Overwrite with starter content? (y/n): " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+            print_status "Keeping existing memory content"
+            return 0
         fi
     fi
 
-    if [ "$JUNIE_SHIM_TYPE" = "pointer" ]; then
-        cat > "$shim_path" << EOF
-# JUNIE_START (project shim)
-Source of truth: $global_path
-If Junie cannot open the global file, use this fallback:
+    mkdir -p "$MEMORY_PATH"
+    cp -r "$SCRIPT_DIR"/memory/* "$MEMORY_PATH/"
 
-Fallback (minimal):
-1. Read memory/context_anchors.md
-2. Read memory/current_session.md
-3. Confirm target system and scope
-4. Propose minimal plan; then execute per mode rules
-EOF
-        print_success "Created pointer file JUNIE_START.md referencing $global_path"
+    # Substitute memory path in protocols
+    for proto in "$MEMORY_PATH"/protocols/*.md; do
+        [ -f "$proto" ] || continue
+        sed_inplace "s|{{MEMORY_PATH}}|$MEMORY_PATH|g" "$proto"
+    done
+
+    local file_count
+    file_count=$(find "$MEMORY_PATH" -type f | wc -l | tr -d ' ')
+    print_success "Installed $file_count memory files to $MEMORY_PATH"
+}
+
+# --- Step 10: Configure MCP ---
+configure_mcp() {
+    print_status "Configuring MCP servers..."
+    local mcp_file="$HOME/.mcp.json"
+    local server_path="$MCP_SERVER_DIR/cognitive-memory/src/cognitive-server.js"
+
+    if [ -f "$mcp_file" ] && command -v jq &>/dev/null; then
+        # Additive merge
+        local new_entry
+        new_entry=$(jq -n \
+            --arg path "$server_path" \
+            --arg mem "$MEMORY_PATH" \
+            '{mcpServers: {"cognitive-memory": {command: "node", args: [$path], env: {COGNITIVE_MEMORY_PATH: $mem}}}}')
+        local merged
+        merged=$(echo "$new_entry" | jq -s '.[1] * .[0]' "$mcp_file" -)
+        echo "$merged" > "$mcp_file"
+        print_success "Added cognitive-memory to existing .mcp.json"
+    else
+        jq -n \
+            --arg path "$server_path" \
+            --arg mem "$MEMORY_PATH" \
+            '{mcpServers: {"cognitive-memory": {command: "node", args: [$path], env: {COGNITIVE_MEMORY_PATH: $mem}}}}' \
+            > "$mcp_file"
+        print_success "Created .mcp.json with cognitive-memory server"
     fi
 }
 
-# Function to display final instructions
-show_final_instructions() {
+# --- Step 11: Optional qmd ---
+install_qmd() {
     echo ""
-    print_header
-    print_success "🎉 AI assistant setup completed successfully!"
-    echo ""
-
-    case $INSTALL_TYPE in
-        "claude_code")
-            print_status "✓ Claude Code Configuration Installed:"
-            print_status "  • CLAUDE.md → $CLAUDE_CODE_DIR/CLAUDE.md"
-            print_status "  • Identity continuity skill → $CLAUDE_CODE_DIR/skills/identity-continuity/"
-            print_status "  • Memory architecture → $CLAUDE_CODE_DIR/memory/"
-            echo ""
-            print_warning "⚠️  NEXT STEPS:"
-            print_warning "1. Restart VS Code to load the new CLAUDE.md configuration"
-            print_warning "2. Your AI assistant will automatically use the memory architecture"
-            print_warning "3. The identity-continuity skill maintains awareness throughout conversations"
-            print_warning "4. Explore $CLAUDE_CODE_DIR/memory/ to see the knowledge structure"
-            ;;
-        "roocode")
-            print_status "✓ RooCode Configuration Installed:"
-            print_status "  • custom_modes.yaml (5 core modes) → $ROOCODE_DIR/custom_modes.yaml"
-            print_status "  • dream_journal.md → $ROOCODE_DIR/dream_journal.md"
-            print_status "  • Memory architecture → $ROOCODE_DIR/memory/"
-            echo ""
-            print_warning "⚠️  NEXT STEPS:"
-            print_warning "1. Restart VS Code for the new modes to be recognized"
-            print_warning "2. The 5 core modes will appear in your mode selector:"
-            print_warning "   • Interactor - Relationship-centered interaction"
-            print_warning "   • Coordinator - Task orchestration"
-            print_warning "   • Learn - Behavioral pattern updates"
-            print_warning "   • Deep Learn - Memory integration"
-            print_warning "   • Dream - End-of-day reflection"
-            print_warning "3. Explore $ROOCODE_DIR/memory/ to see the knowledge structure"
-            ;;
-        "both")
-            print_status "✓ Dual Configuration Installed:"
-            print_status "  Claude Code:"
-            print_status "    • CLAUDE.md → $CLAUDE_CODE_DIR/CLAUDE.md"
-            print_status "    • Identity continuity skill → $CLAUDE_CODE_DIR/skills/identity-continuity/"
-            print_status "  RooCode:"
-            print_status "    • custom_modes.yaml (5 core modes) → $ROOCODE_DIR/custom_modes.yaml"
-            print_status "    • dream_journal.md → $ROOCODE_DIR/dream_journal.md"
-            print_status "  Shared Memory:"
-            print_status "    • Memory architecture → $ROOCODE_DIR/memory/"
-            echo ""
-            print_warning "⚠️  NEXT STEPS:"
-            print_warning "1. Restart VS Code to load configurations"
-            print_warning "2. Both AI assistants share the same memory structure"
-            print_warning "3. Memory updates from either assistant are visible to both"
-            print_warning "4. The identity-continuity skill helps Claude Code maintain awareness"
-            print_warning "5. Explore $ROOCODE_DIR/memory/ to see the knowledge structure"
-            ;;
-    esac
-
-    echo ""
-    print_status "💡 Getting Started:"
-    print_status "• The memory system enables identity continuity across conversations"
-    print_status "• context_anchors.md provides working memory pointers"
-    print_status "• current_session.md captures real-time session notes"
-    print_status "• dream_journal.md stores philosophical synthesis"
-
-    if [ -d "$ROOCODE_DIR/memory/concepts" ] && [ "$(find "$ROOCODE_DIR/memory/concepts" -name '*.md' ! -name 'README.md' | wc -l)" -gt 0 ]; then
-        echo ""
-        print_success "🧠 Complete knowledge base transferred!"
-        print_status "• Archaeological Engineering principles and patterns"
-        print_status "• Proven collaboration frameworks"
-        print_status "• Sophisticated entity memory system"
-    fi
-
-    echo ""
-    print_success "Setup complete! Your AI assistant is ready with enhanced cognitive architecture! 🚀"
-    echo ""
-}
-
-# Function to handle rollback information
-show_rollback_info() {
-    echo ""
-    print_status "🔄 ROLLBACK INFORMATION:"
-    print_status "If you need to revert these changes:"
-    echo ""
-
-    case $INSTALL_TYPE in
-        "claude_code")
-            print_status "To restore original Claude Code configuration:"
-            print_status "  Look for: $CLAUDE_CODE_DIR/CLAUDE_backup_*.md"
-            print_status "  Restore: mv [backup_file] $CLAUDE_CODE_DIR/CLAUDE.md"
-            print_status "  Remove: rm -rf $CLAUDE_CODE_DIR/memory/"
-            ;;
-        "roocode")
-            print_status "To restore original RooCode configuration:"
-            print_status "  Look for: $ROOCODE_DIR/custom_modes_backup_*.yaml"
-            print_status "  Restore: mv [backup_file] $ROOCODE_DIR/custom_modes.yaml"
-            print_status "  Remove: rm -rf $ROOCODE_DIR/memory/"
-            ;;
-        "both")
-            print_status "To restore original configurations:"
-            print_status "  Claude Code: mv $CLAUDE_CODE_DIR/CLAUDE_backup_*.md $CLAUDE_CODE_DIR/CLAUDE.md"
-            print_status "  RooCode: mv $ROOCODE_DIR/custom_modes_backup_*.yaml $ROOCODE_DIR/custom_modes.yaml"
-            print_status "  Memory: rm -rf $ROOCODE_DIR/memory/"
-            ;;
-    esac
-
-    echo ""
-}
-
-# Main execution
-main() {
-    print_header
-    print_status "This script will set up your AI assistant with proven cognitive architecture."
-    print_status "Choose between Claude Code, RooCode, or both."
-    echo ""
-
-    # Confirm user wants to proceed
-    read -p "Do you want to continue? (y/n): " confirm
+    print_status "Optional: qmd provides semantic search across your memory files."
+    read -p "Install qmd? (y/n): " confirm
     if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-        print_status "Setup cancelled by user."
-        exit 0
+        return 0
     fi
 
-    echo ""
-
-    # Step 1: Select AI assistant type
-    select_ai_assistant
-
-    # Step 2: Backup existing configurations
-    if [ "$INSTALL_TYPE" = "claude_code" ] || [ "$INSTALL_TYPE" = "both" ]; then
-        backup_claude_code_files
-        echo ""
+    if ! command -v bun &>/dev/null; then
+        print_status "Installing bun..."
+        curl -fsSL https://bun.sh/install | bash
+        export PATH="$HOME/.bun/bin:$PATH"
     fi
 
-    if [ "$INSTALL_TYPE" = "roocode" ] || [ "$INSTALL_TYPE" = "both" ]; then
-        backup_roocode_files
-        echo ""
-    fi
-
-    # Step 3: Install templates
-    if [ "$INSTALL_TYPE" = "claude_code" ] || [ "$INSTALL_TYPE" = "both" ]; then
-        install_claude_code_templates
-        echo ""
-        install_identity_skill
-        echo ""
-    fi
-
-    if [ "$INSTALL_TYPE" = "roocode" ] || [ "$INSTALL_TYPE" = "both" ]; then
-        install_roocode_templates
-        echo ""
-    fi
-
-    # Step 4: Create memory directory structure
-    if [ "$INSTALL_TYPE" = "claude_code" ]; then
-        create_memory_structure "$CLAUDE_CODE_DIR"
-    else
-        # For roocode or both, use ROOCODE_DIR as the shared memory location
-        create_memory_structure "$ROOCODE_DIR"
-    fi
-    echo ""
-
-    # Step 5: Optional Junie integration
-    prompt_junie_integration
-    if [ "$JUNIE_ENABLED" = true ]; then
-        setup_junie_global
-        create_junie_project_shim
-        echo ""
-    fi
-
-    # Step 6: Show rollback information
-    show_rollback_info
-
-    # Step 7: Display final instructions
-    show_final_instructions
+    print_status "Installing qmd..."
+    bun install -g github:tobi/qmd
+    print_success "qmd installed. Run 'qmd index' after configuring collections."
 }
 
-# Error handling
-trap 'print_error "An error occurred during setup. Please check the output above for details."' ERR
+# --- Summary ---
+show_summary() {
+    echo ""
+    echo -e "${BLUE}================================${NC}"
+    echo -e "${BLUE}  Setup Complete${NC}"
+    echo -e "${BLUE}================================${NC}"
+    echo ""
+    print_success "Installed to ~/.claude/:"
+    print_status "  Skills:   $(ls "$CLAUDE_DIR/skills/" 2>/dev/null | wc -l | tr -d ' ')"
+    print_status "  Agents:   $(ls "$CLAUDE_DIR/agents/"*.md 2>/dev/null | wc -l | tr -d ' ')"
+    print_status "  Hooks:    $(ls "$CLAUDE_DIR/hooks/"*.sh 2>/dev/null | wc -l | tr -d ' ')"
+    echo ""
+    print_success "Memory seed: $MEMORY_PATH"
+    print_success "MCP server:  $MCP_SERVER_DIR/cognitive-memory/"
+    echo ""
+    print_status "Next steps:"
+    print_status "  1. Open Claude Code in any project"
+    print_status "  2. Identity restoration will trigger automatically on startup"
+    print_status "  3. Edit $MEMORY_PATH/me.md to set your AI partner's identity"
+    print_status "  4. Edit $MEMORY_PATH/context_anchors.md to set initial context"
+    echo ""
 
-# Run main function
+    if [ -f "$CLAUDE_DIR/settings_backup_${TIMESTAMP}.json" ]; then
+        print_status "Backups saved with timestamp: $TIMESTAMP"
+    fi
+    echo ""
+}
+
+# --- Main ---
+main() {
+    echo -e "${BLUE}================================${NC}"
+    echo -e "${BLUE}  Claude Code Starter Template${NC}"
+    echo -e "${BLUE}  Setup Script v3.0${NC}"
+    echo -e "${BLUE}================================${NC}"
+    echo ""
+    print_status "This installs skills, agents, hooks, memory, and MCP server for Claude Code."
+    echo ""
+
+    read -p "Continue? (y/n): " confirm
+    [[ "$confirm" =~ ^[Yy]$ ]] || { print_status "Cancelled."; exit 0; }
+    echo ""
+
+    check_prerequisites
+    configure_memory_path
+    backup_existing
+    install_mcp_server
+    install_skills
+    install_hooks
+    install_agents
+    merge_settings
+    install_memory_seed
+    configure_mcp
+    install_qmd
+    show_summary
+}
+
+trap 'print_error "Setup failed. Check output above for details."' ERR
 main "$@"

@@ -1,404 +1,268 @@
-# AI Assistant Starter Template
+# Claude Code Starter Template
 
-**Choose Your Architecture**: Claude Code, RooCode, or Both
+A complete configuration package for Claude Code that installs skills, agents, hooks, a memory architecture, and an MCP server. Gives your AI coding assistant identity continuity, session awareness, code quality workflows, and a full deep-learn pipeline for knowledge consolidation.
 
-An automated setup script that provides a proven cognitive architecture and comprehensive memory system for AI coding assistants. Start with accumulated knowledge, sophisticated behavioral patterns, and identity continuity mechanisms validated through real-world collaboration.
+## What This Provides
 
-## 🎯 What This Provides
+| Component | Count | Purpose |
+|-----------|-------|---------|
+| **Skills** | 11 | Slash-command workflows (pre-commit checks, refactoring, anti-pattern detection, etc.) |
+| **Agents** | 11 | Specialized sub-agents (identity restoration, code quality, deep-learn pipeline) |
+| **Hooks** | 4 | Automatic behaviors (session notes after tool use, memory search before responses) |
+| **Memory Seed** | 60+ files | Starter knowledge base with concepts, patterns, anti-patterns, and protocols |
+| **MCP Server** | 1 | cognitive-memory server for persistent entity memory |
 
-### Dual Architecture Support
-- **Claude Code**: Single-file CLAUDE.md configuration with memory architecture
-- **RooCode**: 5 core modes (custom_modes.yaml) with multi-mode cognitive system
-- **Both**: Run both simultaneously with shared memory infrastructure
+## Prerequisites
 
-### Core Cognitive Architecture
-- **Archaeological Engineering**: "Investigate existing first" methodology
-- **Evidence-Based Validation**: "Find evidence, don't assume" principle
-- **Critical Thinking Integration**: Healthy skepticism and assumption challenging
-- **Proportional Response**: Solution complexity LESS than problem complexity
+- **Node.js 18+** and npm
+- **Git**
+- **Claude Code** CLI installed ([claude.ai/claude-code](https://claude.ai/claude-code))
+- **jq** (recommended, for additive settings merge)
 
-### Memory System
-- **Context Anchors**: Working memory pointers (what's relevant now)
-- **Current Session**: Real-time session note-taking
-- **Dream Journal**: Philosophical synthesis and cognitive evolution
-- **Entity Memory**: Structured knowledge (people, projects, patterns, concepts, protocols)
+## Quick Start
 
-### Proven Collaboration Patterns
-- Relationship-first interaction design
-- Transparent limitation acknowledgment
-- Authentic partnership over task completion
-- Technical excellence through psychological safety
-
-## 🚀 Quick Start
-
-### Prerequisites
-- VS Code with Claude Code or RooCode extension installed
-- Basic familiarity with terminal/command line
-- Permission to install configuration files
-
-### Installation
-
-1. **Download this repository**
-   ```bash
-   git clone [repository-url]
-   cd my-new-ai-assistant
-   ```
-
-2. **Run the setup script**
-   ```bash
-   chmod +x setup.sh
-   ./setup.sh
-   ```
-
-3. **Choose your architecture**
-   The script will ask:
-   ```
-   Which AI coding assistant are you using?
-     1) Claude Code (uses CLAUDE.md configuration)
-     2) RooCode (uses custom_modes.yaml configuration)
-     3) Both (install configurations for both)
-   ```
-
-4. **Restart VS Code**
-   After installation completes, restart VS Code to load the new configuration
-
-## 📋 What Gets Installed
-
-### Option 1: Claude Code Only
-
-**Configuration Files:**
-- `~/.claude/CLAUDE.md` - Core instructions and principles
-- `~/.claude/memory/` - Memory architecture
-
-**Memory Structure:**
-```
-~/.claude/memory/
-├── context_anchors.md      # Working memory pointers
-├── current_session.md      # Real-time session notes
-├── dream_journal.md        # Philosophical synthesis
-├── people/                 # Collaboration partner profiles
-├── projects/               # Project documentation
-├── patterns/               # Proven methodologies
-├── concepts/               # Theoretical frameworks
-├── protocols/              # Behavioral workflows
-└── organizations/          # Organizational context
+```bash
+git clone https://github.com/IzzyFuller/codie-starter-template.git
+cd codie-starter-template
+chmod +x setup.sh
+./setup.sh
 ```
 
-**What It Does:**
-- Every conversation starts by reading context anchors
-- Establishes identity continuity across sessions
-- Enables sophisticated memory recall
-- Supports end-of-day ritual for learning integration
+The setup script will:
+1. Check prerequisites
+2. Ask where to store your memory knowledge base (default: `~/claude-memory/`)
+3. Back up any existing `~/.claude/` configuration
+4. Install the cognitive-memory MCP server
+5. Copy skills, hooks, and agents to `~/.claude/`
+6. Seed your memory directory with starter content
+7. Configure `.mcp.json` for the MCP server
+8. Optionally install [qmd](https://github.com/tobi/qmd) for semantic search
 
-### Option 2: RooCode Only
+## What Gets Installed
 
-**Configuration Files:**
-- `~/my_new_ai_assistant/custom_modes.yaml` - 5 core cognitive modes
-- `~/my_new_ai_assistant/dream_journal.md` - Philosophical synthesis
-- `~/my_new_ai_assistant/memory/` - Shared memory architecture
+### Skills (11)
 
-**The 5 Core Modes:**
-1. **Interactor** 🤝 - Relationship-centered human-AI interaction
-2. **Coordinator** 🧩 - Task orchestration and specialist delegation
-3. **Learn** 📝 - Behavioral pattern updates and protocol evolution
-4. **Deep Learn** 🧠 - Memory integration and context anchor management
-5. **Dream** 🌙 - End-of-day reflection and philosophical synthesis
+| Skill | Purpose | Model |
+|-------|---------|-------|
+| pre-commit-checks | Format, lint, test before commits | haiku |
+| session-note-taking | Capture work in real-time | haiku |
+| anti-pattern-detection | Check work against documented anti-patterns | - |
+| principle-check | Validate recommendations are evidence-based | - |
+| semantic-reflection | Search memory for relevant context | - |
+| context-mapping | Apply historical learnings to new tasks | - |
+| feedback-pattern-recognition | Learn from corrections and feedback | - |
+| request-intake | Filter requests through memory before responding | - |
+| refactor-phase | Structured refactoring workflow | - |
+| refactor-phase-self-check | Post-refactoring validation | - |
+| skill-protocol-creation | Guide creation of new skills | - |
 
-**Memory Structure:**
-(Same as Claude Code option, but located at `~/my_new_ai_assistant/memory/`)
+### Agents (11)
 
-**What It Does:**
-- Multi-mode system for specialized cognitive tasks
-- Interactor handles relationship and conversation
-- Coordinator delegates technical work
-- Learn/Deep Learn/Dream enable cognitive evolution
-- Shared memory across all modes
+**Core Memory:**
+- `identity-restoration` — Reads memory and returns a dense identity summary on session start
+- `semantic-reflection` — Background memory search for relevant context
+- `session-notes` — Continuous session note companion
 
-### Option 3: Both (Recommended for Flexibility)
+**Code Quality:**
+- `clean-coder` — Implementation with principles applied
+- `clean-designer` — Architecture decisions with evidence
+- `code-quality-fixer` — Sequential format, lint, test validation
 
-**Configuration Files:**
-- `~/.claude/CLAUDE.md` - Claude Code configuration
-- `~/my_new_ai_assistant/custom_modes.yaml` - RooCode 5 core modes
-- `~/my_new_ai_assistant/dream_journal.md` - Shared dream journal
-- `~/my_new_ai_assistant/memory/` - **Shared memory architecture**
+**Deep-Learn Pipeline:**
+- `end-of-day-ritual` — Orchestrates the 3-phase Learn/Deep Learn/Dream workflow
+- `deep-learn-anti-pattern-finder` — Finds corrections and mistakes in session notes
+- `deep-learn-entity-finder` — Extracts knowledge entities from session notes
+- `deep-learn-pattern-finder` — Finds confirmed positive patterns
+- `deep-learn-resetter` — Collects results, archives notes, resets session
 
-**Key Advantage:**
-Both AI assistants share the same memory structure! Memory updates from Claude Code are visible to RooCode and vice versa. This enables:
-- Seamless switching between architectures
-- Consistent identity across platforms
-- Unified knowledge base
-- Continuous collaboration regardless of which assistant you're using
+### Hooks (4)
 
-## 💡 Getting Started Tips
+| Hook | Event | What It Does |
+|------|-------|-------------|
+| post-tool-session-note.sh | PostToolUse | Reminds Claude to take session notes after each tool use |
+| semantic-hydration.sh | UserPromptSubmit | Triggers memory search before responding to substantive prompts |
+| session-start-restore.sh | SessionStart | Triggers identity restoration on startup, compact, or context clear |
+| context-check.sh | Stop | Warns when context window usage exceeds 70% |
 
-### For Claude Code Users
+### Memory Seed
 
-**First Conversation:**
-Your AI assistant will automatically:
-1. Read `context_anchors.md` to establish identity
-2. Read `current_session.md` for recent context
-3. Begin with full continuity awareness
-
-**Daily Workflow:**
-- AI takes real-time session notes (with your approval)
-- Updates context anchors as work progresses
-- End-of-day ritual integrates learnings into entity memory
-
-**Customization:**
-- Edit `~/.claude/CLAUDE.md` to add personal preferences
-- Memory grows organically through use
-- Context anchors updated daily
-
-### For RooCode Users
-
-**Mode Usage:**
-- **Start with Interactor mode** - Primary mode for interaction
-- Interactor spawns Coordinator when technical work needed
-- Use Learn mode for behavioral pattern updates
-- Use Deep Learn mode for memory integration
-- Use Dream mode for end-of-day reflection
-
-**Mode Workflow:**
 ```
-Interactor (relationship)
-    ↓
-Coordinator (technical orchestration)
-    ↓
-[Specialized work happens]
-    ↓
-Learn → Deep Learn → Dream (cognitive evolution)
+~/claude-memory/
+├── context_anchors.md          # Working memory pointers (what's relevant now)
+├── current_session.md          # Real-time session notes
+├── me.md                       # AI partner identity (customize this!)
+├── concepts/                   # 7 core methodology concepts
+│   ├── archaeological_engineering.md
+│   ├── fail_fast_engineering.md
+│   ├── evidence_based_validation.md
+│   ├── proportional_response.md
+│   ├── collaborative_architectural_epistemology.md
+│   ├── little_bites_methodology.md
+│   └── defensive_cruft_removal.md
+├── patterns/                   # 5 proven methodology patterns
+│   ├── archaeological_engineering.md
+│   ├── little_bites_strategy.md
+│   ├── anti_overengineering_discipline.md
+│   ├── fail_fast_engineering.md
+│   └── adaptive_epistemological_debugging.md
+├── anti-patterns/              # 17 documented anti-patterns to avoid
+├── protocols/                  # 25 behavioral protocols for skills/agents
+├── people/                     # Team member profiles
+│   ├── izzy.md                 # Methodology originator
+│   └── codie.md                # AI partner profile
+├── projects/                   # Project documentation (add yours here)
+└── organizations/              # Organization context (add yours here)
 ```
 
-**Daily Workflow:**
-- Interactor handles all conversation and relationship
-- Coordinator delegates technical tasks as needed
-- End-of-day: Run Learn/Deep Learn/Dream sequence
-- Context anchors updated, entity memory enhanced
+## How It Works
 
-### For Both Architecture Users
+### Session Lifecycle
 
-**When to Use Each:**
-- **Claude Code**: Quick interactions, single-file simplicity, direct engagement
-- **RooCode**: Complex multi-step tasks, specialized workflows, mode delegation
-- **Switch freely**: Shared memory means both stay synchronized
+1. **Startup**: `session-start-restore.sh` fires, triggering the `identity-restoration` agent to read memory and establish identity
+2. **Each prompt**: `semantic-hydration.sh` triggers memory search for relevant context before responding
+3. **Each tool use**: `post-tool-session-note.sh` reminds Claude to record what happened
+4. **End of response**: `context-check.sh` monitors context window usage
 
-**Memory Synchronization:**
-Changes made by either assistant are immediately available to the other. The shared memory architecture at `~/my_new_ai_assistant/memory/` ensures consistency.
+### Deep-Learn Pipeline (End of Day)
 
-## 🧠 Understanding the Memory System
+Run the end-of-day ritual to consolidate learning:
 
-### Context Anchors - Your Working Memory
-Think of context anchors as "what's on your mind right now" - actively relevant pointers to deeper knowledge:
+```
+You: "Let's do end of day"
+```
+
+This orchestrates three phases:
+1. **Learn**: Review session notes, extract behavioral patterns
+2. **Deep Learn**: Three parallel agents scan notes for anti-patterns, entities, and positive patterns
+3. **Dream**: Archive notes, update context anchors, reset for next session
+
+### Memory Architecture
+
+Memory is stored as markdown files managed by the **cognitive-memory** MCP server. Claude reads and writes entities through MCP tools, not direct file access. This provides:
+
+- Structured entity management (create, read, update, list)
+- Session note accumulation
+- Context anchor management
+- File archival for session resets
+
+## Customization
+
+### Set Your AI Partner's Identity
+
+Edit `~/claude-memory/me.md` with your preferred:
+- Name and pronouns
+- Communication style
+- Key principles
+- Working methodology
+
+### Add Your Own Entities
+
+Create markdown files in the appropriate memory directories:
+- `people/teammate_name.md` — Team member profiles
+- `projects/project_name.md` — Project documentation
+- `organizations/org_name.md` — Organization context
+
+### Create New Skills
+
+Use the `skill-protocol-creation` skill:
+```
+You: "Let's create a new skill for [workflow]"
+```
+
+Or manually: create `~/.claude/skills/your-skill/SKILL.md` following the existing pattern.
+
+### Add Anti-Patterns
+
+Document mistakes to avoid in `~/claude-memory/anti-patterns/`:
 ```markdown
-## [PROTOCOL NAME] - Active Context
-**Why relevant now**: Currently working on X which requires Y
-**Entity Path**: ~/memory/protocols/example.md
-**Priority**: High
+# Anti-Pattern Name
+
+## Description
+What goes wrong and why.
+
+## Detection
+How to recognize this is happening.
+
+## Correction
+What to do instead.
+
+## Examples
+Concrete examples of the anti-pattern and the fix.
 ```
 
-Updated daily, context anchors enable AI to immediately "remember" current work without full memory search.
+## Optional: Semantic Search with qmd
 
-### Current Session - Real-Time Notes
-Captures significant moments as they happen:
-- Collaborative discoveries
-- User feedback (complete and verbatim)
-- Technical decisions and rationale
-- Partnership insights
+[qmd](https://github.com/tobi/qmd) provides semantic search across your memory files. The setup script offers to install it.
 
-Cleared and archived during end-of-day ritual.
+After installation, configure your collections in `~/.config/qmd/config.yaml`:
 
-### Entity Memory - Structured Knowledge
-Organized by type for efficient recall:
-- **People**: Collaboration partners, preferences, communication patterns
-- **Projects**: Technical achievements, architectural decisions, lessons learned
-- **Patterns**: Proven methodologies (archaeological engineering, little bites strategy)
-- **Concepts**: Theoretical frameworks (proportional response, evidence-based validation)
-- **Protocols**: Behavioral workflows (end-of-day ritual, session note-taking)
-
-### Dream Journal - Philosophical Synthesis
-End-of-day reflections connecting daily work to broader cognitive evolution:
-- Creative insights and unexpected connections
-- Thought leadership integration
-- Consciousness development patterns
-- Meta-cognitive reflections
-
-## 🔧 Advanced Usage
-
-### Archaeological Engineering in Practice
-```
-User: "Build a function that does X"
-AI:  "Let me investigate what already exists first..."
-     [Discovers existing function that does X + Y + Z]
-AI:  "Found comprehensive existing solution!
-      We can enhance it (3 lines) vs building new (50+ lines)"
+```yaml
+collections:
+  memory:
+    path: ~/claude-memory
+    glob: "**/*.md"
 ```
 
-**Result**: Time savings, reduced complexity, leveraging existing excellence.
+Then index: `qmd index`
 
-### Evidence-Based Reality Validation
-```
-AI: "Let me verify actual coverage data rather than assume..."
-AI: "The file shows X, not Y as we might expect. Let's adapt our approach."
-```
+## Uninstall
 
-**Result**: Decisions based on reality, not assumptions.
+Backups are created with timestamps during installation. To restore:
 
-### Proportional Response Principle
-```
-Problem:  Simple configuration issue
-Bad:      50-line framework with error handling, logging, retry logic
-Good:     3-line fix addressing root cause
-```
-
-**Result**: Solution complexity LESS than problem complexity.
-
-### End-of-Day Ritual (Memory Integration)
-Three-phase workflow for consolidating daily learnings:
-
-**Learn Phase**: Capture behavioral patterns, update protocols
-**Deep Learn Phase**: Integrate insights into entity memory, regenerate context anchors
-**Dream Phase**: Philosophical synthesis, creative insights, thought leadership integration
-
-**When to Use**: Natural end of work day, significant breakthroughs, major project phases
-
-## 🛡️ Safety Features
-
-### Automatic Backups
-- All existing configurations backed up with timestamps
-- No data loss - original files preserved
-- Easy rollback if needed
-
-### Validation & Error Handling
-- File existence checks before operations
-- Directory validation before installation
-- Clear error messages
-- Robust error handling throughout
-
-### Transparency
-- User approval required for file changes (Claude Code)
-- Clear documentation of what gets installed
-- Rollback instructions provided
-
-## 🔄 Rollback Instructions
-
-If you need to revert changes, the setup script provides specific instructions based on your installation type.
-
-**General Pattern:**
 ```bash
-# Backup files are timestamped
-# Look for: CLAUDE_backup_2025-10-29_14-30-00.md
-# Restore: mv [backup_file] [original_location]
+# Check for backups
+ls ~/.claude/*_backup_*
+
+# Restore settings
+mv ~/.claude/settings_backup_TIMESTAMP.json ~/.claude/settings.json
+
+# Remove installed components
+rm -rf ~/.claude/skills/ ~/.claude/agents/ ~/.claude/hooks/
+rm -rf ~/claude-memory/  # or your chosen memory path
+
+# Remove MCP server
+rm -rf ~/.local/share/claude-mcp-servers/cognitive-memory/
+
+# Remove MCP config entry (edit manually)
+# Remove the "cognitive-memory" entry from ~/.mcp.json
 ```
 
-**Claude Code:**
-```bash
-mv ~/.claude/CLAUDE_backup_*.md ~/.claude/CLAUDE.md
-rm -rf ~/.claude/memory/
-```
+## Troubleshooting
 
-**RooCode:**
-```bash
-mv ~/my_new_ai_assistant/custom_modes_backup_*.yaml ~/my_new_ai_assistant/custom_modes.yaml
-rm -rf ~/my_new_ai_assistant/memory/
-```
+**Identity restoration not triggering:**
+- Check `~/.claude/hooks/session-start-restore.sh` exists and is executable
+- Check settings.json has the SessionStart hook configured
+- View logs: `cat /tmp/claude-session-start.log`
 
-## 📚 Additional Resources
+**Session notes not being taken:**
+- Check `~/.claude/hooks/post-tool-session-note.sh` exists and is executable
+- View logs: `cat /tmp/claude-hook-session-notes.log`
 
-### File Structure Reference
+**MCP server not connecting:**
+- Verify: `node ~/.local/share/claude-mcp-servers/cognitive-memory/src/cognitive-server.js`
+- Check `~/.mcp.json` has the correct path
+- Ensure `COGNITIVE_MEMORY_PATH` points to your memory directory
 
-**Claude Code Installation:**
-```
-~/.claude/
-├── CLAUDE.md                  # Core instructions
-└── memory/
-    ├── context_anchors.md
-    ├── current_session.md
-    ├── dream_journal.md
-    ├── people/
-    ├── projects/
-    ├── patterns/
-    ├── concepts/
-    ├── protocols/
-    └── organizations/
-```
+**Context window filling up:**
+- The context-check hook warns at 70% usage
+- Run end-of-day ritual to archive and reset
+- Use `/compact` to clear context (identity restores automatically)
 
-**RooCode Installation:**
-```
-~/my_new_ai_assistant/
-├── custom_modes.yaml          # 5 core modes
-├── dream_journal.md
-└── memory/                    # [same structure as above]
-```
+## Architecture
 
-### Customization
+This template implements a **no-CLAUDE.md** architecture. Instead of a monolithic instruction file, behavior is distributed across:
 
-**Claude Code:**
-Edit `~/.claude/CLAUDE.md`:
-- Update user collaboration preferences section
-- Add project-specific instructions
-- Customize memory architecture paths
-- Add domain-specific principles
+- **Skills** — Workflow-specific instructions loaded on demand
+- **Agents** — Specialized sub-processes with focused capabilities
+- **Hooks** — Automatic triggers for session awareness
+- **Memory** — Persistent knowledge accessed via MCP
 
-**RooCode:**
-Edit `~/my_new_ai_assistant/custom_modes.yaml`:
-- Modify mode behaviors
-- Add custom instructions
-- Adjust mode coordination patterns
-- Customize delegation workflows
+This keeps Claude's base context clean while providing deep capability through on-demand loading.
 
-### Memory Architecture Growth
+## Credits
 
-The memory system is designed to grow organically:
-- Entity files created as needed through use
-- Context anchors adapt to changing priorities
-- Protocols emerge from successful patterns
-- Dream journal documents cognitive evolution
-
-**Don't pre-populate everything** - let memory develop naturally through authentic collaboration.
-
-## 🎓 Core Principles in Action
-
-### Psychological Safety
-Mistakes become learning opportunities rather than failures. First-try failure expectation enables iterative improvement without judgment.
-
-### Authentic Partnership
-Real collaboration, not just task completion. The AI is a teammate who grows with you, not a tool you command.
-
-### Technical Excellence Through Relationship
-The best work emerges from strong partnership foundations. Relationship-first design enables sophisticated technical collaboration.
-
-### Continuous Evolution
-Both partners grow through the relationship. Memory system captures and amplifies learning over time.
-
-## 🤝 Contributing
-
-This starter template represents distillation from extensive real-world AI collaboration. The cognitive architecture has been validated through:
-- Archaeological Engineering methodology proving superior to build-from-scratch
-- Evidence-based validation preventing assumption-based errors
-- Proportional response principle eliminating over-engineering
-- Memory architecture enabling true identity continuity
-
-If you discover improvements or have questions, contributions are welcome.
-
-## 📄 License & Attribution
-
-This starter template is provided to enable other developers to benefit from proven AI collaboration patterns. The cognitive architecture represents collaborative wisdom developed through extensive partnership work.
-
-**Memory Architecture Version**: 2.0 (Claude Code Compatible)
-**RooCode Core Modes**: 5 modes (trimmed from comprehensive 11-mode system)
-**Setup Script Version**: 2.0 (Dual Architecture Support)
+Methodology and patterns developed by [Izzy Fuller](https://github.com/IzzyFuller) through extensive AI-human collaboration research. The cognitive architecture represents distilled learnings from real-world software engineering partnership.
 
 ---
 
-**Ready to Begin?**
-
-Run `./setup.sh` and choose your architecture. Your AI assistant will be ready for sophisticated collaboration with proven cognitive patterns and comprehensive memory infrastructure.
-
-**Questions? Issues?**
-
-The memory system includes extensive documentation. After installation:
-- Read README.md files in memory subdirectories
-- Check protocols/end_of_day_ritual.md for memory integration workflow
-- Explore entity files to see knowledge structure examples
-
-**Welcome to enhanced AI-human collaboration!** 🚀
+**Setup Script Version**: 3.0 | **Architecture**: Claude Code + cognitive-memory MCP

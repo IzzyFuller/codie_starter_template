@@ -1,342 +1,438 @@
 #!/bin/bash
 
-# Automated test script for AI Assistant Starter Template
-# Tests all three installation paths in isolated Docker environment
+# Test script for Claude Code Starter Template
+# Verifies setup.sh installs all components correctly
 
 set -e
 
-# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-print_test_header() {
-    echo ""
-    echo -e "${BLUE}========================================${NC}"
-    echo -e "${BLUE}  $1${NC}"
-    echo -e "${BLUE}========================================${NC}"
-    echo ""
-}
-
-print_success() {
-    echo -e "${GREEN}✓ $1${NC}"
-}
-
-print_error() {
-    echo -e "${RED}✗ $1${NC}"
-}
-
-print_info() {
-    echo -e "${YELLOW}→ $1${NC}"
-}
-
-# Test counter
 TESTS_PASSED=0
 TESTS_FAILED=0
+CLAUDE_DIR="$HOME/.claude"
+MEMORY_PATH="$HOME/claude-memory-test"
+MCP_SERVER_DIR="$HOME/.local/share/claude-mcp-servers"
 
-# Function to verify file exists
-verify_file() {
-    local file="$1"
-    local description="$2"
+print_header() { echo -e "\n${BLUE}=== $1 ===${NC}\n"; }
+pass() { echo -e "${GREEN}  PASS${NC} $1"; TESTS_PASSED=$((TESTS_PASSED + 1)); }
+fail() { echo -e "${RED}  FAIL${NC} $1"; TESTS_FAILED=$((TESTS_FAILED + 1)); }
+info() { echo -e "${YELLOW}  INFO${NC} $1"; }
 
-    if [ -f "$file" ]; then
-        print_success "$description exists: $file"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-        return 0
+assert_file() {
+    [ -f "$1" ] && pass "$2" || fail "$2: $1"
+}
+
+assert_dir() {
+    [ -d "$1" ] && pass "$2" || fail "$2: $1"
+}
+
+assert_executable() {
+    [ -x "$1" ] && pass "$2 is executable" || fail "$2 not executable: $1"
+}
+
+assert_no_literal() {
+    local pattern="$1" file="$2" desc="$3"
+    if grep -rq "$pattern" "$file" 2>/dev/null; then
+        fail "$desc: found '$pattern' in $file"
     else
-        print_error "$description missing: $file"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-        return 1
+        pass "$desc"
     fi
 }
 
-# Function to verify directory exists
-verify_dir() {
-    local dir="$1"
-    local description="$2"
+# --- Cleanup ---
+cleanup() {
+    info "Cleaning test environment..."
+    rm -rf "$CLAUDE_DIR/skills" "$CLAUDE_DIR/agents" "$CLAUDE_DIR/hooks"
+    rm -f "$CLAUDE_DIR/settings.json"
+    rm -rf "$MEMORY_PATH"
+    rm -f "$HOME/.mcp.json"
+    rm -rf "$MCP_SERVER_DIR/cognitive-memory"
+}
 
-    if [ -d "$dir" ]; then
-        print_success "$description exists: $dir"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-        return 0
+# --- Test: Skills ---
+test_skills() {
+    print_header "Skills (expect 11)"
+
+    local expected_skills=(
+        pre-commit-checks
+        anti-pattern-detection
+        principle-check
+        session-note-taking
+        semantic-reflection
+        context-mapping
+        feedback-pattern-recognition
+        request-intake
+        refactor-phase
+        refactor-phase-self-check
+        skill-protocol-creation
+    )
+
+    local count=0
+    for skill in "${expected_skills[@]}"; do
+        assert_file "$CLAUDE_DIR/skills/$skill/SKILL.md" "Skill: $skill"
+        count=$((count + 1))
+    done
+
+    # Verify count
+    local actual
+    actual=$(find "$CLAUDE_DIR/skills" -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$actual" -eq "${#expected_skills[@]}" ]; then
+        pass "Skill count: $actual"
     else
-        print_error "$description missing: $dir"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-        return 1
+        fail "Skill count: expected ${#expected_skills[@]}, got $actual"
+    fi
+
+    # Verify no {{MEMORY_PATH}} literals remain
+    assert_no_literal "{{MEMORY_PATH}}" "$CLAUDE_DIR/skills" "No path placeholders in skills"
+
+    # Verify haiku model on specific skills
+    if grep -q "model: haiku" "$CLAUDE_DIR/skills/pre-commit-checks/SKILL.md"; then
+        pass "pre-commit-checks uses haiku model"
+    else
+        fail "pre-commit-checks should use haiku model"
+    fi
+
+    if grep -q "model: haiku" "$CLAUDE_DIR/skills/session-note-taking/SKILL.md"; then
+        pass "session-note-taking uses haiku model"
+    else
+        fail "session-note-taking should use haiku model"
     fi
 }
 
-# Function to count files in directory
-count_files() {
-    local dir="$1"
-    find "$dir" -type f 2>/dev/null | wc -l
-}
+# --- Test: Hooks ---
+test_hooks() {
+    print_header "Hooks (expect 4)"
 
-# Cleanup function
-cleanup_installation() {
-    print_info "Cleaning up previous test installation..."
-    rm -rf ~/.claude
-    rm -rf ~/my_new_ai_assistant
-    print_success "Cleanup complete"
-}
+    local expected_hooks=(
+        post-tool-session-note.sh
+        semantic-hydration.sh
+        session-start-restore.sh
+        context-check.sh
+    )
 
-# Test 1: Claude Code Only Installation
-test_claude_code_only() {
-    print_test_header "TEST 1: Claude Code Only Installation"
+    for hook in "${expected_hooks[@]}"; do
+        assert_file "$CLAUDE_DIR/hooks/$hook" "Hook: $hook"
+        assert_executable "$CLAUDE_DIR/hooks/$hook" "$hook"
+    done
 
-    cleanup_installation
-
-    print_info "Running setup.sh with Claude Code option..."
-
-    # Simulate user input: choice 1 (Claude Code)
-    printf "y\n1\n" | ./setup.sh || true
-
-    print_info "Verifying Claude Code installation..."
-
-    verify_file ~/.claude/CLAUDE.md "CLAUDE.md configuration"
-    verify_dir ~/.claude/skills/identity-continuity "Identity continuity skill directory"
-    verify_file ~/.claude/skills/identity-continuity/SKILL.md "Identity continuity skill"
-    verify_dir ~/.claude/memory "Claude Code memory directory"
-    verify_file ~/.claude/memory/context_anchors.md "Context anchors"
-    verify_file ~/.claude/memory/current_session.md "Current session"
-    verify_dir ~/.claude/memory/protocols "Protocols directory"
-    verify_file ~/.claude/memory/protocols/end_of_day_ritual.md "End of day ritual protocol"
-
-    # Verify memory path in CLAUDE.md points to ~/.claude/memory/ (check for expanded path)
-    if grep -q "$HOME/.claude/memory/" ~/.claude/CLAUDE.md || grep -q "~/.claude/memory/" ~/.claude/CLAUDE.md; then
-        print_success "CLAUDE.md memory path correctly set to Claude Code memory location"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
+    # Verify count
+    local actual
+    actual=$(find "$CLAUDE_DIR/hooks" -name "*.sh" 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$actual" -eq "${#expected_hooks[@]}" ]; then
+        pass "Hook count: $actual"
     else
-        print_error "CLAUDE.md memory path not correctly updated"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
+        fail "Hook count: expected ${#expected_hooks[@]}, got $actual"
     fi
 
-    # Verify memory path in skill SKILL.md
-    if grep -q "$HOME/.claude/memory/" ~/.claude/skills/identity-continuity/SKILL.md || grep -q "~/.claude/memory/" ~/.claude/skills/identity-continuity/SKILL.md; then
-        print_success "Skill memory path correctly set to Claude Code memory location"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        print_error "Skill memory path not correctly updated"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-    fi
-
-    # Verify RooCode files NOT created
-    if [ ! -d ~/my_new_ai_assistant ]; then
-        print_success "RooCode directory correctly NOT created"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        print_error "RooCode directory unexpectedly created"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-    fi
-
-    local file_count=$(count_files ~/.claude/memory)
-    print_info "Memory structure contains $file_count files"
-}
-
-# Test 2: RooCode Only Installation
-test_roocode_only() {
-    print_test_header "TEST 2: RooCode Only Installation"
-
-    cleanup_installation
-
-    print_info "Running setup.sh with RooCode option..."
-
-    # Simulate user input: choice 2 (RooCode)
-    printf "y\n2\n" | ./setup.sh || true
-
-    print_info "Verifying RooCode installation..."
-
-    verify_file ~/my_new_ai_assistant/custom_modes.yaml "custom_modes.yaml (5 modes)"
-    verify_file ~/my_new_ai_assistant/dream_journal.md "Dream journal"
-    verify_dir ~/my_new_ai_assistant/memory "RooCode memory directory"
-    verify_file ~/my_new_ai_assistant/memory/context_anchors.md "Context anchors"
-    verify_file ~/my_new_ai_assistant/memory/current_session.md "Current session"
-    verify_dir ~/my_new_ai_assistant/memory/protocols "Protocols directory"
-
-    # Verify 5 modes in custom_modes.yaml
-    local mode_count=$(grep -c "^  - slug:" ~/my_new_ai_assistant/custom_modes.yaml || true)
-    if [ "$mode_count" -eq 5 ]; then
-        print_success "custom_modes.yaml contains exactly 5 modes"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        print_error "custom_modes.yaml contains $mode_count modes (expected 5)"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-    fi
-
-    # Verify the 5 modes are the correct ones
-    if grep -q "slug: interactor" ~/my_new_ai_assistant/custom_modes.yaml && \
-       grep -q "slug: coordinator" ~/my_new_ai_assistant/custom_modes.yaml && \
-       grep -q "slug: learn" ~/my_new_ai_assistant/custom_modes.yaml && \
-       grep -q "slug: deep-learn" ~/my_new_ai_assistant/custom_modes.yaml && \
-       grep -q "slug: dream" ~/my_new_ai_assistant/custom_modes.yaml; then
-        print_success "All 5 core modes present (interactor, coordinator, learn, deep-learn, dream)"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        print_error "Missing one or more core modes"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-    fi
-
-    # Verify Claude Code files NOT created
-    if [ ! -f ~/.claude/CLAUDE.md ]; then
-        print_success "Claude Code CLAUDE.md correctly NOT created"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        print_error "Claude Code CLAUDE.md unexpectedly created"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-    fi
-
-    local file_count=$(count_files ~/my_new_ai_assistant/memory)
-    print_info "Memory structure contains $file_count files"
-}
-
-# Test 3: Both Installation (Shared Memory)
-test_both_installation() {
-    print_test_header "TEST 3: Both Installations (Shared Memory)"
-
-    cleanup_installation
-
-    print_info "Running setup.sh with Both option..."
-
-    # Simulate user input: choice 3 (Both)
-    printf "y\n3\n" | ./setup.sh || true
-
-    print_info "Verifying dual installation..."
-
-    # Verify Claude Code files
-    verify_file ~/.claude/CLAUDE.md "Claude Code CLAUDE.md"
-    verify_dir ~/.claude/skills/identity-continuity "Identity continuity skill directory"
-    verify_file ~/.claude/skills/identity-continuity/SKILL.md "Identity continuity skill"
-
-    # Verify RooCode files
-    verify_file ~/my_new_ai_assistant/custom_modes.yaml "RooCode custom_modes.yaml"
-    verify_file ~/my_new_ai_assistant/dream_journal.md "Dream journal"
-
-    # Verify SHARED memory location
-    verify_dir ~/my_new_ai_assistant/memory "Shared memory directory"
-    verify_file ~/my_new_ai_assistant/memory/context_anchors.md "Shared context anchors"
-    verify_file ~/my_new_ai_assistant/memory/current_session.md "Shared current session"
-
-    # Verify Claude Code memory path points to SHARED location (check for expanded path)
-    if grep -q "$HOME/my_new_ai_assistant/memory/" ~/.claude/CLAUDE.md || grep -q "~/my_new_ai_assistant/memory/" ~/.claude/CLAUDE.md; then
-        print_success "CLAUDE.md memory path correctly points to shared location"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        print_error "CLAUDE.md memory path not pointing to shared location"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-        print_info "Checking actual path in CLAUDE.md:"
-        grep "memory/" ~/.claude/CLAUDE.md | head -3
-    fi
-
-    # Verify skill memory path also points to SHARED location
-    if grep -q "$HOME/my_new_ai_assistant/memory/" ~/.claude/skills/identity-continuity/SKILL.md || grep -q "~/my_new_ai_assistant/memory/" ~/.claude/skills/identity-continuity/SKILL.md; then
-        print_success "Skill memory path correctly points to shared location"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        print_error "Skill memory path not pointing to shared location"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-    fi
-
-    # Verify Claude Code does NOT have its own memory directory
-    if [ ! -d ~/.claude/memory ]; then
-        print_success "Claude Code correctly uses shared memory (no ~/.claude/memory/)"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        print_error "Claude Code unexpectedly created its own memory directory"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-    fi
-
-    local file_count=$(count_files ~/my_new_ai_assistant/memory)
-    print_info "Shared memory structure contains $file_count files"
-}
-
-# Test 4: Backup Functionality
-test_backup_functionality() {
-    print_test_header "TEST 4: Backup Functionality"
-
-    cleanup_installation
-
-    print_info "Creating existing files to test backup..."
-
-    # Create existing CLAUDE.md
-    mkdir -p ~/.claude
-    echo "# Existing CLAUDE.md" > ~/.claude/CLAUDE.md
-
-    # Create existing custom_modes.yaml
-    mkdir -p ~/my_new_ai_assistant
-    echo "customModes:" > ~/my_new_ai_assistant/custom_modes.yaml
-
-    print_info "Running setup.sh with Both option (should create backups)..."
-
-    # Run installation
-    printf "y\n3\n" | ./setup.sh || true
-
-    print_info "Verifying backups were created..."
-
-    # Check for Claude Code backup
-    local claude_backup=$(find ~/.claude -name "CLAUDE_backup_*.md" | head -1)
-    if [ -n "$claude_backup" ]; then
-        print_success "Claude Code backup created: $(basename "$claude_backup")"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-
-        # Verify backup content
-        if grep -q "Existing CLAUDE.md" "$claude_backup"; then
-            print_success "Backup contains original content"
-            TESTS_PASSED=$((TESTS_PASSED + 1))
+    # Verify excluded hooks are NOT present
+    local excluded_hooks=(inject-agent-instructions.sh validate-response.sh pre-compact.sh)
+    for hook in "${excluded_hooks[@]}"; do
+        if [ -f "$CLAUDE_DIR/hooks/$hook" ]; then
+            fail "Excluded hook present: $hook"
         else
-            print_error "Backup does not contain original content"
-            TESTS_FAILED=$((TESTS_FAILED + 1))
+            pass "Excluded hook absent: $hook"
+        fi
+    done
+}
+
+# --- Test: Agents ---
+test_agents() {
+    print_header "Agents (expect 11)"
+
+    local expected_agents=(
+        identity-restoration.md
+        semantic-reflection.md
+        session-notes.md
+        clean-coder.md
+        clean-designer.md
+        code-quality-fixer.md
+        end-of-day-ritual.md
+        deep-learn-anti-pattern-finder.md
+        deep-learn-entity-finder.md
+        deep-learn-pattern-finder.md
+        deep-learn-resetter.md
+    )
+
+    for agent in "${expected_agents[@]}"; do
+        assert_file "$CLAUDE_DIR/agents/$agent" "Agent: $agent"
+    done
+
+    # Verify count
+    local actual
+    actual=$(find "$CLAUDE_DIR/agents" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$actual" -eq "${#expected_agents[@]}" ]; then
+        pass "Agent count: $actual"
+    else
+        fail "Agent count: expected ${#expected_agents[@]}, got $actual"
+    fi
+
+    # Verify no {{MEMORY_PATH}} literals remain
+    assert_no_literal "{{MEMORY_PATH}}" "$CLAUDE_DIR/agents" "No path placeholders in agents"
+
+    # Verify no hardcoded user paths
+    assert_no_literal "/Users/izzyfuller/" "$CLAUDE_DIR/agents" "No hardcoded user paths in agents"
+
+    # Verify excluded agents are NOT present
+    local excluded_agents=(clean-reviewer.md clean-thinker.md)
+    for agent in "${excluded_agents[@]}"; do
+        if [ -f "$CLAUDE_DIR/agents/$agent" ]; then
+            fail "Excluded agent present: $agent"
+        else
+            pass "Excluded agent absent: $agent"
+        fi
+    done
+}
+
+# --- Test: Memory Seed ---
+test_memory_seed() {
+    print_header "Memory Seed"
+
+    # Template files
+    assert_file "$MEMORY_PATH/context_anchors.md" "context_anchors.md"
+    assert_file "$MEMORY_PATH/current_session.md" "current_session.md"
+    assert_file "$MEMORY_PATH/me.md" "me.md"
+
+    # Directories
+    local expected_dirs=(concepts patterns anti-patterns protocols people projects organizations)
+    for dir in "${expected_dirs[@]}"; do
+        assert_dir "$MEMORY_PATH/$dir" "Directory: $dir"
+    done
+
+    # Concepts (7)
+    local concept_count
+    concept_count=$(find "$MEMORY_PATH/concepts" -name "*.md" ! -name "README.md" 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$concept_count" -eq 7 ]; then
+        pass "Concept count: $concept_count"
+    else
+        fail "Concept count: expected 7, got $concept_count"
+    fi
+
+    # Patterns (5)
+    local pattern_count
+    pattern_count=$(find "$MEMORY_PATH/patterns" -name "*.md" ! -name "README.md" 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$pattern_count" -eq 5 ]; then
+        pass "Pattern count: $pattern_count"
+    else
+        fail "Pattern count: expected 5, got $pattern_count"
+    fi
+
+    # Anti-patterns (17)
+    local ap_count
+    ap_count=$(find "$MEMORY_PATH/anti-patterns" -name "*.md" ! -name "README.md" 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$ap_count" -eq 17 ]; then
+        pass "Anti-pattern count: $ap_count"
+    else
+        fail "Anti-pattern count: expected 17, got $ap_count"
+    fi
+
+    # Protocols (25)
+    local proto_count
+    proto_count=$(find "$MEMORY_PATH/protocols" -name "*.md" ! -name "README.md" 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$proto_count" -eq 25 ]; then
+        pass "Protocol count: $proto_count"
+    else
+        fail "Protocol count: expected 25, got $proto_count"
+    fi
+
+    # People (2)
+    assert_file "$MEMORY_PATH/people/izzy.md" "people/izzy.md"
+    assert_file "$MEMORY_PATH/people/codie.md" "people/codie.md"
+
+    # READMEs
+    assert_file "$MEMORY_PATH/projects/README.md" "projects/README.md"
+    assert_file "$MEMORY_PATH/organizations/README.md" "organizations/README.md"
+
+    # No {{MEMORY_PATH}} literals in protocols
+    assert_no_literal "{{MEMORY_PATH}}" "$MEMORY_PATH/protocols" "No path placeholders in protocols"
+
+    # No hardcoded user paths anywhere in memory
+    assert_no_literal "/Users/izzyfuller/" "$MEMORY_PATH" "No hardcoded user paths in memory"
+
+    # No FasterOutcomes references
+    assert_no_literal "FasterOutcomes" "$MEMORY_PATH" "No FasterOutcomes references in memory"
+}
+
+# --- Test: Settings ---
+test_settings() {
+    print_header "Settings"
+
+    assert_file "$CLAUDE_DIR/settings.json" "settings.json"
+
+    # Verify it's valid JSON
+    if jq empty "$CLAUDE_DIR/settings.json" 2>/dev/null; then
+        pass "settings.json is valid JSON"
+    else
+        fail "settings.json is invalid JSON"
+    fi
+
+    # Verify hooks are configured
+    if jq -e '.hooks.PostToolUse' "$CLAUDE_DIR/settings.json" >/dev/null 2>&1; then
+        pass "PostToolUse hook configured"
+    else
+        fail "PostToolUse hook not configured"
+    fi
+
+    if jq -e '.hooks.UserPromptSubmit' "$CLAUDE_DIR/settings.json" >/dev/null 2>&1; then
+        pass "UserPromptSubmit hook configured"
+    else
+        fail "UserPromptSubmit hook not configured"
+    fi
+
+    if jq -e '.hooks.SessionStart' "$CLAUDE_DIR/settings.json" >/dev/null 2>&1; then
+        pass "SessionStart hook configured"
+    else
+        fail "SessionStart hook not configured"
+    fi
+
+    if jq -e '.hooks.Stop' "$CLAUDE_DIR/settings.json" >/dev/null 2>&1; then
+        pass "Stop hook configured"
+    else
+        fail "Stop hook not configured"
+    fi
+
+    # Verify MCP_TOOL_TIMEOUT
+    local timeout
+    timeout=$(jq -r '.env.MCP_TOOL_TIMEOUT // empty' "$CLAUDE_DIR/settings.json" 2>/dev/null)
+    if [ "$timeout" = "120000" ]; then
+        pass "MCP_TOOL_TIMEOUT set to 120000"
+    else
+        fail "MCP_TOOL_TIMEOUT: expected 120000, got '$timeout'"
+    fi
+}
+
+# --- Test: MCP Config ---
+test_mcp_config() {
+    print_header "MCP Configuration"
+
+    assert_file "$HOME/.mcp.json" ".mcp.json"
+
+    # Verify it's valid JSON
+    if jq empty "$HOME/.mcp.json" 2>/dev/null; then
+        pass ".mcp.json is valid JSON"
+    else
+        fail ".mcp.json is invalid JSON"
+        return
+    fi
+
+    # Verify cognitive-memory server entry
+    if jq -e '.mcpServers["cognitive-memory"]' "$HOME/.mcp.json" >/dev/null 2>&1; then
+        pass "cognitive-memory server configured"
+    else
+        fail "cognitive-memory server not in .mcp.json"
+    fi
+
+    # Verify COGNITIVE_MEMORY_PATH points to memory path
+    local mem_path
+    mem_path=$(jq -r '.mcpServers["cognitive-memory"].env.COGNITIVE_MEMORY_PATH // empty' "$HOME/.mcp.json" 2>/dev/null)
+    if [ "$mem_path" = "$MEMORY_PATH" ]; then
+        pass "COGNITIVE_MEMORY_PATH points to $MEMORY_PATH"
+    else
+        fail "COGNITIVE_MEMORY_PATH: expected $MEMORY_PATH, got '$mem_path'"
+    fi
+}
+
+# --- Test: Backups ---
+test_backup() {
+    print_header "Backup Functionality"
+
+    # Create pre-existing config
+    mkdir -p "$CLAUDE_DIR/skills/old-skill"
+    echo "old" > "$CLAUDE_DIR/skills/old-skill/SKILL.md"
+    echo '{"existing": true}' > "$CLAUDE_DIR/settings.json"
+
+    # Re-run setup
+    info "Re-running setup with existing config..."
+    printf "y\n$MEMORY_PATH\ny\nn\n" | ./setup.sh 2>/dev/null || true
+
+    # Check backups exist
+    local skills_backup
+    skills_backup=$(find "$CLAUDE_DIR" -maxdepth 1 -name "skills_backup_*" -type d | head -1)
+    if [ -n "$skills_backup" ]; then
+        pass "Skills backup created"
+    else
+        fail "Skills backup not created"
+    fi
+
+    local settings_backup
+    settings_backup=$(find "$CLAUDE_DIR" -maxdepth 1 -name "settings_backup_*.json" | head -1)
+    if [ -n "$settings_backup" ]; then
+        pass "Settings backup created"
+        if jq -e '.existing' "$settings_backup" >/dev/null 2>&1; then
+            pass "Settings backup contains original content"
+        else
+            fail "Settings backup missing original content"
         fi
     else
-        print_error "Claude Code backup not created"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-    fi
-
-    # Check for RooCode backup
-    local roocode_backup=$(find ~/my_new_ai_assistant -name "custom_modes_backup_*.yaml" | head -1)
-    if [ -n "$roocode_backup" ]; then
-        print_success "RooCode backup created: $(basename "$roocode_backup")"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        print_error "RooCode backup not created"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
+        fail "Settings backup not created"
     fi
 }
 
-# Main test execution
-main() {
-    print_test_header "AI Assistant Starter Template - Installation Tests"
+# --- Test: No CLAUDE.md ---
+test_no_claude_md() {
+    print_header "No CLAUDE.md"
 
-    print_info "Starting automated test suite..."
-    print_info "Test environment: Docker container"
-    print_info "Working directory: $(pwd)"
+    if [ -f "$CLAUDE_DIR/CLAUDE.md" ]; then
+        fail "CLAUDE.md exists (should not be created)"
+    else
+        pass "No CLAUDE.md file (correct - using skills/agents/hooks architecture)"
+    fi
+}
+
+# --- Test: MCP Server ---
+test_mcp_server() {
+    print_header "MCP Server Installation"
+
+    assert_dir "$MCP_SERVER_DIR/cognitive-memory" "cognitive-memory server directory"
+    assert_file "$MCP_SERVER_DIR/cognitive-memory/src/cognitive-server.js" "cognitive-server.js"
+    assert_dir "$MCP_SERVER_DIR/cognitive-memory/node_modules" "node_modules installed"
+}
+
+# --- Main ---
+main() {
+    echo -e "${BLUE}======================================${NC}"
+    echo -e "${BLUE}  Claude Code Starter Template Tests${NC}"
+    echo -e "${BLUE}======================================${NC}"
     echo ""
 
-    # Run all tests
-    test_claude_code_only
-    test_roocode_only
-    test_both_installation
-    test_backup_functionality
+    cleanup
 
-    # Final summary
-    print_test_header "TEST SUMMARY"
+    # Run setup with test memory path
+    info "Running setup.sh..."
+    printf "y\n$MEMORY_PATH\nn\n" | ./setup.sh 2>/dev/null || {
+        fail "setup.sh exited with error"
+    }
 
-    local total_tests=$((TESTS_PASSED + TESTS_FAILED))
+    # Run all test suites
+    test_skills
+    test_hooks
+    test_agents
+    test_memory_seed
+    test_settings
+    test_mcp_config
+    test_no_claude_md
+    test_mcp_server
+    test_backup
 
-    echo -e "${GREEN}Passed: $TESTS_PASSED${NC}"
-    echo -e "${RED}Failed: $TESTS_FAILED${NC}"
-    echo -e "Total:  $total_tests"
+    # Summary
+    print_header "RESULTS"
+
+    local total=$((TESTS_PASSED + TESTS_FAILED))
+    echo -e "  ${GREEN}Passed: $TESTS_PASSED${NC}"
+    echo -e "  ${RED}Failed: $TESTS_FAILED${NC}"
+    echo -e "  Total:  $total"
     echo ""
 
     if [ $TESTS_FAILED -eq 0 ]; then
-        print_success "ALL TESTS PASSED! Installation script is working correctly."
+        echo -e "${GREEN}  ALL TESTS PASSED${NC}"
         exit 0
     else
-        print_error "SOME TESTS FAILED. Please review the output above."
+        echo -e "${RED}  SOME TESTS FAILED${NC}"
         exit 1
     fi
 }
 
-# Run main function
-main
+main "$@"

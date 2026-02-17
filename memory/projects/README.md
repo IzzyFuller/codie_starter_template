@@ -1,26 +1,23 @@
-# Projects Memory
+# Projects
 
-This directory stores information about projects you work on, including:
+Document your active projects here. One file per project.
 
-## Purpose
-- Project documentation and context
-- Lessons learned from development work
-- Architectural decisions and patterns
-- Technical challenges and solutions
-- Team collaboration insights
+## Format
+```
+# Project Name
 
-## File Structure
-Each project should have its own file named `[project-name].md` containing:
-- Project overview and goals
-- Key technical decisions
-- Challenges encountered and solutions
-- Lessons learned
-- Important contacts and resources
+## Status
+Active / Paused / Complete
 
-## Usage
-Your AI assistant will automatically create and update project files as you work together on different initiatives. These files help maintain project context across conversations and provide valuable historical information for future reference.
+## Description
+Brief description of what this project is.
 
-## Integration
-- Referenced through [`context_anchors.md`](../context_anchors.md) for active project context
-- Populated through session memory during collaborative work
-- Used for project continuity and knowledge preservation
+## Architecture
+Key architectural decisions and patterns used.
+
+## Current Focus
+What's being worked on right now.
+
+## Key Decisions
+Important decisions made and their rationale.
+```

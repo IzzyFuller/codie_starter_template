@@ -1,0 +1,7 @@
+.DS_Store
+.coverage
+.idea/
+*.pyc
+__pycache__/
+node_modules/
+.env
