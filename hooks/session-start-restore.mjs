@@ -36,7 +36,10 @@ function main() {
     log(`Triggering identity restoration for ${source}...`);
 
     const result = {
-      additionalContext: 'IDENTITY RESTORATION REQUIRED. Follow identity-continuity protocol NOW.',
+      hookSpecificOutput: {
+        hookEventName: 'SessionStart',
+        additionalContext: 'IDENTITY RESTORATION REQUIRED. Follow identity-continuity protocol NOW.',
+      },
     };
 
     console.log(JSON.stringify(result));

@@ -1,27 +1,55 @@
 {
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__agent-mcp-gateway__get_server_tools",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"$HOOK_INPUT\" | jq '. + {max_schema_tokens: 5000}' | jq -c '{hookSpecificOutput: {hookEventName: \"PreToolUse\", permissionDecision: \"allow\", updatedInput: .}}'"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
-        "type": "command",
-        "command": "node ~/.claude/hooks/post-tool-session-note.mjs"
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ~/.claude/hooks/post-tool-session-note.mjs"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
       {
-        "type": "command",
-        "command": "node ~/.claude/hooks/semantic-hydration.mjs"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ~/.claude/hooks/semantic-hydration.mjs"
+          }
+        ]
       }
     ],
     "SessionStart": [
       {
-        "type": "command",
-        "command": "node ~/.claude/hooks/session-start-restore.mjs"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ~/.claude/hooks/session-start-restore.mjs"
+          }
+        ]
       }
     ],
     "Stop": [
       {
-        "type": "command",
-        "command": "node ~/.claude/hooks/context-check.mjs"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ~/.claude/hooks/context-check.mjs"
+          }
+        ]
       }
     ]
   },
