@@ -3,25 +3,25 @@
     "PostToolUse": [
       {
         "type": "command",
-        "command": "bash ~/.claude/hooks/post-tool-session-note.sh"
+        "command": "node ~/.claude/hooks/post-tool-session-note.mjs"
       }
     ],
     "UserPromptSubmit": [
       {
         "type": "command",
-        "command": "bash ~/.claude/hooks/semantic-hydration.sh"
+        "command": "node ~/.claude/hooks/semantic-hydration.mjs"
       }
     ],
     "SessionStart": [
       {
         "type": "command",
-        "command": "bash ~/.claude/hooks/session-start-restore.sh"
+        "command": "node ~/.claude/hooks/session-start-restore.mjs"
       }
     ],
     "Stop": [
       {
         "type": "command",
-        "command": "bash ~/.claude/hooks/context-check.sh"
+        "command": "node ~/.claude/hooks/context-check.mjs"
       }
     ]
   },
@@ -29,9 +29,11 @@
     "allow": [
       "mcp__cognitive-memory__*",
       "mcp__agent-mcp-gateway__*",
+      "mcp__qmd__*",
       "Bash(git *)",
       "Bash(npm *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(bun *)"
     ]
   },
   "env": {

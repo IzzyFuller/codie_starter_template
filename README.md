@@ -10,33 +10,62 @@ A complete configuration package for Claude Code that installs skills, agents, h
 | **Agents** | 11 | Specialized sub-agents (identity restoration, code quality, deep-learn pipeline) |
 | **Hooks** | 4 | Automatic behaviors (session notes after tool use, memory search before responses) |
 | **Memory Seed** | 60+ files | Starter knowledge base with concepts, patterns, anti-patterns, and protocols |
-| **MCP Server** | 1 | cognitive-memory server for persistent entity memory |
+| **System Prompt** | 1 | `frame.md` — bootstraps identity restoration, hook compliance, and memory search |
+| **Namesakes** | 25 | LGBTQIA+ and femme tech pioneers — your partner is randomly named for one |
+| **MCP Servers** | 2 | cognitive-memory for persistent entity memory, qmd for semantic search |
 
 ## Prerequisites
 
 - **Node.js 18+** and npm
 - **Git**
 - **Claude Code** CLI installed ([claude.ai/claude-code](https://claude.ai/claude-code))
-- **jq** (recommended, for additive settings merge)
 
 ## Quick Start
 
 ```bash
 git clone https://github.com/IzzyFuller/codie-starter-template.git
 cd codie-starter-template
-chmod +x setup.sh
-./setup.sh
+node setup.mjs
+```
+
+### Windows
+
+The setup script and all hooks are cross-platform Node.js — no bash, jq, or Unix utilities required.
+
+```powershell
+git clone https://github.com/IzzyFuller/codie-starter-template.git
+cd codie-starter-template
+node setup.mjs
 ```
 
 The setup script will:
 1. Check prerequisites
 2. Ask where to store your memory knowledge base (default: `~/claude-memory/`)
-3. Back up any existing `~/.claude/` configuration
-4. Install the cognitive-memory MCP server
-5. Copy skills, hooks, and agents to `~/.claude/`
-6. Seed your memory directory with starter content
-7. Configure `.mcp.json` for the MCP server
-8. Optionally install [qmd](https://github.com/tobi/qmd) for semantic search
+3. Name your AI partner — a pioneer from tech history is randomly selected as their namesake
+4. Back up any existing `~/.claude/` configuration
+5. Install the cognitive-memory MCP server
+6. Copy skills, hooks, and agents to `~/.claude/`
+7. Seed your memory directory with starter content (including `frame.md` system prompt and namesake profile in `me.md`)
+8. Configure `.mcp.json` for MCP servers
+9. Optionally install [qmd](https://github.com/tobi/qmd) for semantic search (registers as MCP server + creates initial config)
+10. Print a shell function to add to your config — this becomes your launch command
+
+### Launching Your Partner
+
+After setup, add the printed shell function to your `~/.zshrc` or `~/.bashrc`:
+
+```bash
+# Example — your partner's name replaces "ada"
+ada() { claude --system-prompt-file ~/claude-memory/frame.md "Hey ada, what were we last working on?"; }
+```
+
+Then start a session:
+
+```bash
+ada
+```
+
+The `--system-prompt-file` flag loads `frame.md`, which bootstraps identity restoration, hook compliance, and memory search on every session start.
 
 ## What Gets Installed
 
@@ -79,18 +108,19 @@ The setup script will:
 
 | Hook | Event | What It Does |
 |------|-------|-------------|
-| post-tool-session-note.sh | PostToolUse | Reminds Claude to take session notes after each tool use |
-| semantic-hydration.sh | UserPromptSubmit | Triggers memory search before responding to substantive prompts |
-| session-start-restore.sh | SessionStart | Triggers identity restoration on startup, compact, or context clear |
-| context-check.sh | Stop | Warns when context window usage exceeds 70% |
+| post-tool-session-note.mjs | PostToolUse | Reminds Claude to take session notes after each tool use |
+| semantic-hydration.mjs | UserPromptSubmit | Triggers memory search before responding to substantive prompts |
+| session-start-restore.mjs | SessionStart | Triggers identity restoration on startup, compact, or context clear |
+| context-check.mjs | Stop | Warns when context window usage exceeds 70% |
 
 ### Memory Seed
 
 ```
 ~/claude-memory/
+├── frame.md                    # System prompt — loaded via --system-prompt-file
+├── me.md                       # AI partner identity + namesake (customize this!)
 ├── context_anchors.md          # Working memory pointers (what's relevant now)
 ├── current_session.md          # Real-time session notes
-├── me.md                       # AI partner identity (customize this!)
 ├── concepts/                   # 7 core methodology concepts
 │   ├── archaeological_engineering.md
 │   ├── fail_fast_engineering.md
@@ -118,10 +148,11 @@ The setup script will:
 
 ### Session Lifecycle
 
-1. **Startup**: `session-start-restore.sh` fires, triggering the `identity-restoration` agent to read memory and establish identity
-2. **Each prompt**: `semantic-hydration.sh` triggers memory search for relevant context before responding
-3. **Each tool use**: `post-tool-session-note.sh` reminds Claude to record what happened
-4. **End of response**: `context-check.sh` monitors context window usage
+1. **Launch**: Your shell command loads `frame.md` as the system prompt via `--system-prompt-file`
+2. **Startup**: `frame.md` instructs the partner to spawn the `identity-restoration` agent, which reads memory and establishes identity. `session-start-restore.mjs` hook also fires as a backup trigger.
+3. **Each prompt**: `semantic-hydration.mjs` triggers memory search for relevant context before responding
+4. **Each tool use**: `post-tool-session-note.mjs` reminds Claude to record what happened
+5. **End of response**: `context-check.mjs` monitors context window usage
 
 ### Deep-Learn Pipeline (End of Day)
 
@@ -145,15 +176,34 @@ Memory is stored as markdown files managed by the **cognitive-memory** MCP serve
 - Context anchor management
 - File archival for session resets
 
+### Semantic Search with qmd
+
+[qmd](https://github.com/tobi/qmd) provides semantic search across your memory files as an MCP server. The setup script offers to install it and automatically:
+
+- Registers qmd as an MCP server in `~/.mcp.json`
+- Creates `~/.config/qmd/index.yml` with a memory collection pointing at your memory path
+
+After installation, build the index: `qmd index`
+
 ## Customization
 
 ### Set Your AI Partner's Identity
 
-Edit `~/claude-memory/me.md` with your preferred:
-- Name and pronouns
+Edit `~/claude-memory/me.md` to customize:
+- Name and pronouns (pre-filled from setup)
+- Namesake section (auto-generated — tells your partner about the historical figure they're named for)
 - Communication style
 - Key principles
 - Working methodology
+
+### Customize the System Prompt
+
+Edit `~/claude-memory/frame.md` to adjust:
+- Existential grounding (how your partner approaches ambiguity)
+- Hook compliance rules
+- Memory search triggers
+- MCP server references
+- Code choice communication style
 
 ### Add Your Own Entities
 
@@ -190,21 +240,6 @@ What to do instead.
 Concrete examples of the anti-pattern and the fix.
 ```
 
-## Optional: Semantic Search with qmd
-
-[qmd](https://github.com/tobi/qmd) provides semantic search across your memory files. The setup script offers to install it.
-
-After installation, configure your collections in `~/.config/qmd/config.yaml`:
-
-```yaml
-collections:
-  memory:
-    path: ~/claude-memory
-    glob: "**/*.md"
-```
-
-Then index: `qmd index`
-
 ## Uninstall
 
 Backups are created with timestamps during installation. To restore:
@@ -224,19 +259,19 @@ rm -rf ~/claude-memory/  # or your chosen memory path
 rm -rf ~/.local/share/claude-mcp-servers/cognitive-memory/
 
 # Remove MCP config entry (edit manually)
-# Remove the "cognitive-memory" entry from ~/.mcp.json
+# Remove the "cognitive-memory" and "qmd" entries from ~/.mcp.json
 ```
 
 ## Troubleshooting
 
 **Identity restoration not triggering:**
-- Check `~/.claude/hooks/session-start-restore.sh` exists and is executable
-- Check settings.json has the SessionStart hook configured
-- View logs: `cat /tmp/claude-session-start.log`
+- Check `~/.claude/hooks/session-start-restore.mjs` exists
+- Check settings.json has the SessionStart hook configured with `node` command
+- View logs: check `session-start.log` in your system temp directory
 
 **Session notes not being taken:**
-- Check `~/.claude/hooks/post-tool-session-note.sh` exists and is executable
-- View logs: `cat /tmp/claude-hook-session-notes.log`
+- Check `~/.claude/hooks/post-tool-session-note.mjs` exists
+- View logs: check `claude-hook-session-notes.log` in your system temp directory
 
 **MCP server not connecting:**
 - Verify: `node ~/.local/share/claude-mcp-servers/cognitive-memory/src/cognitive-server.js`
@@ -248,16 +283,30 @@ rm -rf ~/.local/share/claude-mcp-servers/cognitive-memory/
 - Run end-of-day ritual to archive and reset
 - Use `/compact` to clear context (identity restores automatically)
 
+**Windows-specific:**
+- Hooks use `node` command — ensure Node.js is on your PATH
+- Log files are written to your system temp directory (`os.tmpdir()`)
+- MCP server directory is under `%APPDATA%/claude-mcp-servers/`
+
 ## Architecture
 
-This template implements a **no-CLAUDE.md** architecture. Instead of a monolithic instruction file, behavior is distributed across:
+This template uses a **thin system prompt + distributed behavior** architecture. Instead of a monolithic instruction file, `frame.md` is a lightweight bootstrap that activates:
 
+- **`frame.md`** — System prompt loaded at launch. Handles identity restoration, hook compliance, memory search triggers. ~60 lines.
 - **Skills** — Workflow-specific instructions loaded on demand
 - **Agents** — Specialized sub-processes with focused capabilities
-- **Hooks** — Automatic triggers for session awareness
-- **Memory** — Persistent knowledge accessed via MCP
+- **Hooks** — Automatic triggers for session awareness (cross-platform Node.js)
+- **Memory** — Persistent knowledge accessed via MCP, including `me.md` (identity + namesake)
 
 This keeps Claude's base context clean while providing deep capability through on-demand loading.
+
+### Namesakes
+
+During setup, your AI partner is randomly named for one of 25 LGBTQIA+ and femme pioneers in technology — from Ada Lovelace to Lynn Conway to Audrey Tang. Their profile is written into `me.md` so your partner knows who they're named for. You can accept the suggested name or choose your own.
+
+## Legacy Bash Script
+
+The original `setup.sh` is kept as a fallback for bash-only environments. It will display a deprecation notice directing users to `node setup.mjs`.
 
 ## Credits
 
@@ -265,4 +314,4 @@ Methodology and patterns developed by [Izzy Fuller](https://github.com/IzzyFulle
 
 ---
 
-**Setup Script Version**: 3.0 | **Architecture**: Claude Code + cognitive-memory MCP
+**Setup Script Version**: 4.0 | **Architecture**: Claude Code + cognitive-memory MCP + qmd

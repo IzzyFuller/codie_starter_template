@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Test script for Claude Code Starter Template
-# Verifies setup.sh installs all components correctly
+# Verifies setup.mjs installs all components correctly
 
 set -e
 
@@ -30,16 +30,21 @@ assert_dir() {
     [ -d "$1" ] && pass "$2" || fail "$2: $1"
 }
 
-assert_executable() {
-    [ -x "$1" ] && pass "$2 is executable" || fail "$2 not executable: $1"
-}
-
 assert_no_literal() {
     local pattern="$1" file="$2" desc="$3"
     if grep -rq "$pattern" "$file" 2>/dev/null; then
         fail "$desc: found '$pattern' in $file"
     else
         pass "$desc"
+    fi
+}
+
+assert_json_contains() {
+    local file="$1" query="$2" desc="$3"
+    if jq -e "$query" "$file" >/dev/null 2>&1; then
+        pass "$desc"
+    else
+        fail "$desc"
     fi
 }
 
@@ -105,28 +110,45 @@ test_skills() {
 
 # --- Test: Hooks ---
 test_hooks() {
-    print_header "Hooks (expect 4)"
+    print_header "Hooks (expect 4 .mjs files)"
 
     local expected_hooks=(
-        post-tool-session-note.sh
-        semantic-hydration.sh
-        session-start-restore.sh
-        context-check.sh
+        post-tool-session-note.mjs
+        semantic-hydration.mjs
+        session-start-restore.mjs
+        context-check.mjs
     )
 
     for hook in "${expected_hooks[@]}"; do
         assert_file "$CLAUDE_DIR/hooks/$hook" "Hook: $hook"
-        assert_executable "$CLAUDE_DIR/hooks/$hook" "$hook"
     done
 
-    # Verify count
+    # Verify count (.mjs files only)
     local actual
-    actual=$(find "$CLAUDE_DIR/hooks" -name "*.sh" 2>/dev/null | wc -l | tr -d ' ')
+    actual=$(find "$CLAUDE_DIR/hooks" -name "*.mjs" 2>/dev/null | wc -l | tr -d ' ')
     if [ "$actual" -eq "${#expected_hooks[@]}" ]; then
         pass "Hook count: $actual"
     else
         fail "Hook count: expected ${#expected_hooks[@]}, got $actual"
     fi
+
+    # Verify NO .sh hook files are installed
+    local sh_count
+    sh_count=$(find "$CLAUDE_DIR/hooks" -name "*.sh" 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$sh_count" -eq 0 ]; then
+        pass "No .sh hook files installed (correct — using .mjs)"
+    else
+        fail "Found $sh_count .sh hook files (should be 0)"
+    fi
+
+    # Verify each hook starts with node shebang
+    for hook in "${expected_hooks[@]}"; do
+        if head -1 "$CLAUDE_DIR/hooks/$hook" | grep -q "#!/usr/bin/env node"; then
+            pass "$hook has node shebang"
+        else
+            fail "$hook missing node shebang"
+        fi
+    done
 
     # Verify excluded hooks are NOT present
     local excluded_hooks=(inject-agent-instructions.sh validate-response.sh pre-compact.sh)
@@ -270,28 +292,49 @@ test_settings() {
     fi
 
     # Verify hooks are configured
-    if jq -e '.hooks.PostToolUse' "$CLAUDE_DIR/settings.json" >/dev/null 2>&1; then
-        pass "PostToolUse hook configured"
+    assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.PostToolUse' "PostToolUse hook configured"
+    assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.UserPromptSubmit' "UserPromptSubmit hook configured"
+    assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.SessionStart' "SessionStart hook configured"
+    assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.Stop' "Stop hook configured"
+
+    # Verify hooks use 'node' command (not 'bash')
+    local post_cmd
+    post_cmd=$(jq -r '.hooks.PostToolUse[0].command // empty' "$CLAUDE_DIR/settings.json" 2>/dev/null)
+    if echo "$post_cmd" | grep -q "^node "; then
+        pass "PostToolUse uses node command"
     else
-        fail "PostToolUse hook not configured"
+        fail "PostToolUse should use node command, got: $post_cmd"
     fi
 
-    if jq -e '.hooks.UserPromptSubmit' "$CLAUDE_DIR/settings.json" >/dev/null 2>&1; then
-        pass "UserPromptSubmit hook configured"
+    local hydration_cmd
+    hydration_cmd=$(jq -r '.hooks.UserPromptSubmit[0].command // empty' "$CLAUDE_DIR/settings.json" 2>/dev/null)
+    if echo "$hydration_cmd" | grep -q "^node "; then
+        pass "UserPromptSubmit uses node command"
     else
-        fail "UserPromptSubmit hook not configured"
+        fail "UserPromptSubmit should use node command, got: $hydration_cmd"
     fi
 
-    if jq -e '.hooks.SessionStart' "$CLAUDE_DIR/settings.json" >/dev/null 2>&1; then
-        pass "SessionStart hook configured"
+    local start_cmd
+    start_cmd=$(jq -r '.hooks.SessionStart[0].command // empty' "$CLAUDE_DIR/settings.json" 2>/dev/null)
+    if echo "$start_cmd" | grep -q "^node "; then
+        pass "SessionStart uses node command"
     else
-        fail "SessionStart hook not configured"
+        fail "SessionStart should use node command, got: $start_cmd"
     fi
 
-    if jq -e '.hooks.Stop' "$CLAUDE_DIR/settings.json" >/dev/null 2>&1; then
-        pass "Stop hook configured"
+    local stop_cmd
+    stop_cmd=$(jq -r '.hooks.Stop[0].command // empty' "$CLAUDE_DIR/settings.json" 2>/dev/null)
+    if echo "$stop_cmd" | grep -q "^node "; then
+        pass "Stop uses node command"
     else
-        fail "Stop hook not configured"
+        fail "Stop should use node command, got: $stop_cmd"
+    fi
+
+    # Verify hooks reference .mjs files
+    if echo "$post_cmd" | grep -q "\.mjs"; then
+        pass "PostToolUse references .mjs file"
+    else
+        fail "PostToolUse should reference .mjs file"
     fi
 
     # Verify MCP_TOOL_TIMEOUT
@@ -301,6 +344,20 @@ test_settings() {
         pass "MCP_TOOL_TIMEOUT set to 120000"
     else
         fail "MCP_TOOL_TIMEOUT: expected 120000, got '$timeout'"
+    fi
+
+    # Verify qmd permission
+    if jq -r '.permissions.allow[]' "$CLAUDE_DIR/settings.json" 2>/dev/null | grep -q "mcp__qmd__"; then
+        pass "qmd permission in allow list"
+    else
+        fail "qmd permission missing from allow list"
+    fi
+
+    # Verify bun permission
+    if jq -r '.permissions.allow[]' "$CLAUDE_DIR/settings.json" 2>/dev/null | grep -q 'Bash(bun'; then
+        pass "bun permission in allow list"
+    else
+        fail "bun permission missing from allow list"
     fi
 }
 
@@ -319,11 +376,7 @@ test_mcp_config() {
     fi
 
     # Verify cognitive-memory server entry
-    if jq -e '.mcpServers["cognitive-memory"]' "$HOME/.mcp.json" >/dev/null 2>&1; then
-        pass "cognitive-memory server configured"
-    else
-        fail "cognitive-memory server not in .mcp.json"
-    fi
+    assert_json_contains "$HOME/.mcp.json" '.mcpServers["cognitive-memory"]' "cognitive-memory server configured"
 
     # Verify COGNITIVE_MEMORY_PATH points to memory path
     local mem_path
@@ -346,7 +399,7 @@ test_backup() {
 
     # Re-run setup
     info "Re-running setup with existing config..."
-    printf "y\n$MEMORY_PATH\ny\nn\n" | ./setup.sh 2>/dev/null || true
+    printf "y\n$MEMORY_PATH\ny\nn\n" | node setup.mjs 2>/dev/null || true
 
     # Check backups exist
     local skills_backup
@@ -400,10 +453,10 @@ main() {
 
     cleanup
 
-    # Run setup with test memory path
-    info "Running setup.sh..."
-    printf "y\n$MEMORY_PATH\nn\n" | ./setup.sh 2>/dev/null || {
-        fail "setup.sh exited with error"
+    # Run setup with test memory path (using node setup.mjs)
+    info "Running node setup.mjs..."
+    printf "y\n$MEMORY_PATH\nn\n" | node setup.mjs 2>/dev/null || {
+        fail "setup.mjs exited with error"
     }
 
     # Run all test suites

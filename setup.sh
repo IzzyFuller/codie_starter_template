@@ -1,8 +1,23 @@
 #!/bin/bash
 
+# ============================================================================
+# DEPRECATED: Use 'node setup.mjs' instead.
+#
+# This bash script is kept as a fallback for bash-only environments.
+# The Node.js version (setup.mjs) is cross-platform and has no jq dependency.
+# ============================================================================
+
 # Claude Code Starter Template Setup Script
 # Installs skills, agents, hooks, memory seed, and cognitive-memory MCP server
-# Version: 3.0
+# Version: 3.0 (deprecated — see setup.mjs v4.0)
+
+echo ""
+echo -e "\033[1;33m[DEPRECATED]\033[0m This script is deprecated. Use 'node setup.mjs' instead."
+echo -e "\033[1;33m[DEPRECATED]\033[0m The Node.js version is cross-platform and doesn't require jq."
+echo ""
+read -p "Continue with bash version anyway? (y/n): " dep_confirm
+[[ "$dep_confirm" =~ ^[Yy]$ ]] || { echo "Run: node setup.mjs"; exit 0; }
+echo ""
 
 set -e
 

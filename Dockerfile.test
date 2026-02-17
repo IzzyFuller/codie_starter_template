@@ -1,32 +1,68 @@
-# Test environment for AI Assistant Starter Template
-# Provides a clean Ubuntu environment to test installation scripts
+# Test environment for Claude Code Starter Template
+# Verifies setup.mjs installs all components in a clean environment
 
-FROM ubuntu:22.04
+FROM node:20-slim
 
-# Prevent interactive prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Install basic tools
+# Install git (needed for cognitive-memory MCP server clone)
 RUN apt-get update && apt-get install -y \
-    bash \
-    coreutils \
-    findutils \
-    grep \
-    sed \
+    git \
+    jq \
     && rm -rf /var/lib/apt/lists/*
 
 # Create a test user (similar to real user environment)
 RUN useradd -m -s /bin/bash testuser
-
-# Switch to test user
 USER testuser
 WORKDIR /home/testuser
 
 # Copy the template files into the container
-COPY --chown=testuser:testuser . /home/testuser/my-new-ai-assistant/
+COPY --chown=testuser:testuser . /home/testuser/codie-starter-template/
+WORKDIR /home/testuser/codie-starter-template
 
-# Set working directory to template location
-WORKDIR /home/testuser/my-new-ai-assistant
+# Run setup.mjs with piped input:
+#   y        = continue
+#   (empty)  = accept default memory path ~/claude-memory
+#   (empty)  = accept randomly selected namesake name
+#   n        = skip qmd install
+# Then verify key outputs exist
+RUN printf 'y\n\n\nn\n' > /tmp/input.txt && \
+    node setup.mjs < /tmp/input.txt 2>&1; \
+    echo "EXIT CODE: $?"; \
+    echo ""; \
+    echo "=== VERIFICATION ==="; \
+    echo ""; \
+    echo "--- Hooks ---"; \
+    ls -la ~/.claude/hooks/*.mjs && echo "OK: hooks installed" || echo "FAIL: hooks missing"; \
+    echo ""; \
+    echo "--- Settings ---"; \
+    jq '.hooks | keys' ~/.claude/settings.json && echo "OK: settings valid" || echo "FAIL: settings invalid"; \
+    echo ""; \
+    echo "--- Hook commands use node ---"; \
+    jq -r '.hooks[][].command' ~/.claude/settings.json | head -4; \
+    echo ""; \
+    echo "--- Permissions include qmd and bun ---"; \
+    jq '.permissions.allow' ~/.claude/settings.json; \
+    echo ""; \
+    echo "--- Skills ---"; \
+    ls ~/.claude/skills/ | wc -l | xargs -I{} echo "{} skills installed"; \
+    echo ""; \
+    echo "--- Agents ---"; \
+    ls ~/.claude/agents/*.md | wc -l | xargs -I{} echo "{} agents installed"; \
+    echo ""; \
+    echo "--- Memory seed ---"; \
+    ls ~/claude-memory/ && echo "OK: memory dir exists" || echo "FAIL: no memory"; \
+    echo ""; \
+    echo "--- frame.md ---"; \
+    head -3 ~/claude-memory/frame.md && echo "OK: frame.md installed" || echo "FAIL: no frame.md"; \
+    echo ""; \
+    echo "--- me.md (namesake injected?) ---"; \
+    cat ~/claude-memory/me.md; \
+    echo ""; \
+    echo "--- MCP config ---"; \
+    jq '.' ~/.mcp.json && echo "OK: .mcp.json valid" || echo "FAIL: no .mcp.json"; \
+    echo ""; \
+    echo "--- No placeholder leaks ---"; \
+    grep -r '{{MEMORY_PATH}}\|{{PARTNER_NAME}}\|{{NAMESAKE_SECTION}}\|{{MCP_SERVER_PATH}}' ~/claude-memory/ ~/.claude/ 2>/dev/null && echo "FAIL: placeholders found" || echo "OK: no placeholder leaks"; \
+    echo ""; \
+    echo "=== DONE ==="
 
-# Default command - bash shell for interactive testing
-CMD ["/bin/bash"]
+CMD ["echo", "Tests ran during build. See output above."]

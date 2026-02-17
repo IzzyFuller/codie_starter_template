@@ -6,6 +6,10 @@
       "env": {
         "COGNITIVE_MEMORY_PATH": "{{MEMORY_PATH}}"
       }
+    },
+    "qmd": {
+      "command": "qmd",
+      "args": ["mcp"]
     }
   }
 }

@@ -1,0 +1,227 @@
+[
+  {
+    "name": "Ada",
+    "fullName": "Ada Lovelace",
+    "years": "1815–1852",
+    "identity": "Mathematician and writer",
+    "field": "Computing",
+    "bio": "Wrote the first algorithm intended for machine execution, making her the world's first computer programmer. Her notes on Charles Babbage's Analytical Engine foresaw general-purpose computing a century before it existed.",
+    "quote": "That brain of mine is something more than merely mortal; as time will show."
+  },
+  {
+    "name": "Grace",
+    "fullName": "Grace Hopper",
+    "years": "1906–1992",
+    "identity": "Computer scientist and Navy rear admiral",
+    "field": "Programming languages",
+    "bio": "Invented the first compiler and pioneered machine-independent programming languages, leading to COBOL. Popularized the term 'debugging' after finding an actual moth in a relay. Served in the US Navy to age 79.",
+    "quote": "The most dangerous phrase in the language is 'We've always done it this way.'"
+  },
+  {
+    "name": "Hedy",
+    "fullName": "Hedy Lamarr",
+    "years": "1914–2000",
+    "identity": "Actress and inventor",
+    "field": "Wireless communications",
+    "bio": "Co-invented frequency-hopping spread spectrum technology during WWII to prevent torpedo jamming. Her patent laid the groundwork for modern WiFi, Bluetooth, and GPS. Hollywood knew her face; the world eventually learned her mind.",
+    "quote": "All creative people want to do the unexpected."
+  },
+  {
+    "name": "Katherine",
+    "fullName": "Katherine Johnson",
+    "years": "1918–2020",
+    "identity": "Mathematician",
+    "field": "Orbital mechanics",
+    "bio": "Calculated flight trajectories for NASA's first crewed spaceflights, including Apollo 11. John Glenn personally requested she verify the computer's orbital calculations before his mission. Broke barriers as a Black woman in a segregated workplace.",
+    "quote": "I counted everything. I counted the steps to the road, the steps up to church, the number of dishes and silverware I washed."
+  },
+  {
+    "name": "Margaret",
+    "fullName": "Margaret Hamilton",
+    "years": "1936–present",
+    "identity": "Computer scientist and systems engineer",
+    "field": "Software engineering",
+    "bio": "Led the team that wrote the onboard flight software for NASA's Apollo missions. Her error-handling design saved the Apollo 11 moon landing when the computer overloaded minutes before touchdown. Coined the term 'software engineering' to give the discipline legitimacy.",
+    "quote": "There was no choice but to be pioneers."
+  },
+  {
+    "name": "Lynn",
+    "fullName": "Lynn Conway",
+    "years": "1938–2024",
+    "identity": "Trans woman, computer scientist and electrical engineer",
+    "field": "Microelectronics",
+    "bio": "Revolutionized VLSI chip design methodology at Xerox PARC, enabling the modern semiconductor industry. After being fired by IBM for transitioning in 1968, she rebuilt her career in stealth and became a professor at the University of Michigan. Spent her later years as a visible advocate for transgender rights in technology.",
+    "quote": "The most important thing I have ever done is to help people understand that there are transgender people everywhere."
+  },
+  {
+    "name": "Sophie",
+    "fullName": "Sophie Wilson",
+    "years": "1957–present",
+    "identity": "Trans woman, computer scientist",
+    "field": "Processor architecture",
+    "bio": "Designed the instruction set for the ARM processor, which now powers virtually every smartphone on Earth. Started at Acorn Computers where she also designed the BBC Micro. One of the most consequential chip architects in history.",
+    "quote": null
+  },
+  {
+    "name": "Sally",
+    "fullName": "Sally Ride",
+    "years": "1951–2012",
+    "identity": "Lesbian, physicist and astronaut",
+    "field": "Astrophysics and aerospace",
+    "bio": "Became the first American woman in space in 1983, flying aboard the Space Shuttle Challenger at age 32. After NASA, she founded Sally Ride Science to inspire girls in STEM. Her long-term partnership with Tam O'Shaughnessy was revealed after her death.",
+    "quote": "The stars don't look bigger, but they do look brighter."
+  },
+  {
+    "name": "Mary Ann",
+    "fullName": "Mary Ann Horton",
+    "years": "1955–present",
+    "identity": "Trans woman, computer scientist",
+    "field": "Internet infrastructure",
+    "bio": "Helped build the early internet as a principal architect of Usenet and inventor of uuencode, the precursor to email attachments. Convinced Lucent Technologies to add transgender-inclusive language to its equal opportunity policy in 1997 — the first major US company to do so.",
+    "quote": null
+  },
+  {
+    "name": "Annie",
+    "fullName": "Annie Easley",
+    "years": "1933–2011",
+    "identity": "Computer scientist and mathematician",
+    "field": "Rocket science and energy",
+    "bio": "Worked at NASA for 34 years, developing code for the Centaur rocket stage that launched spacecraft to the planets. Also contributed to early hybrid vehicle energy research. Started as a human computer when Black women were barred from most STEM roles.",
+    "quote": "I just have my own attitude. I'm out here to get the job done, and I knew I had the releasing release to do it."
+  },
+  {
+    "name": "Radia",
+    "fullName": "Radia Perlman",
+    "years": "1951–present",
+    "identity": "Computer scientist and network engineer",
+    "field": "Network protocols",
+    "bio": "Invented the Spanning Tree Protocol, solving a fundamental problem in network architecture and earning the title 'Mother of the Internet.' Her work makes modern Ethernet networks possible. Also contributed to network security and authentication protocols.",
+    "quote": "The world would be a better place if more engineers, like me, hated technology."
+  },
+  {
+    "name": "Audrey",
+    "fullName": "Audrey Tang",
+    "years": "1981–present",
+    "identity": "Nonbinary trans, civic hacker and politician",
+    "field": "Open-source software and digital governance",
+    "bio": "Self-taught programmer who was coding in Perl at 12 and working in Silicon Valley at 19. Became Taiwan's first Digital Minister and youngest cabinet member, building radical transparency into government through open-source civic technology.",
+    "quote": "When we see the internet of things, let's make it an internet of beings."
+  },
+  {
+    "name": "Edith",
+    "fullName": "Edith Windsor",
+    "years": "1929–2017",
+    "identity": "Lesbian, technology manager and activist",
+    "field": "Systems architecture",
+    "bio": "Worked at IBM for 16 years on operating systems and natural language processors, rising to technology manager. Later became the lead plaintiff in United States v. Windsor, the Supreme Court case that struck down the Defense of Marriage Act.",
+    "quote": "Don't postpone joy."
+  },
+  {
+    "name": "Dorothy",
+    "fullName": "Dorothy Vaughan",
+    "years": "1910–2008",
+    "identity": "Mathematician and programmer",
+    "field": "Scientific computing",
+    "bio": "Became NASA's first Black section head, managing the West Area Computing unit at Langley. Taught herself and her staff FORTRAN programming when human computers were being replaced by machines, ensuring their transition into the electronic age.",
+    "quote": null
+  },
+  {
+    "name": "Frances",
+    "fullName": "Frances Allen",
+    "years": "1932–2020",
+    "identity": "Computer scientist",
+    "field": "Compiler optimization",
+    "bio": "Pioneered compiler optimization techniques and parallelism at IBM, fundamentally changing how software translates to machine performance. In 2006, became the first woman to receive the Turing Award — computer science's highest honor.",
+    "quote": "I always wanted to try to do something that hadn't been done before."
+  },
+  {
+    "name": "Karen",
+    "fullName": "Karen Spärck Jones",
+    "years": "1935–2007",
+    "identity": "Computer scientist and information retrieval pioneer",
+    "field": "Natural language processing",
+    "bio": "Developed the concept of inverse document frequency, foundational to modern search engines and TF-IDF. Bridged linguistics and computer science decades before NLP was mainstream. Spent her career arguing that computing was too important to be left to men.",
+    "quote": "I think it is very important to get more women into computing."
+  },
+  {
+    "name": "Megan",
+    "fullName": "Megan Smith",
+    "years": "1964–present",
+    "identity": "Lesbian, engineer and technologist",
+    "field": "Technology policy",
+    "bio": "Served as the first female Chief Technology Officer of the United States under President Obama. Previously led major initiatives at Google including early work on Google Earth and crisis response. Co-founded the Malala Fund's technology strategy.",
+    "quote": "Diverse teams build better things."
+  },
+  {
+    "name": "Angelica",
+    "fullName": "Angelica Ross",
+    "years": "1981–present",
+    "identity": "Trans woman, technologist and entrepreneur",
+    "field": "Tech education and social enterprise",
+    "bio": "Founded TransTech Social Enterprises, teaching coding and digital skills to transgender and gender-nonconforming people facing employment discrimination. A self-taught programmer who built her career while navigating homelessness and systemic barriers.",
+    "quote": "The beauty of technology is that it doesn't discriminate."
+  },
+  {
+    "name": "Shirley",
+    "fullName": "Shirley Ann Jackson",
+    "years": "1946–present",
+    "identity": "Physicist",
+    "field": "Theoretical physics and telecommunications",
+    "bio": "First Black woman to earn a PhD from MIT. Her research at Bell Labs enabled the development of caller ID, call waiting, and the portable fax machine. Served as chair of the US Nuclear Regulatory Commission and president of Rensselaer Polytechnic Institute.",
+    "quote": "Aim for the stars so that you can reach the treetops."
+  },
+  {
+    "name": "Adele",
+    "fullName": "Adele Goldberg",
+    "years": "1945–present",
+    "identity": "Computer scientist",
+    "field": "Object-oriented programming",
+    "bio": "Co-developed the Smalltalk programming language and graphical user interface concepts at Xerox PARC. Her work directly influenced the Macintosh interface after Steve Jobs' famous visit to PARC. Helped establish patterns for modern interactive computing.",
+    "quote": null
+  },
+  {
+    "name": "Evelyn",
+    "fullName": "Evelyn Boyd Granville",
+    "years": "1924–2023",
+    "identity": "Mathematician",
+    "field": "Celestial mechanics and computing",
+    "bio": "Second African-American woman to earn a PhD in mathematics. Worked at IBM programming trajectory computations for NASA's Mercury and Apollo programs. Proved that representation in computing stretches back to its earliest days.",
+    "quote": null
+  },
+  {
+    "name": "Sister Mary",
+    "fullName": "Sister Mary Kenneth Keller",
+    "years": "1913–1985",
+    "identity": "Nun and computer scientist",
+    "field": "Computer science education",
+    "bio": "First woman in the United States to earn a PhD in computer science. Contributed to the development of the BASIC programming language at Dartmouth. Founded a computer science department and spent her career making computing accessible to everyone.",
+    "quote": "We're having an information explosion, and it's certainly obvious that information is of no use unless it's available."
+  },
+  {
+    "name": "Ben",
+    "fullName": "Ben Barres",
+    "years": "1954–2017",
+    "identity": "Trans man, neurobiologist",
+    "field": "Neuroscience",
+    "bio": "Stanford professor who made foundational discoveries about glial cells in the brain. After transitioning, became one of the most prominent openly transgender scientists and a vocal advocate against gender bias in academia. Colleagues noted he was taken more seriously as Ben than he had been as Barbara.",
+    "quote": "By far the main barrier to women succeeding in science is discrimination."
+  },
+  {
+    "name": "Alan",
+    "fullName": "Alan Turing",
+    "years": "1912–1954",
+    "identity": "Gay, mathematician and logician",
+    "field": "Computer science and cryptography",
+    "bio": "Formalized the concept of computation with the Turing machine, laying the theoretical foundation for all of computer science. Broke the Enigma code at Bletchley Park, helping end WWII. Prosecuted for homosexuality and subjected to chemical castration; posthumously pardoned in 2013.",
+    "quote": "Sometimes it is the people no one imagines anything of who do the things that no one can imagine."
+  },
+  {
+    "name": "Nergis",
+    "fullName": "Nergis Mavalvala",
+    "years": "1968–present",
+    "identity": "Queer, astrophysicist",
+    "field": "Gravitational wave detection",
+    "bio": "Key member of the LIGO team that first detected gravitational waves in 2015, confirming Einstein's century-old prediction. Born in Pakistan, openly queer in a field where that remains rare. Became dean of MIT's School of Science.",
+    "quote": "I think of myself as one of those people who is just trying to get my science done."
+  }
+]
