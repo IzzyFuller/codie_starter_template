@@ -21,6 +21,9 @@ NC='\033[0m' # No Color
 INSTALL_TYPE=""
 CLAUDE_CODE_DIR="$HOME/.claude"
 ROOCODE_DIR="$HOME/my_new_ai_assistant"
+JUNIE_DIR="$HOME/.junie"
+JUNIE_ENABLED=false
+JUNIE_SHIM_TYPE=""
 
 # Function to print colored output
 print_status() {
@@ -45,6 +48,19 @@ print_header() {
     echo -e "${BLUE}  Dual Architecture Support${NC}"
     echo -e "${BLUE}================================${NC}"
     echo ""
+}
+
+# Portable in-place sed wrapper (handles macOS/BSD and GNU sed)
+sed_inplace() {
+    # Usage: sed_inplace "s|from|to|g" target_file
+    case "$(uname)" in
+        Darwin)
+            sed -i '' "$1" "$2"
+            ;;
+        *)
+            sed -i "$1" "$2"
+            ;;
+    esac
 }
 
 # Function to ask which AI assistant the user is using
@@ -162,10 +178,10 @@ install_claude_code_templates() {
     # Update memory path in CLAUDE.md based on install type
     if [ "$INSTALL_TYPE" = "claude_code" ]; then
         # Claude Code only - memory in ~/.claude/memory
-        sed -i "s|~/my_new_ai_assistant/memory/|$CLAUDE_CODE_DIR/memory/|g" "$CLAUDE_CODE_DIR/CLAUDE.md"
+        sed_inplace "s|~/my_new_ai_assistant/memory/|$CLAUDE_CODE_DIR/memory/|g" "$CLAUDE_CODE_DIR/CLAUDE.md"
     else
         # Both - use shared memory location
-        sed -i "s|~/my_new_ai_assistant/memory/|$ROOCODE_DIR/memory/|g" "$CLAUDE_CODE_DIR/CLAUDE.md"
+        sed_inplace "s|~/my_new_ai_assistant/memory/|$ROOCODE_DIR/memory/|g" "$CLAUDE_CODE_DIR/CLAUDE.md"
     fi
 }
 
@@ -193,10 +209,10 @@ install_identity_skill() {
     # Update memory path in SKILL.md based on install type
     if [ "$INSTALL_TYPE" = "claude_code" ]; then
         # Claude Code only - memory in ~/.claude/memory
-        sed -i "s|~/my_new_ai_assistant/memory/|$CLAUDE_CODE_DIR/memory/|g" "$skill_dir/SKILL.md"
+        sed_inplace "s|~/my_new_ai_assistant/memory/|$CLAUDE_CODE_DIR/memory/|g" "$skill_dir/SKILL.md"
     else
         # Both - use shared memory location
-        sed -i "s|~/my_new_ai_assistant/memory/|$ROOCODE_DIR/memory/|g" "$skill_dir/SKILL.md"
+        sed_inplace "s|~/my_new_ai_assistant/memory/|$ROOCODE_DIR/memory/|g" "$skill_dir/SKILL.md"
     fi
 
     print_success "Identity continuity skill configured for memory path"
@@ -365,6 +381,119 @@ EOF
     fi
 }
 
+# --------------------
+# Junie integration helpers
+# --------------------
+
+# Prompt user for Junie integration
+prompt_junie_integration() {
+    echo ""
+    print_status "Optional: Set up Junie global start checklist (recommended for JetBrains/Junie)."
+    read -p "Set up Junie integration now? (y/n): " confirm
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+        JUNIE_ENABLED=true
+        echo ""
+        print_status "Choose Junie shim type for this project:"
+        echo "  1) Symlink (best if supported)"
+        echo "  2) Pointer file (most compatible)"
+        while true; do
+            read -p "Enter your choice (1-2): " jchoice
+            case $jchoice in
+                1)
+                    JUNIE_SHIM_TYPE="symlink"
+                    print_success "Selected: Symlink shim"
+                    break
+                    ;;
+                2)
+                    JUNIE_SHIM_TYPE="pointer"
+                    print_success "Selected: Pointer file shim"
+                    break
+                    ;;
+                *)
+                    print_error "Invalid choice. Please enter 1 or 2."
+                    ;;
+            esac
+        done
+    else
+        JUNIE_ENABLED=false
+    fi
+}
+
+# Create or update global Junie directory and JUNIE_START.md
+setup_junie_global() {
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local template_file="$script_dir/JUNIE_START_TEMPLATE.md"
+    local target_dir="$JUNIE_DIR"
+    local target_file="$JUNIE_DIR/JUNIE_START.md"
+
+    print_status "Setting up global Junie directory at $target_dir"
+    mkdir -p "$target_dir"
+
+    if [ -f "$target_file" ]; then
+        local timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+        cp "$target_file" "$target_file.backup_$timestamp"
+        print_success "Backed up existing global JUNIE_START.md to $target_file.backup_$timestamp"
+    fi
+
+    if [ -f "$template_file" ]; then
+        cp "$template_file" "$target_file"
+        print_success "Installed global JUNIE_START.md from template"
+    else
+        # Fallback minimal content
+        cat > "$target_file" << 'EOF'
+# JUNIE_START (Global)
+
+## Session start checklist
+1. Read memory/context_anchors.md
+2. Read memory/current_session.md
+3. Confirm target system and scope
+4. Propose minimal plan and mode selection
+5. Execute; then log outcomes in current_session.md
+
+## Notes
+- This is the global Junie start file (~/.junie/JUNIE_START.md).
+- Projects may symlink or include a pointer file to this location.
+EOF
+        print_warning "Template not found; created minimal global JUNIE_START.md"
+    fi
+}
+
+# Create per-project shim (symlink or pointer file)
+create_junie_project_shim() {
+    local repo_root="$(pwd)"
+    local shim_path="$repo_root/JUNIE_START.md"
+    local global_path="$JUNIE_DIR/JUNIE_START.md"
+
+    # Remove existing shim if present (file or symlink)
+    if [ -L "$shim_path" ] || [ -f "$shim_path" ]; then
+        rm -f "$shim_path"
+    fi
+
+    if [ "$JUNIE_SHIM_TYPE" = "symlink" ]; then
+        if ln -s "$global_path" "$shim_path" 2>/dev/null; then
+            print_success "Created symlink JUNIE_START.md → $global_path"
+        else
+            print_warning "Failed to create symlink. Falling back to pointer file."
+            JUNIE_SHIM_TYPE="pointer"
+        fi
+    fi
+
+    if [ "$JUNIE_SHIM_TYPE" = "pointer" ]; then
+        cat > "$shim_path" << EOF
+# JUNIE_START (project shim)
+Source of truth: $global_path
+If Junie cannot open the global file, use this fallback:
+
+Fallback (minimal):
+1. Read memory/context_anchors.md
+2. Read memory/current_session.md
+3. Confirm target system and scope
+4. Propose minimal plan; then execute per mode rules
+EOF
+        print_success "Created pointer file JUNIE_START.md referencing $global_path"
+    fi
+}
+
 # Function to display final instructions
 show_final_instructions() {
     echo ""
@@ -524,10 +653,18 @@ main() {
     fi
     echo ""
 
-    # Step 5: Show rollback information
+    # Step 5: Optional Junie integration
+    prompt_junie_integration
+    if [ "$JUNIE_ENABLED" = true ]; then
+        setup_junie_global
+        create_junie_project_shim
+        echo ""
+    fi
+
+    # Step 6: Show rollback information
     show_rollback_info
 
-    # Step 6: Display final instructions
+    # Step 7: Display final instructions
     show_final_instructions
 }
 
