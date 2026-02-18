@@ -233,20 +233,7 @@ function formatNamesakeIntro(ns) {
 }
 
 async function configureMemoryPath() {
-  const defaultPath = join(HOME, 'claude-memory');
-  printStatus('Where should your memory knowledge base live?');
-  let userPath = await ask('Memory path', defaultPath);
-
-  // Expand ~ if present
-  if (userPath.startsWith('~')) {
-    userPath = join(HOME, userPath.slice(1));
-  }
-
-  MEMORY_PATH = resolve(userPath);
-  printSuccess(`Memory path: ${MEMORY_PATH}`);
-  console.error('');
-
-  // Namesake selection
+  // Partner name first — it determines the default memory path
   const namesakes = loadNamesakes();
   if (namesakes.length > 0) {
     NAMESAKE = pickNamesake(namesakes);
@@ -268,6 +255,20 @@ async function configureMemoryPath() {
   }
 
   printSuccess(`Partner name: ${PARTNER_NAME}`);
+  console.error('');
+
+  // Memory path — default derived from partner name
+  const defaultPath = join(HOME, PARTNER_NAME, 'memory');
+  printStatus('Where should your memory knowledge base live?');
+  let userPath = await ask('Memory path', defaultPath);
+
+  // Expand ~ if present
+  if (userPath.startsWith('~')) {
+    userPath = join(HOME, userPath.slice(1));
+  }
+
+  MEMORY_PATH = resolve(userPath);
+  printSuccess(`Memory path: ${MEMORY_PATH}`);
   console.error('');
 }
 
@@ -465,37 +466,44 @@ async function installMemorySeed() {
 
 // --- Step 10: Configure MCP ---
 
-function configureMcp() {
+async function configureMcp() {
   printStatus('Configuring MCP servers...');
   const mcpFile = join(HOME, '.mcp.json');
   const serverPath = join(MCP_SERVER_DIR, 'cognitive-memory', 'src', 'cognitive-server.js');
 
-  const cognitiveEntry = {
-    mcpServers: {
-      'cognitive-memory': {
-        command: 'node',
-        args: [serverPath],
-        env: {
-          COGNITIVE_MEMORY_PATH: MEMORY_PATH,
-        },
-      },
+  const newEntry = {
+    command: 'node',
+    args: [serverPath],
+    env: {
+      COGNITIVE_MEMORY_PATH: MEMORY_PATH,
     },
   };
 
+  // Read existing config or start fresh
+  let config = { mcpServers: {} };
   if (existsSync(mcpFile)) {
     try {
-      const existing = JSON.parse(readFileSync(mcpFile, 'utf-8'));
-      const merged = deepMerge(existing, cognitiveEntry);
-      writeFileSync(mcpFile, JSON.stringify(merged, null, 2) + '\n', 'utf-8');
-      printSuccess('Added cognitive-memory to existing .mcp.json');
+      const parsed = JSON.parse(readFileSync(mcpFile, 'utf-8'));
+      if (parsed.mcpServers) config = parsed;
+      else config = { ...parsed, mcpServers: {} };
     } catch {
-      writeFileSync(mcpFile, JSON.stringify(cognitiveEntry, null, 2) + '\n', 'utf-8');
-      printSuccess('Created .mcp.json with cognitive-memory server');
+      printWarning('Could not parse existing .mcp.json — will create fresh (backup saved)');
     }
-  } else {
-    writeFileSync(mcpFile, JSON.stringify(cognitiveEntry, null, 2) + '\n', 'utf-8');
-    printSuccess('Created .mcp.json with cognitive-memory server');
   }
+
+  // Don't clobber an existing cognitive-memory entry without asking
+  if (config.mcpServers['cognitive-memory']) {
+    printWarning('cognitive-memory is already configured in .mcp.json');
+    const overwrite = await ask('Overwrite existing cognitive-memory config? (y/n)', 'n');
+    if (!/^[Yy]/.test(overwrite)) {
+      printStatus('Keeping existing cognitive-memory configuration');
+      return;
+    }
+  }
+
+  config.mcpServers['cognitive-memory'] = newEntry;
+  writeFileSync(mcpFile, JSON.stringify(config, null, 2) + '\n', 'utf-8');
+  printSuccess(existsSync(mcpFile) ? 'Added cognitive-memory to .mcp.json' : 'Created .mcp.json with cognitive-memory server');
 }
 
 // --- Step 11: Optional qmd ---
@@ -527,24 +535,37 @@ async function installQmd() {
   // Register qmd as MCP server in .mcp.json
   printStatus('Registering qmd MCP server...');
   const mcpFile = join(HOME, '.mcp.json');
-  const qmdEntry = {
-    mcpServers: {
-      qmd: {
-        command: 'qmd',
-        args: ['mcp'],
-      },
-    },
+  const qmdNewEntry = {
+    command: 'qmd',
+    args: ['mcp'],
   };
 
+  let mcpConfig = { mcpServers: {} };
   if (existsSync(mcpFile)) {
     try {
-      const existing = JSON.parse(readFileSync(mcpFile, 'utf-8'));
-      const merged = deepMerge(existing, qmdEntry);
-      writeFileSync(mcpFile, JSON.stringify(merged, null, 2) + '\n', 'utf-8');
+      const parsed = JSON.parse(readFileSync(mcpFile, 'utf-8'));
+      if (parsed.mcpServers) mcpConfig = parsed;
+      else mcpConfig = { ...parsed, mcpServers: {} };
     } catch {
-      // If parse fails, just add to what's there
-      writeFileSync(mcpFile, JSON.stringify(qmdEntry, null, 2) + '\n', 'utf-8');
+      printWarning('Could not parse .mcp.json — will add qmd to fresh config');
     }
+  }
+
+  // Don't clobber an existing qmd entry without asking
+  if (mcpConfig.mcpServers.qmd) {
+    printWarning('qmd is already configured in .mcp.json');
+    const overwrite = await ask('Overwrite existing qmd config? (y/n)', 'n');
+    if (!/^[Yy]/.test(overwrite)) {
+      printStatus('Keeping existing qmd configuration');
+    } else {
+      mcpConfig.mcpServers.qmd = qmdNewEntry;
+      writeFileSync(mcpFile, JSON.stringify(mcpConfig, null, 2) + '\n', 'utf-8');
+      printSuccess('Updated qmd in .mcp.json');
+    }
+  } else {
+    mcpConfig.mcpServers.qmd = qmdNewEntry;
+    writeFileSync(mcpFile, JSON.stringify(mcpConfig, null, 2) + '\n', 'utf-8');
+    printSuccess('Added qmd to .mcp.json');
   }
 
   // Create initial qmd config with memory collection
@@ -652,7 +673,7 @@ async function main() {
   installAgents();
   mergeSettings();
   await installMemorySeed();
-  configureMcp();
+  await configureMcp();
   await installQmd();
   closePrompts();
   showSummary();
