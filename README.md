@@ -161,8 +161,8 @@ The `--system-prompt-file` flag loads `frame.md`, which bootstraps identity rest
 
 ### Session Lifecycle
 
-1. **Launch**: Your shell command loads `frame.md` as the system prompt via `--system-prompt-file`
-2. **Startup**: `frame.md` instructs the partner to spawn the `identity-restoration` agent, which reads memory and establishes identity. `session-start-restore.mjs` hook also fires as a backup trigger.
+1. **Launch**: Your shell command loads `frame.md` as the system prompt via `--system-prompt-file` and sends an initial user message
+2. **Startup**: The initial message triggers Claude to read `frame.md` and spawn the `identity-restoration` agent, which reads memory and establishes identity. The `session-start-restore.mjs` hook also fires on SessionStart as a backup (e.g., after `/clear` or exiting plan mode).
 3. **Each prompt**: `semantic-hydration.mjs` triggers memory search for relevant context before responding
 4. **Each tool use**: `post-tool-session-note.mjs` reminds Claude to record what happened
 5. **End of response**: `context-check.mjs` monitors context window usage
