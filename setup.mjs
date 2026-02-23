@@ -5,7 +5,7 @@
 // Cross-platform Node.js replacement for setup.sh
 // Version: 4.0
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, copyFileSync, readdirSync, statSync } from 'node:fs';
 import { homedir, platform, tmpdir } from 'node:os';
 import { join, basename, resolve, dirname } from 'node:path';
 import { execSync } from 'node:child_process';
@@ -99,6 +99,20 @@ function commandExists(cmd) {
   } catch {
     return false;
   }
+}
+
+function getShellProfile() {
+  if (IS_WINDOWS) {
+    try {
+      return run('powershell -NoProfile -c "Write-Output $PROFILE"').trim();
+    } catch {
+      return join(HOME, 'Documents', 'WindowsPowerShell', 'Microsoft.PowerShell_profile.ps1');
+    }
+  }
+  // Prefer .zshrc if it exists, otherwise .bashrc
+  const zshrc = join(HOME, '.zshrc');
+  if (existsSync(zshrc)) return zshrc;
+  return join(HOME, '.bashrc');
 }
 
 /** Deep merge b into a (b wins on conflicts). Arrays are replaced, not concatenated. */
@@ -516,13 +530,18 @@ async function installQmd() {
     return;
   }
 
-  // Install bun if needed
+  // Install bun if needed (npm works everywhere — Node.js is already a prerequisite)
   if (!commandExists('bun')) {
-    printStatus('Installing bun...');
-    if (IS_WINDOWS) {
-      run('powershell -c "irm bun.sh/install.ps1 | iex"', { stdio: 'inherit' });
-    } else {
-      run('curl -fsSL https://bun.sh/install | bash', { stdio: 'inherit' });
+    printStatus('Installing bun via npm...');
+    try {
+      run('npm install -g bun', { stdio: 'inherit' });
+    } catch {
+      printWarning('Could not install bun. To install qmd manually later:');
+      printStatus('  1. Install bun: https://bun.sh/docs/installation');
+      printStatus('  2. Run: bun install -g github:tobi/qmd');
+      printStatus('  3. Run: qmd index');
+      printStatus('Continuing setup without qmd...');
+      return;
     }
     // Add bun to PATH for this session
     const bunBin = join(HOME, '.bun', 'bin');
@@ -530,7 +549,14 @@ async function installQmd() {
   }
 
   printStatus('Installing qmd...');
-  run('bun install -g github:tobi/qmd', { stdio: 'inherit' });
+  try {
+    run('bun install -g github:tobi/qmd', { stdio: 'inherit' });
+  } catch {
+    printWarning('qmd installation failed.');
+    printStatus('To install manually: bun install -g github:tobi/qmd');
+    printStatus('Continuing setup without qmd...');
+    return;
+  }
 
   // Register qmd as MCP server in .mcp.json
   printStatus('Registering qmd MCP server...');
@@ -615,28 +641,48 @@ function showSummary() {
   printSuccess(`Memory seed: ${MEMORY_PATH}`);
   printSuccess(`MCP server:  ${MCP_SERVER_DIR}/cognitive-memory/`);
   console.error('');
-  // Startup command
+  // Add launch command to shell profile
   console.error('');
-  printSuccess('Startup command:');
-  console.error('');
-  if (IS_WINDOWS) {
-    console.error(`  Add to your PowerShell profile ($PROFILE):`);
-    console.error('');
-    console.error(`  ${c.yellow}function ${PARTNER_NAME} { claude --system-prompt-file "${MEMORY_PATH}/frame.md" "Hey ${PARTNER_NAME}, what were we last working on?" }${c.nc}`);
-  } else {
-    console.error(`  Add to your ~/.zshrc or ~/.bashrc:`);
-    console.error('');
-    console.error(`  ${c.yellow}${PARTNER_NAME}() { claude --system-prompt-file "${MEMORY_PATH}/frame.md" "Hey ${PARTNER_NAME}, what were we last working on?"; }${c.nc}`);
+  const shellFunc = IS_WINDOWS
+    ? `function ${PARTNER_NAME} { claude --system-prompt-file "${MEMORY_PATH}/frame.md" "Hey ${PARTNER_NAME}, what were we last working on?" }`
+    : `${PARTNER_NAME}() { claude --system-prompt-file "${MEMORY_PATH}/frame.md" "Hey ${PARTNER_NAME}, what were we last working on?"; }`;
+
+  const profilePath = getShellProfile();
+  let profileWritten = false;
+
+  // Check if already present
+  if (existsSync(profilePath)) {
+    const content = readFileSync(profilePath, 'utf-8');
+    if (content.includes(`function ${PARTNER_NAME} `) || content.includes(`${PARTNER_NAME}()`)) {
+      printStatus(`Launch command already exists in ${profilePath}`);
+      profileWritten = true;
+    }
   }
+
+  if (!profileWritten) {
+    try {
+      mkdirSync(dirname(profilePath), { recursive: true });
+      const prefix = existsSync(profilePath) ? '\n' : '';
+      appendFileSync(profilePath, `${prefix}# Claude Code partner launch command\n${shellFunc}\n`, 'utf-8');
+      printSuccess(`Added launch command to ${profilePath}`);
+      profileWritten = true;
+    } catch (err) {
+      printWarning(`Could not write to ${profilePath}: ${err.message}`);
+      printStatus('Add this to your shell profile manually:');
+      console.error(`  ${c.yellow}${shellFunc}${c.nc}`);
+    }
+  }
+
   console.error('');
-  printStatus(`Then start a session by typing: ${PARTNER_NAME}`);
+  if (profileWritten) {
+    printStatus(`Restart your terminal, then start a session by typing: ${PARTNER_NAME}`);
+  }
   console.error('');
 
   printStatus('Next steps:');
-  printStatus(`  1. Add the startup command above to your shell config`);
-  printStatus(`  2. Edit ${MEMORY_PATH}/me.md to set your AI partner's identity`);
-  printStatus(`  3. Edit ${MEMORY_PATH}/context_anchors.md to set initial context`);
-  printStatus(`  4. Run: ${PARTNER_NAME}`);
+  printStatus(`  1. Edit ${MEMORY_PATH}/me.md to set your AI partner's identity`);
+  printStatus(`  2. Edit ${MEMORY_PATH}/context_anchors.md to set initial context`);
+  printStatus(`  3. Restart your terminal and run: ${PARTNER_NAME}`);
   console.error('');
 
   if (existsSync(join(CLAUDE_DIR, `settings_backup_${TIMESTAMP}.json`))) {

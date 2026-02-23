@@ -23,8 +23,8 @@ A complete configuration package for Claude Code that installs skills, agents, h
 ## Quick Start
 
 ```bash
-git clone https://github.com/IzzyFuller/codie-starter-template.git
-cd codie-starter-template
+git clone https://github.com/IzzyFuller/codie_starter_template.git
+cd codie_starter_template
 node setup.mjs
 ```
 
@@ -33,10 +33,12 @@ node setup.mjs
 The setup script and all hooks are cross-platform Node.js — no bash, jq, or Unix utilities required.
 
 ```powershell
-git clone https://github.com/IzzyFuller/codie-starter-template.git
-cd codie-starter-template
+git clone https://github.com/IzzyFuller/codie_starter_template.git
+cd codie_starter_template
 node setup.mjs
 ```
+
+> **Note:** If you cloned the repo to a different location or renamed the directory, just `cd` into wherever you cloned it before running `setup.mjs`.
 
 The setup script will:
 1. Check prerequisites
@@ -52,16 +54,27 @@ The setup script will:
 
 ### Launching Your Partner
 
-After setup, add the printed shell function to your `~/.zshrc` or `~/.bashrc`:
+After setup, add the printed shell function to your shell profile. The setup script prints the exact command for your platform — copy it from the output.
+
+**macOS / Linux** — add to `~/.zshrc` or `~/.bashrc`:
 
 ```bash
 # Example — your partner's name replaces "ada"
 ada() { claude --system-prompt-file ~/claude-memory/frame.md "Hey ada, what were we last working on?"; }
 ```
 
+**Windows** — add to your PowerShell profile (`$PROFILE`):
+
+```powershell
+# Example — your partner's name replaces "ada"
+function ada { claude --system-prompt-file "$HOME\claude-memory\frame.md" "Hey ada, what were we last working on?" }
+```
+
+> **Tip:** If `$PROFILE` doesn't exist yet, create it with `New-Item -Path $PROFILE -ItemType File -Force`, then open it with `notepad $PROFILE`.
+
 Then start a session:
 
-```bash
+```
 ada
 ```
 
