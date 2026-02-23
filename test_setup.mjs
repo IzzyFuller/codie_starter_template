@@ -18,8 +18,10 @@ const MCP_SERVER_DIR = IS_WINDOWS
   ? join(process.env.APPDATA || join(HOME, 'AppData', 'Roaming'), 'claude-mcp-servers')
   : join(HOME, '.local', 'share', 'claude-mcp-servers');
 
-// setup.mjs defaults to ~/claude-memory when you press enter on a blank prompt
-const MEMORY_PATH = join(HOME, 'claude-memory');
+// Derive memory path from what setup.mjs actually configured in .mcp.json
+const mcpForPath = parseJSON(join(HOME, '.mcp.json'));
+const MEMORY_PATH = mcpForPath?.mcpServers?.['cognitive-memory']?.env?.COGNITIVE_MEMORY_PATH
+  || join(HOME, 'claude-memory');
 
 // Derive expected counts from the repo source directories — the same dirs setup.mjs copies from
 const EXPECTED_SKILLS = readdirSync(join(REPO_DIR, 'skills'), { withFileTypes: true })
@@ -184,9 +186,9 @@ function testSettings() {
     }
   }
 
-  // All hook commands use 'node'
+  // All hook commands use 'node' (settings format: hooks.[event][0].hooks[0].command)
   for (const evt of hookEvents) {
-    const cmd = settings.hooks?.[evt]?.[0]?.command || '';
+    const cmd = settings.hooks?.[evt]?.[0]?.hooks?.[0]?.command || '';
     if (cmd.startsWith('node ')) {
       pass(`${evt} uses node command`);
     } else {
