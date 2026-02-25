@@ -60,10 +60,9 @@ cleanup() {
 
 # --- Test: Skills ---
 test_skills() {
-    print_header "Skills (expect 11)"
+    print_header "Skills (expect 10)"
 
     local expected_skills=(
-        pre-commit-checks
         anti-pattern-detection
         principle-check
         session-note-taking
@@ -95,12 +94,6 @@ test_skills() {
     assert_no_literal "{{MEMORY_PATH}}" "$CLAUDE_DIR/skills" "No path placeholders in skills"
 
     # Verify haiku model on specific skills
-    if grep -q "model: haiku" "$CLAUDE_DIR/skills/pre-commit-checks/SKILL.md"; then
-        pass "pre-commit-checks uses haiku model"
-    else
-        fail "pre-commit-checks should use haiku model"
-    fi
-
     if grep -q "model: haiku" "$CLAUDE_DIR/skills/session-note-taking/SKILL.md"; then
         pass "session-note-taking uses haiku model"
     else
@@ -163,9 +156,10 @@ test_hooks() {
 
 # --- Test: Agents ---
 test_agents() {
-    print_header "Agents (expect 11)"
+    print_header "Agents (expect 12)"
 
     local expected_agents=(
+        pre-commit.md
         identity-restoration.md
         semantic-reflection.md
         session-notes.md

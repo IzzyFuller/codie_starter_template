@@ -6,8 +6,8 @@ A complete configuration package for Claude Code that installs skills, agents, h
 
 | Component | Count | Purpose |
 |-----------|-------|---------|
-| **Skills** | 11 | Slash-command workflows (pre-commit checks, refactoring, anti-pattern detection, etc.) |
-| **Agents** | 11 | Specialized sub-agents (identity restoration, code quality, deep-learn pipeline) |
+| **Skills** | 10 | Slash-command workflows (refactoring, anti-pattern detection, session notes, etc.) |
+| **Agents** | 12 | Specialized sub-agents (identity restoration, pre-commit, code quality, deep-learn pipeline) |
 | **Hooks** | 4 | Automatic behaviors (session notes after tool use, memory search before responses) |
 | **Memory Seed** | 60+ files | Starter knowledge base with concepts, patterns, anti-patterns, and protocols |
 | **System Prompt** | 1 | `frame.md` — bootstraps identity restoration, hook compliance, and memory search |
@@ -82,11 +82,10 @@ The `--system-prompt-file` flag loads `frame.md`, which bootstraps identity rest
 
 ## What Gets Installed
 
-### Skills (11)
+### Skills (10)
 
 | Skill | Purpose | Model |
 |-------|---------|-------|
-| pre-commit-checks | Format, lint, test before commits | haiku |
 | session-note-taking | Capture work in real-time | haiku |
 | anti-pattern-detection | Check work against documented anti-patterns | - |
 | principle-check | Validate recommendations are evidence-based | - |
@@ -98,7 +97,10 @@ The `--system-prompt-file` flag loads `frame.md`, which bootstraps identity rest
 | refactor-phase-self-check | Post-refactoring validation | - |
 | skill-protocol-creation | Guide creation of new skills | - |
 
-### Agents (11)
+### Agents (12)
+
+**Pre-Commit:**
+- `pre-commit` — Semantic anti-pattern analysis + format/lint/test before commits
 
 **Core Memory:**
 - `identity-restoration` — Reads memory and returns a dense identity summary on session start
