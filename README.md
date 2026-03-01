@@ -18,7 +18,7 @@ A complete configuration package for Claude Code that installs skills, agents, h
 
 - **Node.js 18+** and npm
 - **Git**
-- **Claude Code** CLI installed ([claude.ai/claude-code](https://claude.ai/claude-code))
+- **Claude Code** CLI installed ([claude.com/product/claude-code](https://claude.com/product/claude-code))
 
 ## Quick Start
 
