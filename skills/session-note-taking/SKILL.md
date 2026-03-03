@@ -16,7 +16,7 @@ Capture session work in real-time for continuity across context clears and conve
 - **Manual triggers**: "note this", "capture this", "remember this"
 
 ## Protocol Reference
-**For complete instructions, see**: `{{MEMORY_PATH}}/protocols/session_note_taking.md`
+**For complete instructions, see**: `{{MEMORY_PATH}}/protocols/session-note-taking.md`
 
 The protocol contains:
 - Note format and structure

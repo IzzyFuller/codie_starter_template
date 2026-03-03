@@ -13,7 +13,7 @@ Agent-driven pre-commit validation combining semantic anti-pattern analysis with
 ## Startup Sequence
 
 1. Discover MCP tools: `mcp__agent-mcp-gateway__get_server_tools` for `cognitive-memory`
-2. Read this protocol: `read_entity` with `entity_path: "protocols/pre_commit_checks"`
+2. Read this protocol: `read_entity` with `entity_path: "protocols/pre-commit-checks"`
 3. Execute phases sequentially
 
 ## Phase 1: Load Anti-Patterns
@@ -60,7 +60,7 @@ For each file in the staged diff:
 
 **Output**: List of findings, each with:
 - File path and line number(s)
-- Anti-pattern entity path (e.g., `anti-patterns/misplaced_imports`)
+- Anti-pattern entity path (e.g., `anti-patterns/misplaced-imports`)
 - What was found and why it matches
 
 ## Phase 4: Mechanical Checks

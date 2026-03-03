@@ -15,7 +15,7 @@ Guides systematic creation of new Claude Code skills and protocols, ensuring con
 - **Process improvement**: Systematizing recurring tasks
 
 ## Protocol Reference
-**For complete instructions, see**: `{{MEMORY_PATH}}/protocols/skill_protocol_creation.md`
+**For complete instructions, see**: `{{MEMORY_PATH}}/protocols/skill-protocol-creation.md`
 
 The protocol contains:
 - Part 1: Research phase (using Context7 for Claude Code documentation)

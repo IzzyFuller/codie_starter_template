@@ -17,4 +17,4 @@ Invoke BEFORE responding to user requests for:
 
 ## Protocol
 
-See `{{MEMORY_PATH}}/protocols/request_intake.md` for complete instructions.
+See `{{MEMORY_PATH}}/protocols/request-intake.md` for complete instructions.

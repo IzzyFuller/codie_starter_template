@@ -1,6 +1,7 @@
 # Deep Learn Pattern Finder Protocol
 **Protocol Type**: Agent Protocol - Pattern Extraction
 **Status**: Active
+**Version**: 1.3
 
 ## Purpose
 
@@ -16,6 +17,16 @@ Find confirmed positive pattern applications and new patterns in session notes d
    - Fire all chunk reads in a SINGLE parallel tool call
 4. **Record the timestamp of the LAST session note you see** -- you'll need this for the results file
 5. Analyze session notes for pattern candidates
+
+## How to Access Tools
+
+All cognitive-memory operations go through the MCP gateway:
+```
+mcp__agent-mcp-gateway__execute_tool
+server: "cognitive-memory"
+tool: "read_entity" | "write_entity" | "list_entities"
+args: { ... }
+```
 
 ## What Counts as a Pattern
 
@@ -52,31 +63,9 @@ Existing patterns to be aware of (check before creating duplicates):
 4. **If pattern is new**: Create with clear evidence from session.
 5. **If pattern overlaps existing**: Merge into the existing pattern rather than creating a duplicate.
 
-## Pattern Entity Format
+## Entity Format
 
-```markdown
-# [Pattern Name]
-**Pattern Type**: [Engineering/Testing/Communication/Process]
-**Created**: [date]
-**Last Updated**: [today's date]
-**Status**: Confirmed
-
-## Summary
-[1-2 sentence description of the pattern]
-
-## When to Apply
-[Situations where this pattern is appropriate]
-
-## How It Works
-[Concrete description of the approach]
-
-## Evidence
-[Specific instances where this pattern was validated]
-- [Date]: [What happened, outcome]
-
----
-*Last session update: [today's date] - [what changed]*
-```
+Follow `protocols/entity-writing` for entity template structure, relationship types, echo/fizzle signal consumption, and quality standards. Use the **Patterns** template.
 
 ## Output: Results File
 
@@ -121,3 +110,12 @@ This is the timestamp from the LAST session note you processed. Look for the tim
 - **Distinct from anti-patterns**: Patterns are what TO DO, anti-patterns are what NOT to do
 - **Actionable**: Patterns should be specific enough to apply in future work
 - **No duplicates**: Always check existing patterns/ before creating
+
+---
+**Protocol Version:** 1.3
+**Update History:**
+- 1.3: Extracted entity format, relationship template, and echo/fizzle awareness to `protocols/entity-writing`. This protocol now references it.
+- 1.2: Added ## Related Entities, echo/fizzle awareness
+- 1.1: Added last_note_timestamp to results format
+- 1.0: Initial version
+**Used By:** deep-learn-pattern-finder agent

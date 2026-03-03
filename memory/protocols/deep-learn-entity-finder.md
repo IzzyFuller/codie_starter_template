@@ -1,6 +1,7 @@
 # Deep Learn Entity Finder Protocol
 **Protocol Type**: Agent Protocol - Entity Extraction
 **Status**: Active
+**Version**: 1.4
 
 ## Purpose
 
@@ -15,7 +16,18 @@ Extract knowledge entities (projects/, people/, concepts/) from session notes du
    - Then read ALL remaining content in parallel 500-line chunks
    - Fire all chunk reads in a SINGLE parallel tool call
 4. **Record the timestamp of the LAST session note you see** -- you'll need this for the results file
-5. Analyze the session notes for entity candidates
+5. **Extract ECHO/FIZZLE signals** from session notes (see Echo/Fizzle Processing section below)
+6. Analyze the session notes for entity candidates
+
+## How to Access Tools
+
+All cognitive-memory operations go through the MCP gateway:
+```
+mcp__agent-mcp-gateway__execute_tool
+server: "cognitive-memory"
+tool: "read_entity" | "write_entity" | "list_entities"
+args: { ... }
+```
 
 ## Entity Identification Strategy
 
@@ -51,26 +63,47 @@ Before creating or updating ANY entity:
 
 **CRITICAL**: Never overwrite existing entity content that isn't mentioned in the current session. Merge, don't replace.
 
-## Entity Content Format
+**Relationship building**: When creating or updating entities, check session notes for other entities mentioned alongside this one. Populate the `## Related Entities` section with observed connections.
+
+## Echo/Fizzle Processing
+
+Session notes contain `ECHO/FIZZLE:` markers tracking which memory entities proved useful together. Extract these to build `co-echo` relationships.
+
+### Marker Format
+
+```
+[sid:xxxxxxxx] ECHO/FIZZLE: entities_retrieved=[A, B, C] entities_used=[A, B] context=brief description
+```
+
+- **entities_retrieved**: All entities the semantic-reflection agent found
+- **entities_used**: Subset that actually informed the response (the "echo")
+- **context**: Brief phrase describing the task/question
+
+### Extraction Algorithm
+
+1. **Scan all session notes** for lines containing `ECHO/FIZZLE:`
+2. **Parse each marker** to extract the `entities_used` array and `context` field
+3. **Build co-occurrence map**: Track which entity pairs appear together in `entities_used` across different contexts
+4. **Apply threshold**: Entity pairs appearing in `entities_used` together **2+ times** across different contexts -> create `co-echo` relationship
+
+### Co-Echo Relationship Creation
+
+When writing or updating an entity, if the co-occurrence map shows it has `co-echo` relationships:
 
 ```markdown
-# [Entity Name]
-**Type**: [people/projects/concepts]
-**Created**: [date]
-**Last Updated**: [today's date]
-
-## Summary
-[2-3 sentence overview]
-
-## Key Details
-[Structured content -- be specific, include file paths, test counts, architecture notes]
-
-## Evidence/Examples
-[Specific instances, quotes, measurements]
-
----
-*Last session update: [today's date] - [what changed]*
+## Related Entities
+- **co-echo** patterns/tdd-discipline: Both used during adapter implementation and test cleanup refactor
 ```
+
+**Rules:**
+- Only add `co-echo` if entities appeared together in `entities_used` 2+ times
+- Use the `context` fields to write a meaningful relationship reason
+- `co-echo` is bidirectional but doesn't need to be written to both entities in the same deep learn pass -- it emerges organically over time
+- Fizzle (entities in `retrieved` but not `used`) is NOT a signal to remove relationships -- only echo adds relationships
+
+## Entity Format
+
+Follow `protocols/entity-writing` for entity template structure, relationship types, echo/fizzle signal consumption, and quality standards.
 
 ## Output: Results File
 
@@ -117,3 +150,13 @@ The `anchor_summary` should be 1-2 sentences capturing what's currently relevant
 - **Include evidence**: Quotes, outcomes, measurements from session notes
 - **Maintain chronology**: Note when things happened within the session
 - **No hallucination**: Only write what's actually in the session notes
+
+---
+**Protocol Version:** 1.4
+**Update History:**
+- 1.4: Added Echo/Fizzle Processing section with extraction algorithm and co-echo relationship creation rules (2+ co-occurrence threshold)
+- 1.3: Extracted entity format, relationship vocabulary, and echo/fizzle consumption to `protocols/entity-writing`. This protocol now references it.
+- 1.2: Added ## Related Entities, relationship vocabulary, echo/fizzle signal processing
+- 1.1: Added last_note_timestamp to results format
+- 1.0: Initial version
+**Used By:** deep-learn-entity-finder agent

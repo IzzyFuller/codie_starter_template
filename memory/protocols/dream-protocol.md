@@ -173,7 +173,7 @@ Prepare key insights and comprehensive reflection content:
 
 Before adding to dream_journal.md, check if it's approaching the 1MB threshold.
 
-**If approaching 1MB**: Execute the **Memory File Archival Protocol** (`memory_file_archival.md`) before continuing.
+**If approaching 1MB**: Execute the **Memory File Archival Protocol** (`memory-file-archival.md`) before continuing.
 
 ### Step 8: Write Synthesis to Dream Journal
 
