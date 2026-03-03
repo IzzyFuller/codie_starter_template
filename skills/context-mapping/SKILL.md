@@ -16,7 +16,7 @@ Apply historical learnings and established patterns when starting new tasks. Ens
 - User references "like we did before"
 
 ## Protocol Reference
-**Full protocol**: `{{MEMORY_PATH}}/protocols/context_mapping.md`
+**Full protocol**: `{{MEMORY_PATH}}/protocols/context-mapping.md`
 
 ## Quick Reference
 

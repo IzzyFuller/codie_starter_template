@@ -17,7 +17,7 @@ Systematic self-evaluation of recent work using memory-grounded principles. Orch
 - When you want to verify your own work quality
 
 ## Protocol Reference
-**For complete instructions, see**: `{{MEMORY_PATH}}/protocols/refactor_phase_self_check.md`
+**For complete instructions, see**: `{{MEMORY_PATH}}/protocols/refactor-phase-self-check.md`
 
 The protocol contains:
 - Complete 8-phase orchestration workflow

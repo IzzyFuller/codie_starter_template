@@ -12,7 +12,7 @@ version: 0.1.0
 - Acting on code review feedback
 
 ## Protocol Reference
-**For complete instructions, see**: `{{MEMORY_PATH}}/protocols/refactor_phase.md`
+**For complete instructions, see**: `{{MEMORY_PATH}}/protocols/refactor-phase.md`
 
 The protocol contains:
 - Phase definitions and agent assignments

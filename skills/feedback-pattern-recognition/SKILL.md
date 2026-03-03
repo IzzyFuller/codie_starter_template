@@ -16,7 +16,7 @@ Search memory for patterns when receiving user corrections. Transforms individua
 - Any teaching moment feedback
 
 ## Protocol Reference
-**Full protocol**: `{{MEMORY_PATH}}/protocols/feedback_pattern_recognition.md`
+**Full protocol**: `{{MEMORY_PATH}}/protocols/feedback-pattern-recognition.md`
 
 ## Quick Reference
 

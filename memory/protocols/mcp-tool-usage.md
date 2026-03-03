@@ -77,7 +77,7 @@ mcp__agent-mcp-gateway__execute_tool({
 
 **Purpose:** Local semantic search with hybrid retrieval
 
-**Available tools:** See `protocols/semantic_search_interface.md` for complete interface specification
+**Available tools:** See `protocols/semantic-search-interface.md` for complete interface specification
 
 **Usage:** Search across memory files semantically, find patterns in session history, cross-file content discovery
 

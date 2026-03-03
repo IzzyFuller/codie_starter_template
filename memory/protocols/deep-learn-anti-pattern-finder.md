@@ -1,6 +1,7 @@
 # Deep Learn Anti-Pattern Finder Protocol
 **Protocol Type**: Agent Protocol - Anti-Pattern Extraction
 **Status**: Active
+**Version**: 1.3
 
 ## Purpose
 
@@ -16,6 +17,16 @@ Find corrections, mistakes, and behavioral failures in session notes during deep
    - Fire all chunk reads in a SINGLE parallel tool call
 4. **Record the timestamp of the LAST session note you see** -- you'll need this for the results file
 5. Analyze session notes for anti-pattern candidates
+
+## How to Access Tools
+
+All cognitive-memory operations go through the MCP gateway:
+```
+mcp__agent-mcp-gateway__execute_tool
+server: "cognitive-memory"
+tool: "read_entity" | "write_entity" | "list_entities"
+args: { ... }
+```
 
 ## What Counts as an Anti-Pattern
 
@@ -54,31 +65,9 @@ Anti-patterns are **confirmed mistakes or bad approaches** -- things that demons
 
 **IMPORTANT**: Repeated anti-patterns (corrections the user has made before) are HIGH PRIORITY. If the session shows the user correcting the same thing again, this MUST be captured and the existing anti-pattern updated with the new instance.
 
-## Anti-Pattern Entity Format
+## Entity Format
 
-```markdown
-# [Anti-Pattern Name]
-**Anti-Pattern Type**: [Code/Behavioral/Testing/Memory]
-**Created**: [date]
-**Last Updated**: [today's date]
-**Severity**: [High/Medium/Low -- High if repeated correction]
-
-## Summary
-[1-2 sentence description of what NOT to do]
-
-## The Mistake
-[What the wrong approach looks like]
-
-## The Correction
-[What to do instead]
-
-## Evidence
-[Specific instances where this was corrected]
-- [Date]: [What happened, user's exact words if available]
-
----
-*Last session update: [today's date] - [what changed]*
-```
+Follow `protocols/entity-writing` for entity template structure, relationship types, echo/fizzle signal consumption, and quality standards. Use the **Anti-Patterns** template.
 
 ## Output: Results File
 
@@ -123,3 +112,12 @@ This is the timestamp from the LAST session note you processed. Look for the tim
 - **Actionable**: Anti-patterns should be specific enough to recognize and avoid in future
 - **No duplicates**: Always check existing anti-patterns/ before creating
 - **Severity matters**: Repeated corrections = High severity
+
+---
+**Protocol Version:** 1.3
+**Update History:**
+- 1.3: Extracted entity format, relationship template, and echo/fizzle awareness to `protocols/entity-writing`. This protocol now references it.
+- 1.2: Added ## Related Entities, echo/fizzle awareness
+- 1.1: Added last_note_timestamp to results format
+- 1.0: Initial version
+**Used By:** deep-learn-anti-pattern-finder agent

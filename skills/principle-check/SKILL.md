@@ -19,7 +19,7 @@ Validates technical recommendations against established principles and memory ar
 - **When generalizing from specific context to general pattern**
 
 ## Protocol Reference
-**For complete instructions, see**: `{{MEMORY_PATH}}/protocols/principle_check.md`
+**For complete instructions, see**: `{{MEMORY_PATH}}/protocols/principle-check.md`
 
 The protocol contains:
 - Phase 1: Recommendation pause (mental checkpoint)

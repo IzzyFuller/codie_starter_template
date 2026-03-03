@@ -19,7 +19,7 @@ Proactively check current work against documented anti-patterns. Catches problem
 - Every 10-15 minutes during active coding
 
 ## Protocol Reference
-**For complete instructions, see**: `{{MEMORY_PATH}}/protocols/anti_pattern_detection.md`
+**For complete instructions, see**: `{{MEMORY_PATH}}/protocols/anti-pattern-detection.md`
 
 The protocol contains all documented anti-patterns, warning signs, and the complete detection workflow.
 

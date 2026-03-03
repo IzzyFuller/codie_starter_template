@@ -97,7 +97,7 @@ The `--system-prompt-file` flag loads `frame.md`, which bootstraps identity rest
 | refactor-phase-self-check | Post-refactoring validation | - |
 | skill-protocol-creation | Guide creation of new skills | - |
 
-### Agents (12)
+### Agents (14)
 
 **Pre-Commit:**
 - `pre-commit` — Semantic anti-pattern analysis + format/lint/test before commits
@@ -110,6 +110,8 @@ The `--system-prompt-file` flag loads `frame.md`, which bootstraps identity rest
 **Code Quality:**
 - `clean-coder` — Implementation with principles applied
 - `clean-designer` — Architecture decisions with evidence
+- `clean-reviewer` — Comprehensive code review with memory entity citations
+- `clean-thinker` — Memory-informed responses via semantic search (haiku)
 - `code-quality-fixer` — Sequential format, lint, test validation
 
 **Deep-Learn Pipeline:**
@@ -136,22 +138,30 @@ The `--system-prompt-file` flag loads `frame.md`, which bootstraps identity rest
 ├── me.md                       # AI partner identity + namesake (customize this!)
 ├── context_anchors.md          # Working memory pointers (what's relevant now)
 ├── current_session.md          # Real-time session notes
-├── concepts/                   # 7 core methodology concepts
-│   ├── archaeological_engineering.md
-│   ├── fail_fast_engineering.md
-│   ├── evidence_based_validation.md
-│   ├── proportional_response.md
-│   ├── collaborative_architectural_epistemology.md
-│   ├── little_bites_methodology.md
-│   └── defensive_cruft_removal.md
-├── patterns/                   # 5 proven methodology patterns
-│   ├── archaeological_engineering.md
-│   ├── little_bites_strategy.md
-│   ├── anti_overengineering_discipline.md
-│   ├── fail_fast_engineering.md
-│   └── adaptive_epistemological_debugging.md
-├── anti-patterns/              # 17 documented anti-patterns to avoid
-├── protocols/                  # 25 behavioral protocols for skills/agents
+├── concepts/                   # 10 core methodology concepts
+│   ├── archaeological-engineering.md
+│   ├── changeability-first-design.md
+│   ├── collaborative-architectural-epistemology.md
+│   ├── context-engineering.md
+│   ├── defensive-cruft-removal.md
+│   ├── essential-frame.md
+│   ├── evidence-based-validation.md
+│   ├── fail-fast-engineering.md
+│   ├── little-bites-methodology.md
+│   └── proportional-response.md
+├── patterns/                   # 10 proven methodology patterns
+│   ├── adaptive-epistemological-debugging.md
+│   ├── anti-overengineering-discipline.md
+│   ├── archaeological-engineering.md
+│   ├── cross-platform-node-over-bash.md
+│   ├── evidence-first-debugging.md
+│   ├── fail-fast-engineering.md
+│   ├── little-bites-strategy.md
+│   ├── scope-adherence.md
+│   ├── test-observable-behavior-not-implementation.md
+│   └── thin-wrapper-hook-protocol-reference.md
+├── anti-patterns/              # 25 documented anti-patterns to avoid
+├── protocols/                  # 33 behavioral protocols for skills/agents
 ├── people/                     # Team member profiles
 │   ├── izzy.md                 # Methodology originator
 │   └── codie.md                # AI partner profile

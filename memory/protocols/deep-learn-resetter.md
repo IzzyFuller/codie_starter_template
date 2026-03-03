@@ -1,6 +1,7 @@
 # Deep Learn Resetter Protocol
 **Protocol Type**: Agent Protocol - Session Reset & Anchor Update
 **Status**: Active
+**Version**: 1.1
 
 ## Purpose
 
@@ -12,9 +13,26 @@ Collect results from the 3 finder agents, update context_anchors with new anchor
 2. Read the results files from `/tmp/deep-learn-results/`
 3. Process results and update memory
 
+## How to Access Tools
+
+Cognitive-memory operations go through the MCP gateway:
+```
+mcp__agent-mcp-gateway__execute_tool
+server: "cognitive-memory"
+tool: "read_entity" | "write_entity" | "list_entities"
+args: { ... }
+```
+
+File operations use Bash:
+```
+Bash: cat /tmp/deep-learn-results/entity-finder.json
+Bash: cat /tmp/deep-learn-results/pattern-finder.json
+Bash: cat /tmp/deep-learn-results/anti-pattern-finder.json
+```
+
 ## Step 1: Read All Results Files
 
-Read all 3 JSON files in parallel:
+Read all 3 JSON files in parallel via Bash:
 
 ```
 /tmp/deep-learn-results/entity-finder.json
@@ -47,7 +65,7 @@ Merge all `entities` arrays into one combined list.
 ## Step 2: Update Context Anchors
 
 1. Read current context_anchors
-2. Get the current timestamp
+2. Get the current timestamp via Bash: `date -u '+%Y-%m-%dT%H:%M:%S.000Z'`
 3. Generate a new deep learn section:
 
 ```markdown
@@ -61,10 +79,12 @@ Merge all `entities` arrays into one combined list.
 
 ## Step 3: Archive Current Session
 
-1. Read the FULL current_session content in parallel chunks
-2. Get today's date
+1. Read the FULL current_session content:
+   - Read first 50 lines to get total_lines
+   - Read ALL remaining content in parallel 500-line chunks
+2. Get today's date: `date '+%Y-%m-%d'`
 3. Check for existing archives -- if today's archive exists, append counter (-2, -3, etc.)
-4. Write the archive to `{{MEMORY_PATH}}/session_archives/YYYY-MM-DD.md`
+4. Write the archive
 
 The archive contains the COMPLETE session file -- this is the safety net.
 
@@ -132,3 +152,10 @@ rm -rf /tmp/deep-learn-results/
 - **Race-condition safe**: Always use cutoff timestamp to preserve post-processing notes
 - **Clean state**: After completion, /tmp/deep-learn-results/ should not exist
 - **Accurate reporting**: Completion message must reflect actual outcomes
+
+---
+**Protocol Version:** 1.1
+**Update History:**
+- 1.1: Added race-condition-safe reset using MIN(last_note_timestamp) cutoff. Post-cutoff notes preserved in reset session file.
+- 1.0: Initial version
+**Used By:** deep-learn-resetter agent

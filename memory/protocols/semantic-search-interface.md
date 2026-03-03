@@ -124,14 +124,14 @@ your-search-tool collection add {{MEMORY_PATH}} --name memory --mask "**/*.md"
 ## Protocol References
 
 The following protocols use semantic search:
-- `semantic_reflection.md` - Core reflection and memory retrieval
-- `principle_check.md` - Search for past feedback on similar recommendations
-- `feedback_pattern_recognition.md` - Find recurring correction patterns
-- `context_mapping.md` - Apply historical learnings to new tasks
-- `anti_pattern_detection.md` - Search documented anti-patterns
-- `identity_continuity.md` - Memory architecture exploration
-- `learn_protocol.md` - Pattern synthesis from past sessions
-- `memory_file_archival.md` - Archive coordination
+- `semantic-reflection.md` - Core reflection and memory retrieval
+- `principle-check.md` - Search for past feedback on similar recommendations
+- `feedback-pattern-recognition.md` - Find recurring correction patterns
+- `context-mapping.md` - Apply historical learnings to new tasks
+- `anti-pattern-detection.md` - Search documented anti-patterns
+- `identity-continuity.md` - Memory architecture exploration
+- `learn-protocol.md` - Pattern synthesis from past sessions
+- `memory-file-archival.md` - Archive coordination
 
 ## Implementation Swap Procedure
 
