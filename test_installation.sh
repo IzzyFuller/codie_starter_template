@@ -103,10 +103,11 @@ test_skills() {
 
 # --- Test: Hooks ---
 test_hooks() {
-    print_header "Hooks (expect 4 .mjs files)"
+    print_header "Hooks (expect 5 .mjs files)"
 
     local expected_hooks=(
         post-tool-session-note.mjs
+        post-tool-failure.mjs
         semantic-hydration.mjs
         session-start-restore.mjs
         context-check.mjs
@@ -156,7 +157,7 @@ test_hooks() {
 
 # --- Test: Agents ---
 test_agents() {
-    print_header "Agents (expect 12)"
+    print_header "Agents (expect 15)"
 
     local expected_agents=(
         pre-commit.md
@@ -165,10 +166,13 @@ test_agents() {
         session-notes.md
         clean-coder.md
         clean-designer.md
+        clean-reviewer.md
+        clean-thinker.md
         code-quality-fixer.md
         end-of-day-ritual.md
         deep-learn-anti-pattern-finder.md
         deep-learn-entity-finder.md
+        deep-learn-learn-agent.md
         deep-learn-pattern-finder.md
         deep-learn-resetter.md
     )
@@ -290,6 +294,7 @@ test_settings() {
     assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.UserPromptSubmit' "UserPromptSubmit hook configured"
     assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.SessionStart' "SessionStart hook configured"
     assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.Stop' "Stop hook configured"
+    assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.PostToolUseFailure' "PostToolUseFailure hook configured"
 
     # Verify hooks use 'node' command (not 'bash')
     local post_cmd

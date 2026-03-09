@@ -1,51 +1,32 @@
 #!/usr/bin/env node
 
-// Semantic Hydration Hook — triggers Codie to use semantic-reflection skill
-// No external API calls — just injects instruction for Codie to execute
-// Cross-platform Node.js replacement for semantic-hydration.sh
+// Semantic Hydration Hook — triggers background semantic-reflection agent
+// Reads the user's prompt from stdin and passes it in the instruction
+// so the main agent doesn't have to paraphrase.
 
-import { readFileSync, statSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 
 function main() {
-  // Skip if identity-restoration just completed (session start)
-  const marker = join(tmpdir(), 'codie-session-hydrated');
+  let prompt = '';
   try {
-    const mtime = statSync(marker).mtimeMs;
-    const ageSeconds = (Date.now() - mtime) / 1000;
-    if (ageSeconds < 120) {
-      process.exit(0);
-    }
+    const input = JSON.parse(readFileSync(0, 'utf-8'));
+    prompt = (input.prompt ?? '').trim();
   } catch {
-    // Marker doesn't exist — continue
+    // If we can't read stdin, still fire — main agent has the prompt in context
   }
 
-  let input;
-  try {
-    const raw = readFileSync(0, 'utf-8');
-    input = JSON.parse(raw);
-  } catch {
+  // Skip if prompt is system content (task notifications, system reminders, etc.) not a real user message
+  // Matches any string starting with an XML-like tag: <tag-name ...>
+  if (!prompt || /^<[a-z][a-z0-9-]*[\s>]/i.test(prompt)) {
     process.exit(0);
   }
 
-  const prompt = input.prompt ?? '';
+  const instruction = `Spawn a background semantic-reflection agent. User prompt: "${prompt}". Include relevant conversation context so the agent can search memory effectively.`;
 
-  // Skip very short prompts or simple acknowledgments
-  if (prompt.length < 30) {
-    process.exit(0);
-  }
-
-  if (/^(yes|no|ok|thanks|sure|good|great|correct|right|yep|nope|yeah|nah)/i.test(prompt)) {
-    process.exit(0);
-  }
-
-  // Inject instruction to use semantic-reflection skill
   const result = {
     hookSpecificOutput: {
       hookEventName: 'UserPromptSubmit',
-      additionalContext:
-        'IMPORTANT: Before responding, invoke the semantic-reflection skill to search memory for relevant context, patterns, and learnings that apply to this request.',
+      additionalContext: instruction,
     },
   };
 
