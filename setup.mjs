@@ -525,37 +525,41 @@ async function configureMcp() {
 async function installQmd() {
   console.error('');
   printStatus('Optional: qmd provides semantic search across your memory files.');
+  printStatus('Requires Node.js 22+ for prebuilt binaries.');
   const confirm = await ask('Install qmd? (y/n)', 'n');
   if (!/^[Yy]/.test(confirm)) {
     return;
   }
 
-  // Install bun if needed (npm works everywhere — Node.js is already a prerequisite)
-  if (!commandExists('bun')) {
-    printStatus('Installing bun via npm...');
-    try {
-      run('npm install -g bun', { stdio: 'inherit' });
-    } catch {
-      printWarning('Could not install bun. To install qmd manually later:');
-      printStatus('  1. Install bun: https://bun.sh/docs/installation');
-      printStatus('  2. Run: bun install -g github:tobi/qmd');
-      printStatus('  3. Run: qmd index');
-      printStatus('Continuing setup without qmd...');
-      return;
-    }
-    // Add bun to PATH for this session
-    const bunBin = join(HOME, '.bun', 'bin');
-    process.env.PATH = `${bunBin}${IS_WINDOWS ? ';' : ':'}${process.env.PATH}`;
-  }
-
-  printStatus('Installing qmd...');
-  try {
-    run('bun install -g github:tobi/qmd', { stdio: 'inherit' });
-  } catch {
-    printWarning('qmd installation failed.');
-    printStatus('To install manually: bun install -g github:tobi/qmd');
+  // Check Node version — better-sqlite3 prebuilt binaries require Node 22+
+  const nodeVer = parseInt(process.versions.node.split('.')[0], 10);
+  if (nodeVer < 22) {
+    printWarning(`Node.js ${nodeVer} detected. qmd requires Node.js 22+ for prebuilt binaries.`);
+    printStatus('Upgrade Node.js from https://nodejs.org, then run:');
+    printStatus('  npm install -g @tobilu/qmd');
     printStatus('Continuing setup without qmd...');
     return;
+  }
+
+  printStatus('Installing qmd via npm...');
+  try {
+    run('npm install -g @tobilu/qmd', { stdio: 'inherit' });
+  } catch {
+    printWarning('qmd installation failed.');
+    printStatus('On networks with SSL inspection, retry with:');
+    printStatus('  NODE_TLS_REJECT_UNAUTHORIZED=0 npm install -g @tobilu/qmd');
+    printStatus('Continuing setup without qmd...');
+    return;
+  }
+
+  // Index the memory collection
+  printStatus('Indexing memory collection...');
+  try {
+    run(`qmd collection add "${MEMORY_PATH}" --name memory --mask "**/*.md"`, { stdio: 'inherit' });
+    printSuccess('Memory collection indexed');
+  } catch {
+    printWarning('Could not index memory collection. Run manually after setup:');
+    printStatus(`  qmd collection add "${MEMORY_PATH}" --name memory --mask "**/*.md"`);
   }
 
   // Register qmd as MCP server in .mcp.json
@@ -594,26 +598,10 @@ async function installQmd() {
     printSuccess('Added qmd to .mcp.json');
   }
 
-  // Create initial qmd config with memory collection
-  const qmdConfigDir = IS_WINDOWS
-    ? join(process.env.APPDATA || join(HOME, 'AppData', 'Roaming'), 'qmd')
-    : join(HOME, '.config', 'qmd');
-  const qmdConfigFile = join(qmdConfigDir, 'index.yml');
-
-  if (!existsSync(qmdConfigFile)) {
-    mkdirSync(qmdConfigDir, { recursive: true });
-    const config = `collections:
-  memory:
-    path: "${MEMORY_PATH}"
-    glob: "**/*.md"
-`;
-    writeFileSync(qmdConfigFile, config, 'utf-8');
-    printSuccess('Created qmd config with memory collection');
-  } else {
-    printStatus('qmd config already exists — skipping');
-  }
-
-  printSuccess('qmd installed. Run \'qmd index\' after setup to build the search index.');
+  printSuccess('qmd installed.');
+  printStatus('Optionally build vector embeddings for semantic search:');
+  printStatus('  qmd embed   (first run downloads ~2GB of models)');
+  printStatus('On machines without a GPU, prefix with NODE_LLAMA_CPP_GPU=false to skip GPU detection.');
 }
 
 // --- Summary ---
