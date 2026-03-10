@@ -20,12 +20,11 @@ Find corrections, mistakes, and behavioral failures in session notes during deep
 
 ## How to Access Tools
 
-All cognitive-memory operations go through the MCP gateway:
+All cognitive-memory operations use direct MCP tools:
 ```
-mcp__agent-mcp-gateway__execute_tool
-server: "cognitive-memory"
-tool: "read_entity" | "write_entity" | "list_entities"
-args: { ... }
+mcp__cognitive-memory__read_entity({ entity_path: "..." })
+mcp__cognitive-memory__write_entity({ ... })
+mcp__cognitive-memory__list_entities({ ... })
 ```
 
 ## What Counts as an Anti-Pattern

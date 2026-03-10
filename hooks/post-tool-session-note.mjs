@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
 // PostToolUse hook — triggers session note-taking after tool use
-// Skips: add_session_note (recursion), get_server_tools (discovery),
-// cognitive-memory and qmd gateway calls (memory plumbing).
-// Context7 and other gateway servers still trigger notes.
+// Skips: add_session_note (recursion),
+// cognitive-memory, qmd, and Read (memory plumbing / not meaningful work units).
 
 import { readFileSync } from 'node:fs';
 
@@ -22,26 +21,16 @@ function main() {
     process.exit(0);
   }
 
-  // Skip get_server_tools entirely — discovery, not meaningful work
-  if (toolName === 'mcp__agent-mcp-gateway__get_server_tools') {
+  // Skip cognitive-memory, qmd, and Read — memory plumbing / not meaningful work units
+  if (toolName.startsWith('mcp__cognitive-memory__') || toolName.startsWith('mcp__qmd__') || toolName === 'Read') {
     process.exit(0);
-  }
-
-  // For gateway execute_tool, skip cognitive-memory and qmd (memory plumbing)
-  // Context7 and other servers still trigger notes
-  if (toolName === 'mcp__agent-mcp-gateway__execute_tool') {
-    const server = input.tool_input?.server ?? '';
-    const skippedServers = ['cognitive-memory', 'qmd'];
-    if (skippedServers.includes(server)) {
-      process.exit(0);
-    }
   }
 
   const result = {
     hookSpecificOutput: {
       hookEventName: 'PostToolUse',
       additionalContext:
-        `Take a session note about what ${toolName} accomplished. Follow the session-note-taking protocol.`,
+        `MANDATORY SESSION NOTE — DO NOT SKIP. You MUST spawn a session-notes agent RIGHT NOW to record what ${toolName} accomplished BEFORE continuing with any other work. This is a BLOCKING requirement. Skipping this is a documented chronic anti-pattern (skipping-session-notes-during-mechanical-work). If you skip this note, you are failing a core behavioral requirement. Spawn the agent, then proceed. Pass this tool result to the agent: ${JSON.stringify(input.tool_response ?? '')}`,
     },
   };
 

@@ -17,7 +17,7 @@ Documents how to interact with MCP tools. All tools are called directly by name 
 - `list_entities` — List all entities or filter by prefix
 - `deep_learn` — Bulk session-to-entity consolidation, resets session
 - `learn` — Update me.md with validated behavioral patterns
-- `synthesis_reflection` — Append to dream_journal.md
+
 
 **Usage:**
 ```typescript

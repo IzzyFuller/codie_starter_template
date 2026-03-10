@@ -2,11 +2,11 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "mcp__agent-mcp-gateway__get_server_tools",
+        "matcher": "mcp__cognitive-memory__*",
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"$HOOK_INPUT\" | jq '. + {max_schema_tokens: 5000}' | jq -c '{hookSpecificOutput: {hookEventName: \"PreToolUse\", permissionDecision: \"allow\", updatedInput: .}}'"
+            "command": "echo \"$HOOK_INPUT\" | jq -c '{hookSpecificOutput: {hookEventName: \"PreToolUse\", permissionDecision: \"allow\", updatedInput: .}}'"
           }
         ]
       }
@@ -28,6 +28,10 @@
           {
             "type": "command",
             "command": "node ~/.claude/hooks/semantic-hydration.mjs"
+          },
+          {
+            "type": "command",
+            "command": "node ~/.claude/hooks/break-enforcement.mjs"
           }
         ]
       }
@@ -67,7 +71,6 @@
   "permissions": {
     "allow": [
       "mcp__cognitive-memory__*",
-      "mcp__agent-mcp-gateway__*",
       "mcp__qmd__*",
       "Bash(git *)",
       "Bash(npm *)",

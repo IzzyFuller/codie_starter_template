@@ -5,6 +5,4 @@ model: sonnet
 color: purple
 ---
 
-Read and follow `protocols/pre-commit-checks` and `protocols/refactor-phase-self-check` from cognitive-memory exactly.
-
-Startup: `mcp__agent-mcp-gateway__execute_tool` with `server: "cognitive-memory"`, `tool: "read_entity"`, `args: {"entity_path": "protocols/pre-commit-checks"}` (repeat for each protocol)
+Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/pre-commit-checks` and `protocols/refactor-phase-self-check`.

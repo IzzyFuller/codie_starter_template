@@ -115,7 +115,7 @@ The `--system-prompt-file` flag loads `frame.md`, which bootstraps identity rest
 - `code-quality-fixer` — Sequential format, lint, test validation
 
 **Deep-Learn Pipeline:**
-- `end-of-day-ritual` — Orchestrates the 3-phase Learn/Deep Learn/Dream workflow
+- `end-of-day-ritual` — Orchestrates the 2-phase Learn/Deep Learn workflow
 - `deep-learn-anti-pattern-finder` — Finds corrections and mistakes in session notes
 - `deep-learn-entity-finder` — Extracts knowledge entities from session notes
 - `deep-learn-pattern-finder` — Finds confirmed positive patterns
@@ -187,10 +187,9 @@ Run the end-of-day ritual to consolidate learning:
 You: "Let's do end of day"
 ```
 
-This orchestrates three phases:
+This orchestrates two phases:
 1. **Learn**: Review session notes, extract behavioral patterns
-2. **Deep Learn**: Three parallel agents scan notes for anti-patterns, entities, and positive patterns
-3. **Dream**: Archive notes, update context anchors, reset for next session
+2. **Deep Learn**: Three parallel agents scan notes for anti-patterns, entities, and positive patterns; archive notes, update context anchors, reset for next session
 
 ### Memory Architecture
 

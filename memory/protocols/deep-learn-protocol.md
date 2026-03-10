@@ -208,7 +208,6 @@ After Resetter completes:
 
 - **End of Day Ritual**: May trigger Deep Learn first if session is large, then do anchor updates
 - **Learn Protocol**: Operates on archived sessions for identity/protocol updates (less frequent)
-- **Dream Protocol**: Operates on archives for philosophical synthesis (as needed)
 
 ---
 
