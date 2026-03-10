@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 // PostToolUse hook — triggers session note-taking after tool use
-// Skips: add_session_note (recursion), get_server_tools (discovery),
-// cognitive-memory and qmd calls (memory plumbing).
+// Skips: add_session_note (recursion),
+// cognitive-memory and qmd calls (memory plumbing),
+// Read/Glob/Bash/ToolSearch (research/filesystem exploration).
 
 import { readFileSync } from 'node:fs';
 
@@ -26,11 +27,17 @@ function main() {
     process.exit(0);
   }
 
+  // Skip Read, Glob, Bash, ToolSearch — research/filesystem exploration, not work units
+  const researchTools = ['Read', 'Glob', 'Bash', 'ToolSearch'];
+  if (researchTools.includes(toolName)) {
+    process.exit(0);
+  }
+
   const result = {
     hookSpecificOutput: {
       hookEventName: 'PostToolUse',
       additionalContext:
-        `Take a session note about what ${toolName} accomplished. Follow the session-note-taking protocol.`,
+        `MANDATORY SESSION NOTE — DO NOT SKIP. You MUST spawn a session-notes agent RIGHT NOW to record what ${toolName} accomplished BEFORE continuing with any other work. This is a BLOCKING requirement. Skipping this is a documented chronic anti-pattern (skipping-session-notes-during-mechanical-work). If you skip this note, you are failing a core behavioral requirement. Spawn the agent, then proceed.`,
     },
   };
 
