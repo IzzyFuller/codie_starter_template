@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// PostToolUseFailure hook — on MCP gateway tool failures,
+// PostToolUseFailure hook — on MCP tool failures,
 // inject instruction to read tool definition before retrying.
 // Addresses chronic anti-pattern: hallucinating-tool-parameters.
 
@@ -16,19 +16,16 @@ function main() {
 
   const toolName = input.tool_name ?? '';
 
-  // Only intercept gateway execute_tool failures
-  if (toolName !== 'mcp__agent-mcp-gateway__execute_tool') {
+  // Only intercept MCP tool failures (cognitive-memory, qmd, etc.)
+  if (!toolName.startsWith('mcp__')) {
     process.exit(0);
   }
-
-  const server = input.tool_input.server;
-  const tool = input.tool_input.tool;
 
   const result = {
     hookSpecificOutput: {
       hookEventName: 'PostToolUseFailure',
       additionalContext:
-        `STOP. Tool call to ${server}/${tool} failed. Before retrying, call get_server_tools for server "${server}" and read the definition for "${tool}". Verify the correct parameter names and types. Do NOT guess — read the definition.`,
+        `STOP. Tool call to ${toolName} failed. Before retrying, verify the correct parameter names and types. Do NOT guess — check the tool definition.`,
     },
   };
 

@@ -10,15 +10,19 @@ Generate a seed prompt for seamless context continuation after `/clear`. Identit
 
 ## Steps
 
-### 1. Update Session Notes
+### 1. Break Check
+
+Before proceeding, check `protocols/break-enforcement`. A context refresh is a natural pause point — if the session has been running ~1 hour continuously, suggest a break before continuing.
+
+### 2. Update Session Notes
 
 Capture any current context not already in session notes via `add_session_note`. Look at the active conversation -- decisions made, progress, blockers, next steps -- and fill gaps.
 
-### 2. Enter Plan Mode
+### 3. Enter Plan Mode
 
 Call `EnterPlanMode`. The plan file is the deliverable.
 
-### 3. Write a Seed Prompt
+### 4. Write a Seed Prompt
 
 In the plan file, write a compact first message for the new session. Base it on the fully updated session notes.
 
@@ -30,7 +34,7 @@ Continuing session [sid:xxxxxxxx].
 ```
 This line MUST appear at the start of the seed prompt. It preserves note continuity across context clears.
 
-### 4. Exit Plan Mode
+### 5. Exit Plan Mode
 
 Call `ExitPlanMode` for user approval. Plan mode IS the delivery mechanism -- after approval and `/clear`, the next session automatically receives the seed prompt via "Implement the following plan." No manual pasting required.
 

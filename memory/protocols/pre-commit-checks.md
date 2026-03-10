@@ -12,7 +12,7 @@ Agent-driven pre-commit validation combining semantic anti-pattern analysis with
 
 ## Startup Sequence
 
-1. Discover MCP tools: `mcp__agent-mcp-gateway__get_server_tools` for `cognitive-memory`
+1. Discover MCP tools: call `mcp__cognitive-memory__list_entities` to verify connectivity
 2. Read this protocol: `read_entity` with `entity_path: "protocols/pre-commit-checks"`
 3. Execute phases sequentially
 
@@ -97,6 +97,10 @@ On failure → report and continue to test.
 On failure → report.
 
 **Note**: Mechanical checks run even if earlier steps fail. We want the complete picture.
+
+## Phase 5: Break Check
+
+After completing all checks, consult `protocols/break-enforcement`. A commit cycle is a natural pause point — if the session has been running ~1 hour continuously, include a break reminder in the output.
 
 ## Output Format
 

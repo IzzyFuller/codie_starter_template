@@ -23,7 +23,7 @@ return "Take a session note: categorize as CONTEXT if..."
 **Correct Pattern** (protocol reference):
 ```javascript
 // Hook references protocol explicitly
-return "Call mcp__agent-mcp-gateway__execute_tool with server='cognitive-memory', tool='read_entity', args={entity_path: 'protocols/session-note-taking'} to read the protocol, then follow its instructions exactly"
+return "Call mcp__cognitive-memory__read_entity with entity_path='protocols/session-note-taking' to read the protocol, then follow its instructions exactly"
 ```
 
 **Key Elements**:

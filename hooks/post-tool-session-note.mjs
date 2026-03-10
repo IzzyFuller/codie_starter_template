@@ -2,8 +2,7 @@
 
 // PostToolUse hook — triggers session note-taking after tool use
 // Skips: add_session_note (recursion), get_server_tools (discovery),
-// cognitive-memory and qmd gateway calls (memory plumbing).
-// Context7 and other gateway servers still trigger notes.
+// cognitive-memory and qmd calls (memory plumbing).
 
 import { readFileSync } from 'node:fs';
 
@@ -22,19 +21,9 @@ function main() {
     process.exit(0);
   }
 
-  // Skip get_server_tools entirely — discovery, not meaningful work
-  if (toolName === 'mcp__agent-mcp-gateway__get_server_tools') {
+  // Skip cognitive-memory and qmd calls — memory plumbing, not meaningful work
+  if (toolName.startsWith('mcp__cognitive-memory__') || toolName.startsWith('mcp__qmd__')) {
     process.exit(0);
-  }
-
-  // For gateway execute_tool, skip cognitive-memory and qmd (memory plumbing)
-  // Context7 and other servers still trigger notes
-  if (toolName === 'mcp__agent-mcp-gateway__execute_tool') {
-    const server = input.tool_input?.server ?? '';
-    const skippedServers = ['cognitive-memory', 'qmd'];
-    if (skippedServers.includes(server)) {
-      process.exit(0);
-    }
   }
 
   const result = {

@@ -7,4 +7,4 @@ color: purple
 
 Read and follow `protocols/end-of-day-ritual`, `protocols/dream-protocol`, `protocols/learn-protocol`, and `protocols/deep-learn-protocol` from cognitive-memory exactly.
 
-Startup: `mcp__agent-mcp-gateway__execute_tool` with `server: "cognitive-memory"`, `tool: "read_entity"`, `args: {"entity_path": "protocols/end-of-day-ritual"}` (repeat for each protocol)
+Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/end-of-day-ritual"` (repeat for each protocol)

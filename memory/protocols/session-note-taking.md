@@ -189,12 +189,17 @@ Before adding session notes, check if current_session.md is approaching ~150KB. 
 - **Size-based archival**: Preserves raw session notes when file grows too large between Deep Learn cycles
 - Both mechanisms can coexist -- archive first if needed, then Deep Learn integrates content from both files
 
+## Break Enforcement Integration
+
+When writing session notes, check timestamps of recent notes. If notes show continuous activity for ~1 hour (no gaps >10 minutes), trigger `protocols/break-enforcement`. Session note-taking naturally touches timestamps, making it the right place to notice when a break is overdue.
+
 ## Integration with Other Protocols
 
 - **End of Day Ritual**: Session notes feed into context anchor updates
 - **Learn Protocol**: Review session notes for behavioral patterns
 - **Deep Learn Protocol**: Transform session insights into structured entity memory
 - **Dream Protocol**: Source material for philosophical synthesis
+- **Break Enforcement**: Check session timestamps when taking notes; remind if ~1 hour continuous
 
 ## Related Entities
 

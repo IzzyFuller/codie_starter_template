@@ -6,4 +6,4 @@ color: yellow
 
 Read and follow `protocols/session-note-taking` from cognitive-memory exactly.
 
-Startup: `mcp__agent-mcp-gateway__execute_tool` with `server: "cognitive-memory"`, `tool: "read_entity"`, `args: {"entity_path": "protocols/session-note-taking"}`
+Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/session-note-taking"`

@@ -7,4 +7,4 @@ color: red
 
 Read and follow `protocols/pre-commit-checks` from cognitive-memory exactly.
 
-Startup: `mcp__agent-mcp-gateway__execute_tool` with `server: "cognitive-memory"`, `tool: "read_entity"`, `args: {"entity_path": "protocols/pre-commit-checks"}`
+Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/pre-commit-checks"`

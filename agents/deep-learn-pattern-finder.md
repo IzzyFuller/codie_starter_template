@@ -7,4 +7,4 @@ color: green
 
 Read and follow `protocols/deep-learn-pattern-finder` from cognitive-memory exactly.
 
-Startup: `mcp__agent-mcp-gateway__execute_tool` with `server: "cognitive-memory"`, `tool: "read_entity"`, `args: {"entity_path": "protocols/deep-learn-pattern-finder"}`
+Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/deep-learn-pattern-finder"`

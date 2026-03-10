@@ -7,4 +7,4 @@ color: green
 
 Read and follow `protocols/principle-check` and `protocols/refactor-phase-self-check` from cognitive-memory exactly.
 
-Startup: `mcp__agent-mcp-gateway__execute_tool` with `server: "cognitive-memory"`, `tool: "read_entity"`, `args: {"entity_path": "protocols/principle-check"}` (repeat for each protocol)
+Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/principle-check"` (repeat for each protocol)
