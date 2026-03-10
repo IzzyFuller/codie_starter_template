@@ -5,6 +5,4 @@ model: sonnet
 color: red
 ---
 
-Read and follow `protocols/pre-commit-checks` from cognitive-memory exactly.
-
-Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/pre-commit-checks"`
+Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/pre-commit-checks`.

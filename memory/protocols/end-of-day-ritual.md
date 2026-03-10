@@ -50,6 +50,5 @@ Read back to confirm updates persisted correctly.
 
 - **Create/update entity files** -> Use Deep Learn
 - **Extract behavioral patterns** -> Use Learn
-- **Philosophical synthesis** -> Use Dream
 
 This protocol ONLY updates working memory pointers.

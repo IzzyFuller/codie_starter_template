@@ -5,6 +5,4 @@ model: sonnet
 color: cyan
 ---
 
-Read and follow `protocols/semantic-reflection` from cognitive-memory exactly.
-
-Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/semantic-reflection"`
+Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/semantic-reflection`.

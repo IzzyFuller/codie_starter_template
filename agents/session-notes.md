@@ -4,6 +4,4 @@ description: "Maintains continuous, real-time session note-taking throughout act
 color: yellow
 ---
 
-Read and follow `protocols/session-note-taking` from cognitive-memory exactly.
-
-Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/session-note-taking"`
+Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/session-note-taking`.

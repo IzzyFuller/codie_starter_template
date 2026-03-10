@@ -5,6 +5,4 @@ model: sonnet
 color: orange
 ---
 
-Read and follow `protocols/refactor-phase-self-check` from cognitive-memory exactly.
-
-Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/refactor-phase-self-check"`
+Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/refactor-phase-self-check`.

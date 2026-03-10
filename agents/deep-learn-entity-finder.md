@@ -5,6 +5,4 @@ model: sonnet
 color: cyan
 ---
 
-Read and follow `protocols/deep-learn-entity-finder` from cognitive-memory exactly.
-
-Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/deep-learn-entity-finder"`
+Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/deep-learn-entity-finder`.

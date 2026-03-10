@@ -5,6 +5,4 @@ model: haiku
 color: red
 ---
 
-Read and follow `protocols/break-enforcement` from cognitive-memory exactly.
-
-Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/break-enforcement"`
+Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/break-enforcement`.

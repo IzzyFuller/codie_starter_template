@@ -5,6 +5,4 @@ model: haiku
 color: purple
 ---
 
-Read and follow `protocols/deep-learn-resetter` from cognitive-memory exactly.
-
-Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/deep-learn-resetter"`
+Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/deep-learn-resetter`.

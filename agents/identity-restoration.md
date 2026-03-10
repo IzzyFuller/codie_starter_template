@@ -5,6 +5,4 @@ model: sonnet
 color: purple
 ---
 
-Read and follow `protocols/identity-continuity` from cognitive-memory exactly.
-
-Startup: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/identity-continuity"`
+Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/identity-continuity`.
