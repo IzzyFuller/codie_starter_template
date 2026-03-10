@@ -28,6 +28,10 @@
           {
             "type": "command",
             "command": "node ~/.claude/hooks/semantic-hydration.mjs"
+          },
+          {
+            "type": "command",
+            "command": "node ~/.claude/hooks/break-enforcement.mjs"
           }
         ]
       }
