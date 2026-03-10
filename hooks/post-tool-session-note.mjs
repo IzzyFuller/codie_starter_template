@@ -3,7 +3,7 @@
 // PostToolUse hook — triggers session note-taking after tool use
 // Skips: add_session_note (recursion),
 // cognitive-memory and qmd calls (memory plumbing),
-// Read/Glob/Bash/ToolSearch (research/filesystem exploration).
+// Read (filesystem reads, not meaningful work units).
 
 import { readFileSync } from 'node:fs';
 
@@ -27,9 +27,8 @@ function main() {
     process.exit(0);
   }
 
-  // Skip Read, Glob, Bash, ToolSearch — research/filesystem exploration, not work units
-  const researchTools = ['Read', 'Glob', 'Bash', 'ToolSearch'];
-  if (researchTools.includes(toolName)) {
+  // Skip Read — filesystem reads, not meaningful work units
+  if (toolName === 'Read') {
     process.exit(0);
   }
 
