@@ -1,6 +1,6 @@
 ---
 name: identity-restoration
-description: "Reads all identity and context sources (context_anchors, current_session, me, qmd) in its own context window and returns a dense ~80-line structured summary. Replaces 700+ lines of raw entity reading in main context."
+description: "Reads all identity and context sources (context_anchors, current_session, me, qmd) in its own context window and returns a structured identity summary proportional to session complexity. Replaces raw entity reading in main context."
 model: sonnet
 color: purple
 ---
