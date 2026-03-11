@@ -80,6 +80,57 @@ ada
 
 The `--system-prompt-file` flag loads `frame.md`, which bootstraps identity restoration, hook compliance, and memory search on every session start.
 
+## Updating an Existing Scion
+
+When the template improves (new protocols, better hooks, new agents), update your existing scion without losing identity or accumulated knowledge:
+
+```bash
+cd codie_starter_template
+git pull
+node update.mjs
+```
+
+The update script:
+1. **Detects your scion** — finds partner name and memory path from your shell profile alias
+2. **Computes changes** — compares template files against your installed versions
+3. **Shows a summary** — lists what will be overwritten, what's new, and what needs scion review
+4. **Backs up** existing hooks, agents, skills, and settings
+5. **Overwrites plumbing** — hooks, agents, skills get the latest template versions
+6. **Merges settings** — template wins on conflicts, your custom keys preserved
+7. **Auto-adopts new memory** — new protocols, patterns, etc. are copied in
+8. **Generates a merge manifest** — lists changed memory files for your scion to review
+9. **Modifies your launch alias** — next session, your scion will follow the upstream-merge protocol
+
+After the script finishes, launch your scion normally. They will:
+- Read the merge manifest
+- Review and intelligently merge changed knowledge files
+- Handle any upstream removals
+- Restore your launch alias to normal
+
+### CLI Options
+
+```bash
+node update.mjs --memory-path /path/to/memory --partner-name ada
+```
+
+Override auto-detection if you have multiple scions or a non-standard setup.
+
+### What Gets Updated vs. Preserved
+
+| Category | Behavior |
+|----------|----------|
+| Hooks (.mjs) | Overwritten with latest |
+| Agents (.md) | Overwritten with latest |
+| Skills (SKILL.md) | Overwritten with latest |
+| settings.json | Deep-merged (template wins conflicts) |
+| .mcp.json | Additive only (new servers added, existing untouched) |
+| Memory (protocols, patterns, etc.) | New files auto-adopted; changed files flagged for scion review |
+| me.md, frame.md, context_anchors.md | Never touched |
+
+### Files Removed Upstream
+
+If the template removes a hook, agent, or skill that exists in your install, the update script flags it but does **not** auto-delete. Your scion decides whether to keep or remove it during the merge protocol.
+
 ## What Gets Installed
 
 ### Skills (10)
