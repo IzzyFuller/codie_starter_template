@@ -3,165 +3,26 @@
 // Claude Code Starter Template Setup Script
 // Installs skills, agents, hooks, memory seed, and cognitive-memory MCP server
 // Cross-platform Node.js replacement for setup.sh
-// Version: 4.0
+// Version: 4.1
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, copyFileSync, readdirSync, statSync } from 'node:fs';
-import { homedir, platform, tmpdir } from 'node:os';
-import { join, basename, resolve, dirname } from 'node:path';
-import { execSync } from 'node:child_process';
-import { createInterface } from 'node:readline';
-import { fileURLToPath } from 'node:url';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, copyFileSync, readdirSync } from 'node:fs';
+import { join, resolve, dirname } from 'node:path';
 
-// --- Constants ---
+import {
+  SCRIPT_DIR, HOME, IS_WINDOWS, CLAUDE_DIR, MCP_SERVER_DIR,
+  c, printStatus, printSuccess, printWarning, printError,
+  ask, closePrompts,
+  run, commandExists, getShellProfile,
+  deepMerge, copyDirWithSubstitutions, countFiles,
+} from './lib/shared.mjs';
 
-const __filename = fileURLToPath(import.meta.url);
-const SCRIPT_DIR = dirname(__filename);
+// --- Script-local state ---
 
-const HOME = homedir();
-const IS_WINDOWS = platform() === 'win32';
-const CLAUDE_DIR = join(HOME, '.claude');
-const MCP_SERVER_DIR = IS_WINDOWS
-  ? join(process.env.APPDATA || join(HOME, 'AppData', 'Roaming'), 'claude-mcp-servers')
-  : join(HOME, '.local', 'share', 'claude-mcp-servers');
 const TIMESTAMP = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
 
 let MEMORY_PATH = '';
 let PARTNER_NAME = '';
 let NAMESAKE = null;
-
-// --- Colors (ANSI, disabled on Windows cmd without color support) ---
-
-const supportsColor = !IS_WINDOWS || process.env.TERM || process.env.WT_SESSION;
-const c = {
-  red: supportsColor ? '\x1b[0;31m' : '',
-  green: supportsColor ? '\x1b[0;32m' : '',
-  yellow: supportsColor ? '\x1b[1;33m' : '',
-  blue: supportsColor ? '\x1b[0;34m' : '',
-  nc: supportsColor ? '\x1b[0m' : '',
-};
-
-function printStatus(msg)  { console.error(`${c.blue}[INFO]${c.nc} ${msg}`); }
-function printSuccess(msg) { console.error(`${c.green}[OK]${c.nc} ${msg}`); }
-function printWarning(msg) { console.error(`${c.yellow}[WARN]${c.nc} ${msg}`); }
-function printError(msg)   { console.error(`${c.red}[ERROR]${c.nc} ${msg}`); }
-
-// --- Utilities ---
-
-// Piped stdin (Docker, CI, echo | node setup.mjs) vs interactive TTY need
-// completely different strategies. With piped input, readline fires 'close'
-// the moment the pipe is exhausted, which kills the Node.js event loop before
-// async steps can run. Fix: read all piped input upfront, shift lines per prompt.
-const IS_TTY = process.stdin.isTTY;
-let inputLines = [];
-let rl;
-
-if (IS_TTY) {
-  rl = createInterface({ input: process.stdin, output: process.stderr });
-} else {
-  // Read entire piped input synchronously — no event loop dependency
-  try {
-    const raw = readFileSync(0, 'utf-8');
-    inputLines = raw.split('\n');
-  } catch {
-    inputLines = [];
-  }
-}
-
-function ask(question, defaultValue = '') {
-  const suffix = defaultValue ? ` [${defaultValue}]` : '';
-  if (IS_TTY) {
-    return new Promise((resolve) => {
-      rl.question(`${question}${suffix}: `, (answer) => {
-        resolve(answer.trim() || defaultValue);
-      });
-    });
-  }
-  // Piped: consume next pre-read line
-  const line = inputLines.shift() || '';
-  console.error(`${question}${suffix}: ${line}`);
-  return Promise.resolve(line.trim() || defaultValue);
-}
-
-function closePrompts() {
-  if (rl) rl.close();
-}
-
-function run(cmd, opts = {}) {
-  const result = execSync(cmd, { encoding: 'utf-8', stdio: opts.stdio ?? 'pipe', ...opts });
-  return result ? result.trim() : '';
-}
-
-function commandExists(cmd) {
-  try {
-    const check = IS_WINDOWS ? `where ${cmd}` : `command -v ${cmd}`;
-    run(check);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function getShellProfile() {
-  if (IS_WINDOWS) {
-    try {
-      return run('powershell -NoProfile -c "Write-Output $PROFILE"').trim();
-    } catch {
-      return join(HOME, 'Documents', 'WindowsPowerShell', 'Microsoft.PowerShell_profile.ps1');
-    }
-  }
-  // Prefer .zshrc if it exists, otherwise .bashrc
-  const zshrc = join(HOME, '.zshrc');
-  if (existsSync(zshrc)) return zshrc;
-  return join(HOME, '.bashrc');
-}
-
-/** Deep merge b into a (b wins on conflicts). Arrays are replaced, not concatenated. */
-function deepMerge(a, b) {
-  const result = { ...a };
-  for (const key of Object.keys(b)) {
-    if (
-      result[key] && typeof result[key] === 'object' && !Array.isArray(result[key]) &&
-      typeof b[key] === 'object' && !Array.isArray(b[key])
-    ) {
-      result[key] = deepMerge(result[key], b[key]);
-    } else {
-      result[key] = b[key];
-    }
-  }
-  return result;
-}
-
-/** Recursively copy a directory, substituting placeholders in file contents. */
-function copyDirWithSubstitutions(src, dest, substitutions = {}) {
-  mkdirSync(dest, { recursive: true });
-  for (const entry of readdirSync(src, { withFileTypes: true })) {
-    const srcPath = join(src, entry.name);
-    const destPath = join(dest, entry.name);
-    if (entry.isDirectory()) {
-      copyDirWithSubstitutions(srcPath, destPath, substitutions);
-    } else {
-      let content = readFileSync(srcPath, 'utf-8');
-      for (const [placeholder, value] of Object.entries(substitutions)) {
-        content = content.replaceAll(placeholder, value);
-      }
-      writeFileSync(destPath, content, 'utf-8');
-    }
-  }
-}
-
-/** Count files recursively in a directory. */
-function countFiles(dir) {
-  let count = 0;
-  if (!existsSync(dir)) return 0;
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (entry.isDirectory()) {
-      count += countFiles(join(dir, entry.name));
-    } else {
-      count++;
-    }
-  }
-  return count;
-}
 
 // --- Step 1: Prerequisites ---
 
@@ -684,7 +545,7 @@ function showSummary() {
 async function main() {
   console.error(`${c.blue}================================${c.nc}`);
   console.error(`${c.blue}  Claude Code Starter Template${c.nc}`);
-  console.error(`${c.blue}  Setup Script v4.0${c.nc}`);
+  console.error(`${c.blue}  Setup Script v4.1${c.nc}`);
   console.error(`${c.blue}================================${c.nc}`);
   console.error('');
   printStatus('This installs skills, agents, hooks, memory, and MCP server for Claude Code.');
