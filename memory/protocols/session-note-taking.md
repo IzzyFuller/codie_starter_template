@@ -173,27 +173,9 @@ add_session_note(note_type="context", importance="low",
 
 **Consumed by**: Deep learn finder agents scan for `ECHO/FIZZLE:` markers to discover co-echo relationships -- entities that prove useful together get linked via `co-echo` relationship type.
 
-## File Size Management
-
-### Size Threshold
-- **Action threshold**: ~150KB -- archive current_session.md when it approaches this size
-- **Check frequency**: At conversation start (during identity restoration) or when file feels unwieldy
-
-### When Archival is Needed
-Before adding session notes, check if current_session.md is approaching ~150KB. If so, execute the **Memory File Archival Protocol** (`memory-file-archival.md`) before continuing.
-
-**Why 150KB?** current_session.md is read at the start of every conversation for identity restoration -- smaller file = faster restoration and less context window impact.
-
-### Relationship to Deep Learn
-- **Deep Learn integration**: Transforms session insights into entity memory, then resets session file
-- **Size-based archival**: Preserves raw session notes when file grows too large between Deep Learn cycles
-- Both mechanisms can coexist -- archive first if needed, then Deep Learn integrates content from both files
-
 ## Integration with Other Protocols
 
-- **End of Day Ritual**: Session notes feed into context anchor updates
-- **Learn Protocol**: Review session notes for behavioral patterns
-- **Deep Learn Protocol**: Transform session insights into structured entity memory
+- **End of Day Ritual**: Session notes feed into context anchor updates, archival, and deep learn integration
 - **Break Enforcement**: See `protocols/break-enforcement`
 
 ## Related Entities
