@@ -93,4 +93,4 @@ If `mcp__qmd__*` calls fail, verify qmd is running and accessible. Check `mcp__q
 
 ---
 
-**Related Protocols:** identity-continuity.md, session-note-taking.md, semantic-search-interface.md
+**Related Protocols:** situational-awareness.md, session-note-taking.md, semantic-search-interface.md

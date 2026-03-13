@@ -51,7 +51,7 @@ function main() {
 
 2. Call ExitPlanMode to trigger the context clear confirmation
 
-The confirmation will allow the user to approve clearing context. After clearing, identity-continuity protocol will restore context on the next prompt.`,
+The confirmation will allow the user to approve clearing context. After clearing, situational-awareness protocol will restore context on the next prompt.`,
     };
 
     console.log(JSON.stringify(result));

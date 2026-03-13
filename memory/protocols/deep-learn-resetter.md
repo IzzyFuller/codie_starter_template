@@ -1,7 +1,7 @@
 # Deep Learn Resetter Protocol
 **Protocol Type**: Agent Protocol - Session Reset & Anchor Update
 **Status**: Active
-**Version**: 1.1
+**Version**: 1.2
 
 ## Purpose
 
@@ -33,10 +33,10 @@ Bash: cat /tmp/deep-learn-results/anti-pattern-finder.json
 
 Read all 3 JSON files in parallel via Bash:
 
-```
-/tmp/deep-learn-results/entity-finder.json
-/tmp/deep-learn-results/pattern-finder.json
-/tmp/deep-learn-results/anti-pattern-finder.json
+```bash
+cat /tmp/deep-learn-results/entity-finder.json
+cat /tmp/deep-learn-results/pattern-finder.json
+cat /tmp/deep-learn-results/anti-pattern-finder.json
 ```
 
 Each file has format:
@@ -63,9 +63,32 @@ Merge all `entities` arrays into one combined list.
 
 ## Step 2: Update Context Anchors
 
-1. Read current context_anchors
+Context anchors have a 3-section structure. Preserve it.
+
+### 2.1: Read and Parse
+
+1. Read current context_anchors: `mcp__cognitive-memory__read_entity({ entity_path: "context_anchors" })`
 2. Get the current timestamp via Bash: `date -u '+%Y-%m-%dT%H:%M:%S.000Z'`
-3. Generate a new deep learn section:
+3. Identify the 3 sections in the existing content:
+   - **Core Principles** (`## Core Principles`): Stable pointers. Do NOT modify unless a finder result is a new pattern/anti-pattern not already listed.
+   - **Active Focus** (`## Active Focus`): Project summaries with timestamps.
+   - **Deep Learn Sessions** (`## Deep Learn Session - ...`): Detailed per-session entries.
+
+### 2.2: Update Active Focus
+
+For each entity in the merged results whose path starts with `projects/`:
+- If the project already exists in Active Focus, update its summary and timestamp
+- If it's a new project, add a new line
+- Timestamp format: `*YYYY-MM-DD*` (date only, from the deep learn timestamp)
+
+### 2.3: Update Core Principles (if needed)
+
+For each entity in the merged results whose path starts with `patterns/` or `anti-patterns/`:
+- If it's already in Core Principles, skip it (pointers are stable)
+- If it's NEW and was flagged as significant (severity High, or CHRONIC, or foundational), add it to Core Principles with a brief description
+- Use judgment -- not every new pattern/anti-pattern needs a Core Principles pointer
+
+### 2.4: Generate New Deep Learn Section
 
 ```markdown
 ## Deep Learn Session - {ISO_TIMESTAMP}
@@ -73,17 +96,27 @@ Merge all `entities` arrays into one combined list.
 - **{path}**: {anchor_summary}
 ```
 
-4. Insert the new section AFTER the header line and the `*Last Updated*` line, BEFORE any existing `## Deep Learn Session` sections.
-5. Write the updated content
+### 2.5: Assemble and Trim
+
+1. Keep the header (`# Context Anchors`) and update `*Last Updated*` date if present
+2. Keep the Core Principles section (updated per 2.3)
+3. Keep the Active Focus section (updated per 2.2)
+4. Insert the new deep-learn section AFTER Active Focus
+5. **Keep only the 2 most recent deep-learn entries.** Drop any older entries.
+6. Keep the footer note about older sessions being archived
+
+### 2.6: Write
+
+Write the assembled content: `mcp__cognitive-memory__write_entity({ entity_path: "context_anchors", content: "..." })`
 
 ## Step 3: Archive Current Session
 
 1. Read the FULL current_session content:
-   - Read first 50 lines to get total_lines
+   - `mcp__cognitive-memory__read_entity({ entity_path: "current_session", offset: 0, limit: 50 })` to get total_lines
    - Read ALL remaining content in parallel 500-line chunks
 2. Get today's date: `date '+%Y-%m-%d'`
-3. Check for existing archives -- if today's archive exists, append counter (-2, -3, etc.)
-4. Write the archive
+3. Check for existing archives: `mcp__cognitive-memory__list_entities({ entity_path: "session_archives/" })` -- if today's archive exists, append counter (-2, -3, etc.)
+4. Write the archive: `mcp__cognitive-memory__write_entity({ entity_path: "session_archives/YYYY-MM-DD", content: "..." })`
 
 The archive contains the COMPLETE session file -- this is the safety net.
 
@@ -110,11 +143,24 @@ The archive contains the COMPLETE session file -- this is the safety net.
 {IF there are post-cutoff notes, include them here verbatim}
 ```
 
-5. Write the reset content to current_session
+5. Write: `mcp__cognitive-memory__write_entity({ entity_path: "current_session", content: "..." })`
 
 ### Example:
 
-If the cutoff is `2026-02-10T14:30:00.000Z` and there's a note at `2026-02-10T14:35:00.000Z`, the reset file would include the header plus the preserved post-cutoff note verbatim.
+If the cutoff is `2026-02-10T14:30:00.000Z` and there's a note at `2026-02-10T14:35:00.000Z`, the reset file would be:
+
+```markdown
+# Current Session
+
+*Session reset on 2026-02-10 after Deep Learn integration*
+*Previous session content integrated into structured entities*
+*Session archived to: session_archives/2026-02-10*
+
+
+### CONTEXT - MEDIUM (2026-02-10T14:35:00.000Z)
+## Some Note Title
+Content that was added after the finders processed...
+```
 
 If there are NO post-cutoff notes, just write the header with no trailing content.
 
@@ -151,10 +197,12 @@ rm -rf /tmp/deep-learn-results/
 - **Race-condition safe**: Always use cutoff timestamp to preserve post-processing notes
 - **Clean state**: After completion, /tmp/deep-learn-results/ should not exist
 - **Accurate reporting**: Completion message must reflect actual outcomes
+- **2-entry max**: Context anchors never accumulate more than 2 deep-learn sections
 
 ---
-**Protocol Version:** 1.1
+**Protocol Version:** 1.2
 **Update History:**
+- 1.2: Step 2 rewritten for 3-section context_anchors structure (Core Principles + Active Focus + last 2 deep-learn entries). Older entries trimmed on each run.
 - 1.1: Added race-condition-safe reset using MIN(last_note_timestamp) cutoff. Post-cutoff notes preserved in reset session file.
 - 1.0: Initial version
 **Used By:** deep-learn-resetter agent

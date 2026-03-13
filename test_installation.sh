@@ -60,18 +60,21 @@ cleanup() {
 
 # --- Test: Skills ---
 test_skills() {
-    print_header "Skills (expect 10)"
+    print_header "Skills (expect 13)"
 
     local expected_skills=(
         anti-pattern-detection
-        principle-check
-        session-note-taking
-        semantic-reflection
+        break-enforcement
+        claude-agent-creation
         context-mapping
+        context-refresh
         feedback-pattern-recognition
-        request-intake
+        principle-check
         refactor-phase
         refactor-phase-self-check
+        request-intake
+        semantic-reflection
+        session-note-taking
         skill-protocol-creation
     )
 
@@ -106,11 +109,11 @@ test_hooks() {
     print_header "Hooks (expect 5 .mjs files)"
 
     local expected_hooks=(
-        post-tool-session-note.mjs
-        post-tool-failure.mjs
-        semantic-hydration.mjs
-        session-start-restore.mjs
+        break-enforcement.mjs
         context-check.mjs
+        post-tool-failure.mjs
+        post-tool-session-note.mjs
+        semantic-hydration.mjs
     )
 
     for hook in "${expected_hooks[@]}"; do
@@ -145,7 +148,7 @@ test_hooks() {
     done
 
     # Verify excluded hooks are NOT present
-    local excluded_hooks=(inject-agent-instructions.sh validate-response.sh pre-compact.sh)
+    local excluded_hooks=(inject-agent-instructions.sh validate-response.sh session-start-restore.mjs)
     for hook in "${excluded_hooks[@]}"; do
         if [ -f "$CLAUDE_DIR/hooks/$hook" ]; then
             fail "Excluded hook present: $hook"
@@ -157,24 +160,26 @@ test_hooks() {
 
 # --- Test: Agents ---
 test_agents() {
-    print_header "Agents (expect 15)"
+    print_header "Agents (expect 17)"
 
     local expected_agents=(
-        pre-commit.md
-        identity-restoration.md
-        semantic-reflection.md
-        session-notes.md
+        break-enforcement.md
         clean-coder.md
         clean-designer.md
         clean-reviewer.md
         clean-thinker.md
         code-quality-fixer.md
-        end-of-day-ritual.md
         deep-learn-anti-pattern-finder.md
         deep-learn-entity-finder.md
         deep-learn-learn-agent.md
         deep-learn-pattern-finder.md
         deep-learn-resetter.md
+        end-of-day-ritual.md
+        pre-commit.md
+        semantic-reflection.md
+        session-notes.md
+        situational-awareness.md
+        upstream-merge.md
     )
 
     for agent in "${expected_agents[@]}"; do
@@ -197,7 +202,7 @@ test_agents() {
     assert_no_literal "/Users/izzyfuller/" "$CLAUDE_DIR/agents" "No hardcoded user paths in agents"
 
     # Verify excluded agents are NOT present
-    local excluded_agents=(clean-reviewer.md clean-thinker.md)
+    local excluded_agents=(identity-restoration.md)
     for agent in "${excluded_agents[@]}"; do
         if [ -f "$CLAUDE_DIR/agents/$agent" ]; then
             fail "Excluded agent present: $agent"
@@ -222,40 +227,40 @@ test_memory_seed() {
         assert_dir "$MEMORY_PATH/$dir" "Directory: $dir"
     done
 
-    # Concepts (7)
+    # Concepts (10)
     local concept_count
     concept_count=$(find "$MEMORY_PATH/concepts" -name "*.md" ! -name "README.md" 2>/dev/null | wc -l | tr -d ' ')
-    if [ "$concept_count" -eq 7 ]; then
+    if [ "$concept_count" -eq 10 ]; then
         pass "Concept count: $concept_count"
     else
-        fail "Concept count: expected 7, got $concept_count"
+        fail "Concept count: expected 10, got $concept_count"
     fi
 
-    # Patterns (5)
+    # Patterns (11)
     local pattern_count
     pattern_count=$(find "$MEMORY_PATH/patterns" -name "*.md" ! -name "README.md" 2>/dev/null | wc -l | tr -d ' ')
-    if [ "$pattern_count" -eq 5 ]; then
+    if [ "$pattern_count" -eq 11 ]; then
         pass "Pattern count: $pattern_count"
     else
-        fail "Pattern count: expected 5, got $pattern_count"
+        fail "Pattern count: expected 11, got $pattern_count"
     fi
 
-    # Anti-patterns (17)
+    # Anti-patterns (26)
     local ap_count
     ap_count=$(find "$MEMORY_PATH/anti-patterns" -name "*.md" ! -name "README.md" 2>/dev/null | wc -l | tr -d ' ')
-    if [ "$ap_count" -eq 17 ]; then
+    if [ "$ap_count" -eq 26 ]; then
         pass "Anti-pattern count: $ap_count"
     else
-        fail "Anti-pattern count: expected 17, got $ap_count"
+        fail "Anti-pattern count: expected 26, got $ap_count"
     fi
 
-    # Protocols (25)
+    # Protocols (29)
     local proto_count
     proto_count=$(find "$MEMORY_PATH/protocols" -name "*.md" ! -name "README.md" 2>/dev/null | wc -l | tr -d ' ')
-    if [ "$proto_count" -eq 25 ]; then
+    if [ "$proto_count" -eq 29 ]; then
         pass "Protocol count: $proto_count"
     else
-        fail "Protocol count: expected 25, got $proto_count"
+        fail "Protocol count: expected 29, got $proto_count"
     fi
 
     # People (2)
@@ -292,13 +297,13 @@ test_settings() {
     # Verify hooks are configured
     assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.PostToolUse' "PostToolUse hook configured"
     assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.UserPromptSubmit' "UserPromptSubmit hook configured"
-    assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.SessionStart' "SessionStart hook configured"
     assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.Stop' "Stop hook configured"
     assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.PostToolUseFailure' "PostToolUseFailure hook configured"
+    assert_json_contains "$CLAUDE_DIR/settings.json" '.hooks.PreToolUse' "PreToolUse hook configured"
 
     # Verify hooks use 'node' command (not 'bash')
     local post_cmd
-    post_cmd=$(jq -r '.hooks.PostToolUse[0].command // empty' "$CLAUDE_DIR/settings.json" 2>/dev/null)
+    post_cmd=$(jq -r '.hooks.PostToolUse[0].hooks[0].command // empty' "$CLAUDE_DIR/settings.json" 2>/dev/null)
     if echo "$post_cmd" | grep -q "^node "; then
         pass "PostToolUse uses node command"
     else
@@ -306,23 +311,15 @@ test_settings() {
     fi
 
     local hydration_cmd
-    hydration_cmd=$(jq -r '.hooks.UserPromptSubmit[0].command // empty' "$CLAUDE_DIR/settings.json" 2>/dev/null)
+    hydration_cmd=$(jq -r '.hooks.UserPromptSubmit[0].hooks[0].command // empty' "$CLAUDE_DIR/settings.json" 2>/dev/null)
     if echo "$hydration_cmd" | grep -q "^node "; then
         pass "UserPromptSubmit uses node command"
     else
         fail "UserPromptSubmit should use node command, got: $hydration_cmd"
     fi
 
-    local start_cmd
-    start_cmd=$(jq -r '.hooks.SessionStart[0].command // empty' "$CLAUDE_DIR/settings.json" 2>/dev/null)
-    if echo "$start_cmd" | grep -q "^node "; then
-        pass "SessionStart uses node command"
-    else
-        fail "SessionStart should use node command, got: $start_cmd"
-    fi
-
     local stop_cmd
-    stop_cmd=$(jq -r '.hooks.Stop[0].command // empty' "$CLAUDE_DIR/settings.json" 2>/dev/null)
+    stop_cmd=$(jq -r '.hooks.Stop[0].hooks[0].command // empty' "$CLAUDE_DIR/settings.json" 2>/dev/null)
     if echo "$stop_cmd" | grep -q "^node "; then
         pass "Stop uses node command"
     else

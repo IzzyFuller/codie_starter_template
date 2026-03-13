@@ -141,12 +141,12 @@ Rules:
 
 ## Integration with Identity Continuity
 
-Semantic reflection complements identity continuity:
-- **Identity Continuity:** Maintains who you are throughout conversation
+Semantic reflection complements situational awareness:
+- **Situational Awareness:** Maintains who you are and where you are throughout conversation
 - **Semantic Reflection:** Retrieves what you know when needed
 
 Both work together:
-- Identity continuity reads core files at start (context_anchors, me, current_session)
+- Situational awareness reads core files at start (context_anchors, me, current_session)
 - Semantic reflection searches deeper when questions require historical knowledge
 - Both use the same memory architecture, different access patterns
 
@@ -176,4 +176,4 @@ Both work together:
 ---
 
 **Protocol Version:** 2.2
-**Related Protocols:** identity-continuity, session-note-taking
+**Related Protocols:** situational-awareness, session-note-taking

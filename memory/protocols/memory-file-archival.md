@@ -113,9 +113,9 @@ Record archival decision with:
 - Check memory file sizes
 - Current session automatically archived during Deep Learn
 
-### Identity Continuity
+### Situational Awareness
 - Archives remain accessible through semantic search
-- Identity restoration reads active files (context_anchors, me.md, current_session)
+- Situational awareness reads active files (context_anchors, me.md, current_session)
 - Historical investigation uses semantic search across all files
 
 ## Verification Checklist

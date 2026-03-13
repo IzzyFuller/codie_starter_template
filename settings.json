@@ -36,16 +36,6 @@
         ]
       }
     ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ~/.claude/hooks/session-start-restore.mjs"
-          }
-        ]
-      }
-    ],
     "Stop": [
       {
         "hooks": [
@@ -66,7 +56,7 @@
           }
         ]
       }
-    ]
+    ],
   },
   "permissions": {
     "allow": [

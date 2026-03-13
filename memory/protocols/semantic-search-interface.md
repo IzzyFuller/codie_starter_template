@@ -129,7 +129,7 @@ The following protocols use semantic search:
 - `feedback-pattern-recognition.md` - Find recurring correction patterns
 - `context-mapping.md` - Apply historical learnings to new tasks
 - `anti-pattern-detection.md` - Search documented anti-patterns
-- `identity-continuity.md` - Memory architecture exploration
+- `situational-awareness.md` - Memory architecture exploration
 - `learn-protocol.md` - Pattern synthesis from past sessions
 - `memory-file-archival.md` - Archive coordination
 
