@@ -175,8 +175,8 @@ function testSettings() {
   }
   pass('settings.json is valid JSON');
 
-  // All 4 hook event types present
-  const hookEvents = ['PostToolUse', 'UserPromptSubmit', 'SessionStart', 'Stop'];
+  // All 3 hook event types present (SessionStart was removed — see README)
+  const hookEvents = ['PostToolUse', 'UserPromptSubmit', 'Stop'];
   for (const evt of hookEvents) {
     const hooks = settings.hooks?.[evt];
     if (Array.isArray(hooks) && hooks.length > 0) {
