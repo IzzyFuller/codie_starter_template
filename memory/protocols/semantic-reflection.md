@@ -139,17 +139,6 @@ Rules:
 **When:** Complex pattern recognition or strategic questions
 **Approach:** Comprehensive search across entities + session history
 
-## Integration with Identity Continuity
-
-Semantic reflection complements situational awareness:
-- **Situational Awareness:** Maintains who you are and where you are throughout conversation
-- **Semantic Reflection:** Retrieves what you know when needed
-
-Both work together:
-- Situational awareness reads core files at start (context_anchors, me, current_session)
-- Semantic reflection searches deeper when questions require historical knowledge
-- Both use the same memory architecture, different access patterns
-
 ## Common Anti-Patterns to Avoid
 
 ### Avoid: Guessing Tool Names
@@ -171,9 +160,6 @@ Both work together:
 - User explicitly wants quick answer without research
 - Information is already loaded in current context
 
-## Related Entities
-
 ---
 
 **Protocol Version:** 2.2
-**Related Protocols:** situational-awareness, session-note-taking

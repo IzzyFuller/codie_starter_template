@@ -89,8 +89,7 @@ For each entity in the merged results whose path starts with `projects/`:
 
 Core Principles are **curated** — they are set by the human engineer or proposed and confirmed in conversation. The deep-learn-resetter does NOT add to Core Principles automatically.
 
-- Do NOT scan finder results for new patterns/anti-patterns to add here
-- If a finder result references something already in Core Principles, leave it as-is
+- If a finder result references something already in Core Principles, update its inline note with a timestamp and a touch counter (e.g., `<!-- last touched: 2026-03-16, touches: 3 -->`) to track how often it surfaces
 - Core Principles only change when explicitly directed
 
 ### 2.4: Generate New Deep Learn Section
@@ -116,13 +115,9 @@ Write the assembled content: `mcp__cognitive-memory__write_entity({ entity_path:
 
 ## Step 3: Archive Current Session
 
-1. Determine the cognitive-memory storage path for current_session. Use Bash to find the actual file:
+1. Copy the current session file to the archive location:
    ```bash
-   find ~/.cognitive-memory -name "current_session.md" -type f 2>/dev/null
-   ```
-2. Copy the file directly to the archive location using Bash:
-   ```bash
-   cp <source_path> <archive_dir>/YYYY-MM-DD.md
+   cp {{MEMORY_PATH}}/current_session.md {{MEMORY_PATH}}/session_archives/YYYY-MM-DD.md
    ```
    Check for existing archives first: `mcp__cognitive-memory__list_entities({ entity_path: "session_archives/" })` — if today's archive exists, append counter (-2, -3, etc.)
 3. Do NOT read the full file into your context window — the copy preserves everything.

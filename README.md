@@ -203,7 +203,6 @@ This release replaces the identity-restoration system with situational-awareness
 | post-tool-failure.mjs | PostToolUseFailure | Captures tool failure context for debugging |
 | semantic-hydration.mjs | UserPromptSubmit | Triggers memory search before responding to substantive prompts |
 | break-enforcement.mjs | UserPromptSubmit | Checks session duration and triggers break reminders |
-| context-check.mjs | Stop | Warns when context window usage exceeds 70% |
 
 ### Memory Seed
 
@@ -253,7 +252,6 @@ This release replaces the identity-restoration system with situational-awareness
 2. **Startup**: The initial message triggers Claude to read `frame.md` and spawn the `situational-awareness` agent, which reads memory and establishes working context.
 3. **Each prompt**: `semantic-hydration.mjs` triggers memory search for relevant context before responding
 4. **Each tool use**: `post-tool-session-note.mjs` reminds Claude to record what happened
-5. **End of response**: `context-check.mjs` monitors context window usage
 
 ### Deep-Learn Pipeline (End of Day)
 
@@ -379,7 +377,6 @@ rm -rf ~/.local/share/claude-mcp-servers/cognitive-memory/
 - Ensure `COGNITIVE_MEMORY_PATH` points to your memory directory
 
 **Context window filling up:**
-- The context-check hook warns at 70% usage
 - Run end-of-day ritual to archive and reset
 - Use `/compact` to clear context (identity restores automatically)
 

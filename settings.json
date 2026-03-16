@@ -36,16 +36,6 @@
         ]
       }
     ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ~/.claude/hooks/context-check.mjs"
-          }
-        ]
-      }
-    ],
     "PostToolUseFailure": [
       {
         "matcher": "*",

@@ -16,9 +16,15 @@
 - Never write code that isn't required to make a failing test pass
 - No extra fallbacks, no defensive validation, no "just in case" — trust the tests
 - No stubs without tests (see `anti-patterns/stubs-without-tests`)
-- No backfilled tests to inflate coverage — that's fake TDD
-- Tests assert externally observable behavior, not implementation details (see `patterns/e2e-test-client-perspective`)
+- Backfilling tests for existing code is still required — writing tests first is preferable, but if code already exists without tests, write the tests anyway
 - If code doesn't have a test demanding it, it shouldn't exist yet
+
+## What Makes a Good Test
+
+- **Asserts on external behavior only** — tests verify what a unit does from the outside, not how it does it internally (see `patterns/e2e-test-client-perspective`)
+- **No implementation detail coupling** — don't assert on private state, internal method calls, or intermediate values
+- **Mocking only at the extreme edge of the system** — mock external boundaries (HTTP, filesystem, database, third-party APIs) and nothing else; mocking internal collaborators is a sign the test is testing the wrong thing
+- **Single invocation** — no loops driving the assertion; each test exercises one scenario
 
 ## Related Entities
 

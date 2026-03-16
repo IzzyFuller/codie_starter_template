@@ -13,14 +13,15 @@ if (!prompt || /^<[a-z][a-z0-9-]*[\s>]/i.test(prompt)) {
   process.exit(0);
 }
 
-// Best-effort: append USER_ACTIVE marker to current_session memory file
+// Best-effort: append USER_ACTIVE marker to current_session memory file.
+// try/catch is required — directory may not exist on fresh installs before setup runs.
+const memoryPath = process.env.COGNITIVE_MEMORY_PATH ?? `${homedir()}/Codie/memory`;
 try {
-  const memoryPath = process.env.COGNITIVE_MEMORY_PATH ?? `${homedir()}/Codie/memory`;
   appendFileSync(
     `${memoryPath}/current_session.md`,
     `\nUSER_ACTIVE ${new Date().toISOString()}\n`
   );
-} catch (_) {}
+} catch { /* directory missing — skip silently, hook still emits agent spawn */ }
 
 console.log(JSON.stringify({
   hookSpecificOutput: {
