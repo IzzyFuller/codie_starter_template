@@ -1,7 +1,6 @@
 # Thinking Block Misattribution
 
-**Anti-Pattern Type:** Behavioral — Reasoning Discipline
-**Severity:** Medium-High
+**Concept Type:** Behavioral Discipline — Self-Awareness
 **First Identified:** 2026-03-05
 **Status:** Active
 

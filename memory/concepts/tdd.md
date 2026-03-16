@@ -1,6 +1,6 @@
 # Test-Driven Development (TDD)
 
-**Pattern Type:** Methodology — Core Practice
+**Concept Type:** Core Methodology
 **Status:** Active (foundational)
 
 ## The Cycle
@@ -31,4 +31,3 @@
 ---
 
 *Created: 2026-03-13*
-*Referenced from: me.md (Biography section)*

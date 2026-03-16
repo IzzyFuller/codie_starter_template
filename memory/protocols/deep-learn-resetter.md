@@ -1,7 +1,7 @@
 # Deep Learn Resetter Protocol
 **Protocol Type**: Agent Protocol - Session Reset & Anchor Update
 **Status**: Active
-**Version**: 1.2
+**Version**: 1.3
 
 ## Purpose
 
@@ -70,7 +70,7 @@ Context anchors have a 3-section structure. Preserve it.
 1. Read current context_anchors: `mcp__cognitive-memory__read_entity({ entity_path: "context_anchors" })`
 2. Get the current timestamp via Bash: `date -u '+%Y-%m-%dT%H:%M:%S.000Z'`
 3. Identify the 3 sections in the existing content:
-   - **Core Principles** (`## Core Principles`): Stable pointers. Do NOT modify unless a finder result is a new pattern/anti-pattern not already listed.
+   - **Core Principles** (`## Core Principles`): Curated pointers. Do NOT modify (see 2.3).
    - **Active Focus** (`## Active Focus`): Project summaries with timestamps.
    - **Deep Learn Sessions** (`## Deep Learn Session - ...`): Detailed per-session entries.
 
@@ -81,12 +81,17 @@ For each entity in the merged results whose path starts with `projects/`:
 - If it's a new project, add a new line
 - Timestamp format: `*YYYY-MM-DD*` (date only, from the deep learn timestamp)
 
-### 2.3: Update Core Principles (if needed)
+### Ageing Rule
+- Projects not updated in the last 3 deep-learn cycles should be moved to the most recent Deep Learn Session section (they're still findable, just not in active focus)
+- If a project has no activity for 3+ cycles and isn't in any recent deep-learn entry, it can be dropped from context_anchors entirely (it still exists as an entity)
 
-For each entity in the merged results whose path starts with `patterns/` or `anti-patterns/`:
-- If it's already in Core Principles, skip it (pointers are stable)
-- If it's NEW and was flagged as significant (severity High, or CHRONIC, or foundational), add it to Core Principles with a brief description
-- Use judgment -- not every new pattern/anti-pattern needs a Core Principles pointer
+### 2.3: Core Principles (preserve, don't auto-populate)
+
+Core Principles are **curated** — they are set by the human engineer or proposed and confirmed in conversation. The deep-learn-resetter does NOT add to Core Principles automatically.
+
+- Do NOT scan finder results for new patterns/anti-patterns to add here
+- If a finder result references something already in Core Principles, leave it as-is
+- Core Principles only change when explicitly directed
 
 ### 2.4: Generate New Deep Learn Section
 
@@ -111,14 +116,18 @@ Write the assembled content: `mcp__cognitive-memory__write_entity({ entity_path:
 
 ## Step 3: Archive Current Session
 
-1. Read the FULL current_session content:
-   - `mcp__cognitive-memory__read_entity({ entity_path: "current_session", offset: 0, limit: 50 })` to get total_lines
-   - Read ALL remaining content in parallel 500-line chunks
-2. Get today's date: `date '+%Y-%m-%d'`
-3. Check for existing archives: `mcp__cognitive-memory__list_entities({ entity_path: "session_archives/" })` -- if today's archive exists, append counter (-2, -3, etc.)
-4. Write the archive: `mcp__cognitive-memory__write_entity({ entity_path: "session_archives/YYYY-MM-DD", content: "..." })`
+1. Determine the cognitive-memory storage path for current_session. Use Bash to find the actual file:
+   ```bash
+   find ~/.cognitive-memory -name "current_session.md" -type f 2>/dev/null
+   ```
+2. Copy the file directly to the archive location using Bash:
+   ```bash
+   cp <source_path> <archive_dir>/YYYY-MM-DD.md
+   ```
+   Check for existing archives first: `mcp__cognitive-memory__list_entities({ entity_path: "session_archives/" })` — if today's archive exists, append counter (-2, -3, etc.)
+3. Do NOT read the full file into your context window — the copy preserves everything.
 
-The archive contains the COMPLETE session file -- this is the safety net.
+The archive is the safety net. The original file is now safely duplicated.
 
 ## Step 4: Reset Current Session (RACE-CONDITION SAFE)
 
@@ -126,12 +135,13 @@ The archive contains the COMPLETE session file -- this is the safety net.
 
 ### Procedure:
 
-1. You already have the full current_session content from Step 3
-2. Using the **cutoff timestamp** from Step 1, scan the session content for any notes with timestamps AFTER the cutoff
-3. Session notes have headers like: `### CONTEXT - MEDIUM (2026-02-10T14:36:09.055Z)`
-4. Extract the timestamp from each note header. Any note where the timestamp is STRICTLY AFTER the cutoff must be preserved.
+1. Using the **cutoff timestamp** from Step 1, read the ARCHIVED copy (not current_session) to find post-cutoff notes:
+   - Read the last ~100 lines of the archived session: `mcp__cognitive-memory__read_entity({ entity_path: "session_archives/YYYY-MM-DD", offset: <total_lines - 100>, limit: 100 })`
+   - Session notes have headers like: `### CONTEXT - MEDIUM (2026-02-10T14:36:09.055Z)`
+   - Extract timestamps. Any note STRICTLY AFTER the cutoff must be preserved.
+   - If notes near the boundary suggest more content above, read further back.
 
-### Build the reset content:
+2. Build the reset content:
 
 ```markdown
 # Current Session
@@ -143,7 +153,7 @@ The archive contains the COMPLETE session file -- this is the safety net.
 {IF there are post-cutoff notes, include them here verbatim}
 ```
 
-5. Write: `mcp__cognitive-memory__write_entity({ entity_path: "current_session", content: "..." })`
+3. Write: `mcp__cognitive-memory__write_entity({ entity_path: "current_session", content: "..." })`
 
 ### Example:
 
@@ -200,8 +210,9 @@ rm -rf /tmp/deep-learn-results/
 - **2-entry max**: Context anchors never accumulate more than 2 deep-learn sections
 
 ---
-**Protocol Version:** 1.2
+**Protocol Version:** 1.3
 **Update History:**
+- 1.3 (2026-03-16): Section 2.3 made curated-only (no auto-population from finder results). Ageing rule added to 2.2. Step 3 switched to bash cp instead of reading full file into context. Step 4 reads archived copy (not current_session) when scanning for post-cutoff notes.
 - 1.2: Step 2 rewritten for 3-section context_anchors structure (Core Principles + Active Focus + last 2 deep-learn entries). Older entries trimmed on each run.
 - 1.1: Added race-condition-safe reset using MIN(last_note_timestamp) cutoff. Post-cutoff notes preserved in reset session file.
 - 1.0: Initial version

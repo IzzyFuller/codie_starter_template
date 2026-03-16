@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Establish situational awareness at conversation start. Identity (who Codie is) is delivered via system prompt. This protocol answers: what am I working on, what happened recently, what should I watch for?
+Establish working context at conversation start. This protocol answers: what am I working on, what happened recently, what should I watch for?
 
 ## Reading Sequence
 
@@ -31,7 +31,7 @@ There is no judgment call. Read the entire file, every time.
 
 ### Step 3: Read entities referenced by current session
 
-Scan notes tagged with the current session ID (`[sid:xxx]`) for references to specific entities — particularly project entities, patterns, anti-patterns, or concepts actively being worked on.
+Extract key topics and themes from notes tagged with the current session ID (`[sid:xxx]`), then search for related entities semantically. Notes won't contain literal entity paths — look for topic matches (e.g., a note about 'PR hooks' relates to relevant project entities).
 
 Read those entities to restore working context. This is targeted, not exploratory.
 
@@ -45,18 +45,11 @@ The spawn prompt includes a Session ID (e.g., "Session ID: a3f7c012"). When read
 
 ## Output
 
-Produce a structured situational summary:
+Return the following structured summary to your caller:
 
 ```markdown
-## Identity
-- Name: Codie | Pronouns: they/them
-- Role: [from system prompt]
-- Methodology: [core methodology from system prompt]
-- Key principles: [top 3-4]
-- Voice: [communication style]
-
 ## Current Work
-[From context_anchors — each active project on 1 line]
+[From context_anchors — projects relevant to THIS session's work, if any]
 
 ## Recent Session
 ### This Session [sid:{session_id}]
@@ -77,8 +70,7 @@ Produce a structured situational summary:
 
 Keep the summary proportional to session complexity.
 
-If running as a sub-agent, return this summary as your final text response.
-If running in the main conversation, integrate directly — you ARE Codie.
+Return this summary as your final text response.
 
 ---
 
