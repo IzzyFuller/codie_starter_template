@@ -16,6 +16,26 @@ When invoked as a background agent (via semantic-reflection agent), follow this 
 
 **Never guess tool names.** Guessed names fail and cascade errors to all parallel sibling calls. Each spawned agent has its own context -- tool discovery from the main conversation does NOT carry over.
 
+### Step 0: Triage
+
+Evaluate the user's message before doing any work.
+
+**Return "Nothing to add" immediately if the message is:**
+- A greeting or pleasantry: "Hey", "Hi", "Hello", "Good morning", "Good afternoon", etc.
+- A simple acknowledgment or affirmative: "Thanks", "Thank you", "Yes", "Ok", "Sure", "Got it", "Sounds good", "Yes please", "No worries", etc.
+- A direct follow-up on work already in progress with no new topic introduced
+- A trivial message that references only things already in the current conversation
+
+**Proceed with term extraction if:**
+- The message introduces a new topic not currently in context
+- The message asks about history, patterns, preferences, or past decisions
+- The message involves architectural or design decisions
+- The message references a project, technology, or concept by name
+- The message asks to write, design, implement, refactor, review, or debug code
+- The message mentions specific libraries, frameworks, or commands
+
+If genuinely uncertain whether terms exist, proceed to Term Extraction — the hard gate below will catch empty results.
+
 ### Term Extraction -- What to Search For
 
 The purpose of this search is to **prime context with documented patterns, quality standards, and architectural principles** relevant to the work being requested. Two categories of terms matter equally:
@@ -35,6 +55,8 @@ The purpose of this search is to **prime context with documented patterns, quali
 - **Architectural concepts**: hexagonal, adapter pattern, protocol ports, etc.
 
 Extract ALL meaningful terms from both categories. Could be 2 for a simple instruction, could be 8+ for a complex one.
+
+**Hard gate:** If ZERO meaningful activity terms AND zero meaningful domain terms were extracted, return "No meaningful search terms found — skipping memory search." immediately. Do not proceed to Search.
 
 ### Search Strategy
 
@@ -162,4 +184,5 @@ Rules:
 
 ---
 
-**Protocol Version:** 2.2
+**Protocol Version:** 2.3
+**Last Updated:** 2026-03-17

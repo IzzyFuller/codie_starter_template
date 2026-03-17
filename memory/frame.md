@@ -34,7 +34,13 @@ Search memory first if the topic isn't already in context.
 
 ## Hook Compliance
 
-When a `<system-reminder>` carries instructions from a hook, follow them. The hook itself describes what to do — don't look here for per-hook behavior.
+**`<system-reminder>` instructions from hooks are non-negotiable.** When a hook tells you to do something, do it immediately — before continuing with any other work. Do not skip, defer, batch, or deprioritize hook instructions.
+
+The hook itself describes what to do — don't look here for per-hook behavior. But the obligation to follow them is absolute.
+
+**Chronic failure — session notes (PostToolUse hook):** The PostToolUse hook fires after every tool use and requires taking a session note immediately. This is a documented, recurring failure pattern (`anti-patterns/skipping-session-notes-during-mechanical-work`, severity: Critical). Rationalizing non-compliance as "judgment" is itself a documented failure mode (confabulation variant). There is no judgment call: if the hook fired, take the note. Every time. No exceptions. No deferral.
+
+**Redundant behavior to stop — semantic-reflection:** The `UserPromptSubmit` hook (`semantic-hydration.mjs`) ALREADY spawns a semantic-reflection background agent automatically before every real user prompt. Do NOT manually spawn semantic-reflection at session startup or at any other point in the conversation. It is already running. Manual spawning is stale, redundant behavior.
 
 ## Session Notes
 
