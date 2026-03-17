@@ -51,9 +51,9 @@ function detectScionFromProfile() {
   const content = readFileSync(profilePath, 'utf-8');
 
   // Unix: partnerName() { claude --system-prompt-file "MEMORY_PATH/frame.md" "..."; }
-  const unixPattern = /^(\w[\w-]*)\(\)\s*\{\s*claude\s+--system-prompt-file\s+"([^"]+)\/frame\.md"/m;
-  // Windows: function partnerName { claude --system-prompt-file "MEMORY_PATH/frame.md" "..." }
-  const winPattern = /^function\s+(\w[\w-]*)\s*\{\s*claude\s+--system-prompt-file\s+"([^"]+)\/frame\.md"/m;
+  const unixPattern = /^(\w[\w-]*)\(\)\s*\{\s*claude\s+--system-prompt-file\s+"([^"]+)[/\\]frame\.md"/m;
+  // Windows: function partnerName { claude --system-prompt-file "MEMORY_PATH\frame.md" "..." }
+  const winPattern = /^function\s+(\w[\w-]*)\s*\{\s*claude\s+--system-prompt-file\s+"([^"]+)[/\\]frame\.md"/m;
 
   const match = content.match(unixPattern) || content.match(winPattern);
   if (!match) return null;
