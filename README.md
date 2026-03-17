@@ -6,11 +6,11 @@ A complete configuration package for Claude Code that installs skills, agents, h
 
 | Component | Count | Purpose |
 |-----------|-------|---------|
-| **Skills** | 10 | Slash-command workflows (refactoring, anti-pattern detection, session notes, etc.) |
-| **Agents** | 12 | Specialized sub-agents (identity restoration, pre-commit, code quality, deep-learn pipeline) |
-| **Hooks** | 4 | Automatic behaviors (session notes after tool use, memory search before responses) |
-| **Memory Seed** | 60+ files | Starter knowledge base with concepts, patterns, anti-patterns, and protocols |
-| **System Prompt** | 1 | `frame.md` — bootstraps identity restoration, hook compliance, and memory search |
+| **Skills** | 13 | Slash-command workflows (refactoring, anti-pattern detection, session notes, etc.) |
+| **Agents** | 17 | Specialized sub-agents (situational awareness, pre-commit, code quality, deep-learn pipeline) |
+| **Hooks** | 5 | Automatic behaviors (session notes after tool use, memory search before responses, break enforcement) |
+| **Memory Seed** | 80+ files | Starter knowledge base with concepts, patterns, anti-patterns, and protocols |
+| **System Prompt** | 1 | `frame.md` — bootstraps situational awareness, hook compliance, and memory search |
 | **Namesakes** | 25 | LGBTQIA+ and femme tech pioneers — your partner is randomly named for one |
 | **MCP Servers** | 2 | cognitive-memory for persistent entity memory, qmd for semantic search |
 
@@ -78,7 +78,7 @@ Then start a session:
 ada
 ```
 
-The `--system-prompt-file` flag loads `frame.md`, which bootstraps identity restoration, hook compliance, and memory search on every session start.
+The `--system-prompt-file` flag loads `frame.md`, which bootstraps situational awareness, hook compliance, and memory search on every session start.
 
 ## Updating an Existing Scion
 
@@ -131,30 +131,49 @@ Override auto-detection if you have multiple scions or a non-standard setup.
 
 If the template removes a hook, agent, or skill that exists in your install, the update script flags it but does **not** auto-delete. Your scion decides whether to keep or remove it during the merge protocol.
 
+### Migration Note: 3-Area Protocol Redesign (March 2026)
+
+This release replaces the identity-restoration system with situational-awareness agents. If you're updating from a previous version:
+
+1. **Deleted files** — `update.mjs` will flag these for removal by your scion:
+   - `agents/identity-restoration.md` — replaced by `agents/situational-awareness.md`
+   - `hooks/session-start-restore.mjs` — no longer needed (identity is established via frame.md + agent spawn)
+   - `protocols/identity-continuity.md` — replaced by `protocols/situational-awareness.md`
+
+2. **Manual updates needed** — `frame.md` and `context_anchors.md` are on the NEVER_TOUCH list, so `update.mjs` won't modify them. You should manually update:
+   - **`frame.md`**: Replace the identity-restoration agent spawn with the situational-awareness agent spawn. Add the Delegation section. Remove any PreCompact hook references.
+   - **`context_anchors.md`**: Update to the new 3-section format (Active Focus / Recent Context / Standing Priorities) if desired.
+   - **`me.md`**: Optionally update to v4.0 format (Demographics / Biography / Relationships sections).
+
+3. **Settings** — `update.mjs` will remove the `SessionStart` hook entry and `PreCompact` hook entry from your `settings.json` automatically via deep-merge.
+
 ## What Gets Installed
 
-### Skills (10)
+### Skills (13)
 
 | Skill | Purpose | Model |
 |-------|---------|-------|
-| session-note-taking | Capture work in real-time | haiku |
 | anti-pattern-detection | Check work against documented anti-patterns | - |
-| principle-check | Validate recommendations are evidence-based | - |
-| semantic-reflection | Search memory for relevant context | - |
+| break-enforcement | Enforce regular breaks during work sessions | - |
+| claude-agent-creation | Guide creation of new custom agents | - |
 | context-mapping | Apply historical learnings to new tasks | - |
+| context-refresh | Generate seed prompt for seamless context refresh | - |
 | feedback-pattern-recognition | Learn from corrections and feedback | - |
-| request-intake | Filter requests through memory before responding | - |
+| principle-check | Validate recommendations are evidence-based | - |
 | refactor-phase | Structured refactoring workflow | - |
 | refactor-phase-self-check | Post-refactoring validation | - |
+| request-intake | Filter requests through memory before responding | - |
+| semantic-reflection | Search memory for relevant context | - |
+| session-note-taking | Capture work in real-time | haiku |
 | skill-protocol-creation | Guide creation of new skills | - |
 
-### Agents (14)
+### Agents (17)
 
 **Pre-Commit:**
 - `pre-commit` — Semantic anti-pattern analysis + format/lint/test before commits
 
 **Core Memory:**
-- `identity-restoration` — Reads memory and returns a dense identity summary on session start
+- `situational-awareness` — Reads memory and returns working context summary on session start
 - `semantic-reflection` — Background memory search for relevant context
 - `session-notes` — Continuous session note companion
 
@@ -165,6 +184,10 @@ If the template removes a hook, agent, or skill that exists in your install, the
 - `clean-thinker` — Memory-informed responses via semantic search (haiku)
 - `code-quality-fixer` — Sequential format, lint, test validation
 
+**Operational:**
+- `break-enforcement` — Monitors session duration and enforces regular breaks
+- `upstream-merge` — Integrates upstream template updates after update.mjs runs
+
 **Deep-Learn Pipeline:**
 - `end-of-day-ritual` — Orchestrates the 2-phase Learn/Deep Learn workflow
 - `deep-learn-anti-pattern-finder` — Finds corrections and mistakes in session notes
@@ -172,14 +195,14 @@ If the template removes a hook, agent, or skill that exists in your install, the
 - `deep-learn-pattern-finder` — Finds confirmed positive patterns
 - `deep-learn-resetter` — Collects results, archives notes, resets session
 
-### Hooks (4)
+### Hooks (5)
 
 | Hook | Event | What It Does |
 |------|-------|-------------|
 | post-tool-session-note.mjs | PostToolUse | Reminds Claude to take session notes after each tool use |
+| post-tool-failure.mjs | PostToolUseFailure | Captures tool failure context for debugging |
 | semantic-hydration.mjs | UserPromptSubmit | Triggers memory search before responding to substantive prompts |
-| session-start-restore.mjs | SessionStart | Triggers identity restoration on startup, compact, or context clear |
-| context-check.mjs | Stop | Warns when context window usage exceeds 70% |
+| break-enforcement.mjs | UserPromptSubmit | Checks session duration and triggers break reminders |
 
 ### Memory Seed
 
@@ -200,7 +223,7 @@ If the template removes a hook, agent, or skill that exists in your install, the
 │   ├── fail-fast-engineering.md
 │   ├── little-bites-methodology.md
 │   └── proportional-response.md
-├── patterns/                   # 10 proven methodology patterns
+├── patterns/                   # 11 proven methodology patterns
 │   ├── adaptive-epistemological-debugging.md
 │   ├── anti-overengineering-discipline.md
 │   ├── archaeological-engineering.md
@@ -209,10 +232,11 @@ If the template removes a hook, agent, or skill that exists in your install, the
 │   ├── fail-fast-engineering.md
 │   ├── little-bites-strategy.md
 │   ├── scope-adherence.md
+│   ├── tdd.md
 │   ├── test-observable-behavior-not-implementation.md
 │   └── thin-wrapper-hook-protocol-reference.md
-├── anti-patterns/              # 25 documented anti-patterns to avoid
-├── protocols/                  # 33 behavioral protocols for skills/agents
+├── anti-patterns/              # 26 documented anti-patterns to avoid
+├── protocols/                  # 29 behavioral protocols for skills/agents
 ├── people/                     # Team member profiles
 │   ├── izzy.md                 # Methodology originator
 │   └── codie.md                # AI partner profile
@@ -225,10 +249,9 @@ If the template removes a hook, agent, or skill that exists in your install, the
 ### Session Lifecycle
 
 1. **Launch**: Your shell command loads `frame.md` as the system prompt via `--system-prompt-file` and sends an initial user message
-2. **Startup**: The initial message triggers Claude to read `frame.md` and spawn the `identity-restoration` agent, which reads memory and establishes identity. The `session-start-restore.mjs` hook also fires on SessionStart as a backup (e.g., after `/clear` or exiting plan mode).
+2. **Startup**: The initial message triggers Claude to read `frame.md` and spawn the `situational-awareness` agent, which reads memory and establishes working context.
 3. **Each prompt**: `semantic-hydration.mjs` triggers memory search for relevant context before responding
 4. **Each tool use**: `post-tool-session-note.mjs` reminds Claude to record what happened
-5. **End of response**: `context-check.mjs` monitors context window usage
 
 ### Deep-Learn Pipeline (End of Day)
 
@@ -339,10 +362,10 @@ rm -rf ~/.local/share/claude-mcp-servers/cognitive-memory/
 
 ## Troubleshooting
 
-**Identity restoration not triggering:**
-- Check `~/.claude/hooks/session-start-restore.mjs` exists
-- Check settings.json has the SessionStart hook configured with `node` command
-- View logs: check `session-start.log` in your system temp directory
+**Situational awareness not triggering:**
+- Verify `frame.md` is loaded via `--system-prompt-file` in your launch alias
+- Check that your scion's initial message triggers the situational-awareness agent spawn
+- Verify `~/.claude/agents/situational-awareness.md` exists
 
 **Session notes not being taken:**
 - Check `~/.claude/hooks/post-tool-session-note.mjs` exists
@@ -354,7 +377,6 @@ rm -rf ~/.local/share/claude-mcp-servers/cognitive-memory/
 - Ensure `COGNITIVE_MEMORY_PATH` points to your memory directory
 
 **Context window filling up:**
-- The context-check hook warns at 70% usage
 - Run end-of-day ritual to archive and reset
 - Use `/compact` to clear context (identity restores automatically)
 
@@ -367,7 +389,7 @@ rm -rf ~/.local/share/claude-mcp-servers/cognitive-memory/
 
 This template uses a **thin system prompt + distributed behavior** architecture. Instead of a monolithic instruction file, `frame.md` is a lightweight bootstrap that activates:
 
-- **`frame.md`** — System prompt loaded at launch. Handles identity restoration, hook compliance, memory search triggers. ~60 lines.
+- **`frame.md`** — System prompt loaded at launch. Handles situational awareness, hook compliance, memory search triggers, and agent delegation.
 - **Skills** — Workflow-specific instructions loaded on demand
 - **Agents** — Specialized sub-processes with focused capabilities
 - **Hooks** — Automatic triggers for session awareness (cross-platform Node.js)
@@ -389,4 +411,4 @@ Methodology and patterns developed by [Izzy Fuller](https://github.com/IzzyFulle
 
 ---
 
-**Setup Script Version**: 4.0 | **Architecture**: Claude Code + cognitive-memory MCP + qmd
+**Setup Script Version**: 5.0 | **Architecture**: Claude Code + cognitive-memory MCP + qmd

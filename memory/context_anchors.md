@@ -1,12 +1,15 @@
 # Context Anchors
 
-## Active Projects
-<!-- List your active projects here -->
-<!-- Format: **projects/{name}**: Brief description. Current status. -->
+## Core Principles
 
-## Priority Items
-<!-- Key patterns, anti-patterns, or concepts to keep top of mind -->
-<!-- Format: **{type}/{name}**: Brief description -->
+Key pointers (read these entities for details):
+- `patterns/...` — [description]
+- `concepts/...` — [description]
 
-## Recent Patterns
-<!-- Recently learned or applied patterns -->
+## Active Focus
+
+[Empty — populated during work]
+
+## Deep Learn Sessions
+
+[Empty — populated by deep-learn-resetter]
