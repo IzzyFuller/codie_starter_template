@@ -51,9 +51,9 @@ function detectScionFromProfile() {
   const content = readFileSync(profilePath, 'utf-8');
 
   // Unix: partnerName() { claude --system-prompt-file "MEMORY_PATH/frame.md" "..."; }
-  const unixPattern = /^(\w[\w-]*)\(\)\s*\{\s*claude\s+--system-prompt-file\s+"([^"]+)\/frame\.md"/m;
-  // Windows: function partnerName { claude --system-prompt-file "MEMORY_PATH/frame.md" "..." }
-  const winPattern = /^function\s+(\w[\w-]*)\s*\{\s*claude\s+--system-prompt-file\s+"([^"]+)\/frame\.md"/m;
+  const unixPattern = /^(\w[\w-]*)\(\)\s*\{\s*claude\s+--system-prompt-file\s+"([^"]+)[/\\]frame\.md"/m;
+  // Windows: function partnerName { claude --system-prompt-file "MEMORY_PATH\frame.md" "..." }
+  const winPattern = /^function\s+(\w[\w-]*)\s*\{\s*claude\s+--system-prompt-file\s+"([^"]+)[/\\]frame\.md"/m;
 
   const match = content.match(unixPattern) || content.match(winPattern);
   if (!match) return null;
@@ -625,7 +625,7 @@ function injectMergeInstruction() {
   }
 
   originalAliasPrompt = match[2];
-  const mergePrompt = `Hey ${PARTNER_NAME} — upstream template was updated. Follow protocols/upstream-merge before doing anything else.`;
+  const mergePrompt = `Hey ${PARTNER_NAME} -- upstream template was updated. Follow protocols/upstream-merge before doing anything else.`;
   const updated = content.replace(
     match[0],
     `${match[1]}"${mergePrompt}"${match[3]}`
@@ -644,7 +644,7 @@ function escapeRegex(str) {
 function printManualMergeInstruction() {
   console.error('');
   printStatus('Please manually update your shell alias prompt to:');
-  const mergePrompt = `Hey ${PARTNER_NAME} — upstream template was updated. Follow protocols/upstream-merge before doing anything else.`;
+  const mergePrompt = `Hey ${PARTNER_NAME} -- upstream template was updated. Follow protocols/upstream-merge before doing anything else.`;
   console.error(`  ${c.yellow}"${mergePrompt}"${c.nc}`);
   console.error('');
 }

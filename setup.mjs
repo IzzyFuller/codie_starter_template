@@ -492,9 +492,10 @@ function showSummary() {
   console.error('');
   // Add launch command to shell profile
   console.error('');
+  const framePath = join(MEMORY_PATH, 'frame.md');
   const shellFunc = IS_WINDOWS
-    ? `function ${PARTNER_NAME} { claude --system-prompt-file "${MEMORY_PATH}/frame.md" "Hey ${PARTNER_NAME}, what were we last working on?" }`
-    : `${PARTNER_NAME}() { claude --system-prompt-file "${MEMORY_PATH}/frame.md" "Hey ${PARTNER_NAME}, what were we last working on?"; }`;
+    ? `function ${PARTNER_NAME} { claude --system-prompt-file "${framePath}" "Hey ${PARTNER_NAME}, what were we last working on?" }`
+    : `${PARTNER_NAME}() { claude --system-prompt-file "${framePath}" "Hey ${PARTNER_NAME}, what were we last working on?"; }`;
 
   const profilePath = getShellProfile();
   let profileWritten = false;
