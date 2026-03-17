@@ -625,7 +625,7 @@ function injectMergeInstruction() {
   }
 
   originalAliasPrompt = match[2];
-  const mergePrompt = `Hey ${PARTNER_NAME} — upstream template was updated. Follow protocols/upstream-merge before doing anything else.`;
+  const mergePrompt = `Hey ${PARTNER_NAME} -- upstream template was updated. Follow protocols/upstream-merge before doing anything else.`;
   const updated = content.replace(
     match[0],
     `${match[1]}"${mergePrompt}"${match[3]}`
@@ -644,7 +644,7 @@ function escapeRegex(str) {
 function printManualMergeInstruction() {
   console.error('');
   printStatus('Please manually update your shell alias prompt to:');
-  const mergePrompt = `Hey ${PARTNER_NAME} — upstream template was updated. Follow protocols/upstream-merge before doing anything else.`;
+  const mergePrompt = `Hey ${PARTNER_NAME} -- upstream template was updated. Follow protocols/upstream-merge before doing anything else.`;
   console.error(`  ${c.yellow}"${mergePrompt}"${c.nc}`);
   console.error('');
 }
