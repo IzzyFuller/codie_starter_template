@@ -50,9 +50,9 @@ Read session archives accumulated since last Learn. Identify:
 | Learning Type | Route To |
 |---------------|----------|
 | Identity change | me.md |
-| Positive pattern | `{{MEMORY_PATH}}/patterns/` |
-| Thing to avoid | `{{MEMORY_PATH}}/anti-patterns/` |
-| Workflow/procedure | `{{MEMORY_PATH}}/protocols/` |
+| Positive pattern | `patterns/` entities (write via `mcp__cognitive-memory__write_entity`) |
+| Thing to avoid | `anti-patterns/` entities (write via `mcp__cognitive-memory__write_entity`) |
+| Workflow/procedure | `protocols/` entities (write via `mcp__cognitive-memory__write_entity`) |
 | Automated enforcement | hooks/scripts |
 
 ### Step 4: Make Changes

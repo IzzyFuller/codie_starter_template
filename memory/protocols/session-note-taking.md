@@ -155,10 +155,7 @@ PostToolUse hooks can automatically create session note reminders after successf
 2. Assess which retrieved entities genuinely informed the response
 3. Write ONE session note:
 
-```
-add_session_note(note_type="context", importance="low",
-  content="[sid:xxx] ECHO/FIZZLE: entities_retrieved=[A, B, C] entities_used=[A, B] context=brief description")
-```
+Use `mcp__cognitive-memory__add_session_note` with parameters `note_type: "context"`, `importance: "low"`, `content: "[sid:xxx] ECHO/FIZZLE: entities_retrieved=[A, B, C] entities_used=[A, B] context=brief description"`
 
 **Signal Interpretation:**
 - All retrieved entities useful -> all in both lists (strong echo)

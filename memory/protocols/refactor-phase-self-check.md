@@ -40,7 +40,7 @@ This grounds review in documented principles, not vague intuitions.
 
 **Load relevant memory context:**
 
-Use `list_entities` to enumerate all `anti-patterns/`, `patterns/`, and `concepts/` entities. These are the full set of documented principles to review against.
+Use `mcp__cognitive-memory__list_entities` to enumerate all `anti-patterns/`, `patterns/`, and `concepts/` entities. These are the full set of documented principles to review against.
 
 ### Phase 1: Semantic Reflection
 
@@ -79,8 +79,8 @@ Use `list_entities` to enumerate all `anti-patterns/`, `patterns/`, and `concept
 **Purpose:** Catch violations of documented anti-patterns.
 
 **Execute:**
-1. Use `list_entities` with entity_type `anti-patterns` to get the full current set
-2. Read each anti-pattern entity relevant to the code under review
+1. Use `mcp__cognitive-memory__list_entities` with entity_type `anti-patterns` to get the full current set
+2. Read each anti-pattern entity relevant to the code under review via `mcp__cognitive-memory__read_entity`
 3. Check the code against every applicable anti-pattern
 
 Do NOT hardcode a list of anti-patterns -- the memory store is the source of truth and grows over time.
@@ -95,9 +95,9 @@ Do NOT hardcode a list of anti-patterns -- the memory store is the source of tru
 **Purpose:** Verify documented patterns are correctly applied.
 
 **Execute:**
-1. Use `list_entities` with entity_type `patterns` to get the full current set
+1. Use `mcp__cognitive-memory__list_entities` with entity_type `patterns` to get the full current set
 2. Identify which patterns are applicable to the work type and code under review
-3. Read each applicable pattern entity
+3. Read each applicable pattern entity via `mcp__cognitive-memory__read_entity`
 4. Verify compliance with each pattern
 
 Do NOT hardcode a list of patterns -- the memory store is the source of truth and grows over time.

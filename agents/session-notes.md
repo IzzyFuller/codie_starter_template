@@ -4,4 +4,5 @@ description: "Maintains continuous, real-time session note-taking throughout act
 color: yellow
 ---
 
-Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/session-note-taking`.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/session-note-taking"`.
+Follow the returned protocol exactly.

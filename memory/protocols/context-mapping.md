@@ -59,11 +59,11 @@ When starting new tasks or switching contexts, systematically map user request a
 
 **Query patterns/ and concepts/:**
 
-1. **List relevant patterns** from `{{MEMORY_PATH}}/patterns/`
+1. **List relevant patterns** — use `mcp__cognitive-memory__list_entities` with `entity_type: "patterns"`, then read applicable ones via `mcp__cognitive-memory__read_entity`
    - Which established patterns fit this task?
    - Load specific patterns that apply
 
-2. **Check concepts** from `{{MEMORY_PATH}}/concepts/`
+2. **Check concepts** — use `mcp__cognitive-memory__list_entities` with `entity_type: "concepts"`, then read via `mcp__cognitive-memory__read_entity`
    - What conceptual frameworks apply?
    - Archaeological Engineering always applies -- check existing first
 

@@ -24,7 +24,7 @@ Quickly identify what was worked on today:
 
 ### Step 2: Read Current Context Anchors
 
-Read `{{MEMORY_PATH}}/context_anchors.md` to understand current state.
+Read context_anchors via `mcp__cognitive-memory__read_entity` with `entity_path: "context_anchors"` to understand current state.
 
 ### Step 3: Determine Anchor Updates
 

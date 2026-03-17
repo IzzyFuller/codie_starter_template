@@ -5,4 +5,5 @@ model: sonnet
 color: red
 ---
 
-Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/pre-commit-checks`.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/pre-commit-checks"`.
+Follow the returned protocol exactly.

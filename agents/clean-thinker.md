@@ -5,4 +5,5 @@ model: haiku
 color: blue
 ---
 
-Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/semantic-reflection`.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/semantic-reflection"`.
+Follow the returned protocol exactly.

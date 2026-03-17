@@ -33,7 +33,7 @@ Identify:
 
 ### Step 2: Search Memory
 
-Search `{{MEMORY_PATH}}/` for relevant past work, patterns, anti-patterns, and user feedback related to this type of work.
+Search memory for relevant past work, patterns, anti-patterns, and user feedback related to this type of work — use `mcp__cognitive-memory__list_entities` to browse entity directories and `mcp__cognitive-memory__read_entity` to read specific entities.
 
 ### Step 3: Read Relevant Memory
 

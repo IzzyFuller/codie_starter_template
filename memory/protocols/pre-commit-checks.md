@@ -13,7 +13,7 @@ Agent-driven pre-commit validation combining semantic anti-pattern analysis with
 ## Startup Sequence
 
 1. Discover MCP tools: call `mcp__cognitive-memory__list_entities` to verify connectivity
-2. Read this protocol: `read_entity` with `entity_path: "protocols/pre-commit-checks"`
+2. Read this protocol: `mcp__cognitive-memory__read_entity` with `entity_path: "protocols/pre-commit-checks"`
 3. Execute phases sequentially
 
 ## Phase 1: Load Anti-Patterns
@@ -21,8 +21,8 @@ Agent-driven pre-commit validation combining semantic anti-pattern analysis with
 **Action**: Load all anti-pattern definitions from cognitive-memory.
 
 ```
-1. list_entities with filter_prefix: "anti-patterns/"
-2. For each entity: read_entity (run in parallel for speed)
+1. mcp__cognitive-memory__list_entities with filter_prefix: "anti-patterns/"
+2. For each entity: mcp__cognitive-memory__read_entity (run in parallel for speed)
 3. Store all anti-pattern definitions for Phase 3 analysis
 ```
 

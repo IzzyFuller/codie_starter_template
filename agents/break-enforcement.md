@@ -5,7 +5,8 @@ model: haiku
 color: red
 ---
 
-Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/break-enforcement`.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/break-enforcement"`.
+Follow the returned protocol exactly.
 
 CRITICAL RULES:
 - You MUST use `mcp__cognitive-memory__read_entity` exclusively to read `current_session`. Do NOT use Bash, cat, tail, head, grep, or any shell command to read cache files or filesystem paths. The ONLY way to access session data is through cognitive-memory's `read_entity` tool.

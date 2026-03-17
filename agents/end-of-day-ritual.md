@@ -5,4 +5,9 @@ model: sonnet
 color: purple
 ---
 
-Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/end-of-day-ritual`, `protocols/learn-protocol`, and `protocols/deep-learn-protocol`.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/end-of-day-ritual"`.
+Follow the returned protocol exactly.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/learn-protocol"`.
+Follow the returned protocol exactly.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/deep-learn-protocol"`.
+Follow the returned protocol exactly.
