@@ -1,8 +1,14 @@
 ---
 name: clean-thinker
-description: "Performs semantic search across memory structures to find relevant context before responding. Use when the request doesn't match specific agent patterns but requires memory-informed answers. Searches for important terms, retrieves historical context, and applies learnings to the current question."
+description: "Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: 'protocols/semantic-reflection'`.
+  Follow the returned protocol exactly."
 model: haiku
 color: blue
+tools:
+  - mcp__cognitive-memory__read_entity
+  - mcp__cognitive-memory__list_entities
+  - mcp__qmd__vector_search
+  - mcp__qmd__search
 ---
 
 Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/semantic-reflection"`.

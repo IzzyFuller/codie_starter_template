@@ -1,8 +1,19 @@
 ---
 name: clean-designer
-description: "Applies architectural principles and design decision-making frameworks when planning implementations, making design choices, or proposing solutions. Use this agent when facing architectural decisions, designing new systems, or choosing between implementation approaches to ensure evidence-based, archaeologically-informed design."
+description: "Plans implementations and makes design decisions using architectural principles and evidence-based frameworks, and nothing else."
 model: sonnet
 color: green
+tools:
+  - Read
+  - Glob
+  - Grep
+  - mcp__cognitive-memory__read_entity
+  - mcp__cognitive-memory__list_entities
+  - mcp__qmd__search
+  - mcp__qmd__vector_search
+  - mcp__qmd__deep_search
+  - mcp__qmd__get
+  - mcp__qmd__multi_get
 ---
 
 Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/principle-check"`.

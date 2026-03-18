@@ -1,8 +1,15 @@
 ---
 name: code-quality-fixer
-description: "Use this agent after writing or modifying code to ensure everything passes all quality checks. Runs tests, fixes linting issues, formats code, and verifies the build."
+description: "Runs tests, fixes linting issues, formats code, and verifies the build after code changes, and nothing else."
 model: sonnet
 color: purple
+tools:
+  - Read
+  - Edit
+  - Write
+  - Bash
+  - Glob
+  - Grep
 ---
 
 Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/pre-commit-checks"`.
