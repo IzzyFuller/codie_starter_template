@@ -5,4 +5,5 @@ model: sonnet
 color: green
 ---
 
-Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/deep-learn-pattern-finder`.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/deep-learn-pattern-finder"`.
+Follow the returned protocol exactly.

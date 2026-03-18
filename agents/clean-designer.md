@@ -5,4 +5,7 @@ model: sonnet
 color: green
 ---
 
-Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/principle-check` and `protocols/refactor-phase-self-check`.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/principle-check"`.
+Follow the returned protocol exactly.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/refactor-phase-self-check"`.
+Follow the returned protocol exactly.

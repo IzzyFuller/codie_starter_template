@@ -16,7 +16,7 @@ Before proceeding, check `protocols/break-enforcement`. A context refresh is a n
 
 ### 2. Update Session Notes
 
-Capture any current context not already in session notes via `add_session_note`. Look at the active conversation -- decisions made, progress, blockers, next steps -- and fill gaps.
+Capture any current context not already in session notes via `mcp__cognitive-memory__add_session_note`. Look at the active conversation -- decisions made, progress, blockers, next steps -- and fill gaps.
 
 ### 3. Enter Plan Mode
 

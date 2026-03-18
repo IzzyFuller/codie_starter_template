@@ -175,8 +175,8 @@ function testSettings() {
   }
   pass('settings.json is valid JSON');
 
-  // Core hook event types present (SessionStart and Stop were removed — see README)
-  const hookEvents = ['PostToolUse', 'UserPromptSubmit'];
+  // Core hook event types present
+  const hookEvents = ['SessionStart', 'PostToolUse', 'UserPromptSubmit'];
   for (const evt of hookEvents) {
     const hooks = settings.hooks?.[evt];
     if (Array.isArray(hooks) && hooks.length > 0) {
@@ -186,8 +186,9 @@ function testSettings() {
     }
   }
 
-  // All hook commands use 'node' (settings format: hooks.[event][0].hooks[0].command)
-  for (const evt of hookEvents) {
+  // Hook commands that use node (SessionStart uses shell command for qmd embed)
+  const nodeHookEvents = ['PostToolUse', 'UserPromptSubmit'];
+  for (const evt of nodeHookEvents) {
     const cmd = settings.hooks?.[evt]?.[0]?.hooks?.[0]?.command || '';
     if (cmd.startsWith('node ')) {
       pass(`${evt} uses node command`);

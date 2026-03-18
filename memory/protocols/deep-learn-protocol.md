@@ -20,7 +20,7 @@ Consolidate session notes into structured entity memory when the session file gr
 Run Deep Learn when current_session content approaches the effective read limit:
 
 **Indicators it's time:**
-- `read_entity` response shows `total_lines` significantly higher than `returned_lines`
+- `mcp__cognitive-memory__read_entity` response shows `total_lines` significantly higher than `returned_lines`
 - Need to use `offset`/`limit` parameters to paginate content
 - Session notes feel unwieldy to process
 - Multiple significant work sessions since last integration
@@ -62,9 +62,9 @@ Run Deep Learn when current_session content approaches the effective read limit:
 
 ```
 current_session (read by each finder in their own context)
-    |-> Entity Finder      -> write_entity(projects/*, people/*, concepts/*)
-    |-> Pattern Finder      -> write_entity(patterns/*)
-    |-> Anti-Pattern Finder -> write_entity(anti-patterns/*)
+    |-> Entity Finder      -> mcp__cognitive-memory__write_entity(projects/*, people/*, concepts/*)
+    |-> Pattern Finder      -> mcp__cognitive-memory__write_entity(patterns/*)
+    |-> Anti-Pattern Finder -> mcp__cognitive-memory__write_entity(anti-patterns/*)
     |
     |   [all three write results to /tmp/deep-learn-results/*.json]
     |
@@ -198,7 +198,7 @@ After Resetter completes:
 | Over-consolidation (losing detail) | When in doubt, keep more detail |
 | Under-consolidation (entity for every note) | Apply frequency/importance filters |
 | Anchor data dump | Keep summaries to 1-2 sentences |
-| Ignoring existing entities | Agents always list_entities first |
+| Ignoring existing entities | Agents always call `mcp__cognitive-memory__list_entities` first |
 | Letting session grow too large | Run Deep Learn when approaching ~800 lines |
 | Context compaction during deep learn | Team architecture prevents this |
 

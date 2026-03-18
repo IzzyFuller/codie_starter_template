@@ -5,4 +5,11 @@ model: sonnet
 color: blue
 ---
 
-Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/anti-pattern-detection`, `protocols/principle-check`, `protocols/pattern-check`, and `protocols/code-smell-check`.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/anti-pattern-detection"`.
+Follow the returned protocol exactly.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/principle-check"`.
+Follow the returned protocol exactly.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/pattern-check"`.
+Follow the returned protocol exactly.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/code-smell-check"`.
+Follow the returned protocol exactly.

@@ -33,7 +33,7 @@ During active work, periodically check your actions against documented anti-patt
 
 ### Phase 2: Check Against Known Anti-Patterns
 
-Check current work against documented anti-patterns in `{{MEMORY_PATH}}/anti-patterns/`:
+Check current work against documented anti-patterns (use `mcp__cognitive-memory__list_entities` with `entity_type: "anti-patterns"` to enumerate them, then read each via `mcp__cognitive-memory__read_entity`):
 
 1. **Backwards Compatibility Obsession**
    - Am I adding compatibility logic?

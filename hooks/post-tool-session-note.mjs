@@ -2,7 +2,7 @@
 
 // PostToolUse hook — triggers session note-taking after tool use
 // Skips: add_session_note (recursion),
-// cognitive-memory, qmd, and Read (memory plumbing / not meaningful work units).
+// cognitive-memory, qmd, Read, and Agent (memory plumbing / not meaningful work units).
 
 import { readFileSync } from 'node:fs';
 
@@ -21,8 +21,9 @@ function main() {
     process.exit(0);
   }
 
-  // Skip cognitive-memory, qmd, and Read — memory plumbing / not meaningful work units
-  if (toolName.startsWith('mcp__cognitive-memory__') || toolName.startsWith('mcp__qmd__') || toolName === 'Read') {
+  // Skip cognitive-memory, qmd, Read, and Agent — memory plumbing / not meaningful work units
+  // Agent is skipped because spawning a session-notes agent to record an Agent spawn creates noise
+  if (toolName.startsWith('mcp__cognitive-memory__') || toolName.startsWith('mcp__qmd__') || toolName === 'Read' || toolName === 'Agent') {
     process.exit(0);
   }
 

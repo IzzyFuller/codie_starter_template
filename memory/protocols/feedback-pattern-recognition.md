@@ -20,13 +20,7 @@ When receiving user corrections or feedback, systematically search memory for si
 **Before responding to the correction:**
 
 1. **Record verbatim feedback** in session notes (importance: high):
-   ```
-   add_session_note(
-     note_type: "insight",
-     content: "USER FEEDBACK (VERBATIM): [exact words]",
-     importance: "high"
-   )
-   ```
+   Use `mcp__cognitive-memory__add_session_note` with parameters `note_type: "insight"`, `content: "USER FEEDBACK (VERBATIM): [exact words]"`, `importance: "high"`
 
 2. **Extract the core issue:**
    - What specific behavior was corrected?

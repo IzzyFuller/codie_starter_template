@@ -40,7 +40,7 @@ Protocol structure:
 5. **Integration** -- How it fits with existing tools
 6. **Tools Reference** -- Tools and their usage
 
-Store protocols in `{{MEMORY_PATH}}/protocols/`.
+Store protocols in cognitive-memory under the `protocols/` path (write via `mcp__cognitive-memory__write_entity` with `entity_path: "protocols/your-protocol-name"`).
 
 ## Part 3: Skill Creation (After Protocol Exists)
 

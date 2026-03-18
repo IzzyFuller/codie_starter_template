@@ -23,7 +23,7 @@ During active work, verify that documented patterns are being correctly applied.
 
 ### Phase 1: Identify Applicable Patterns
 
-**Determine what patterns from `{{MEMORY_PATH}}/patterns/` apply to current work:**
+**Determine what patterns apply to current work** (use `mcp__cognitive-memory__list_entities` with `entity_type: "patterns"` to enumerate, then read relevant ones via `mcp__cognitive-memory__read_entity`):
 
 - Error handling? -> Check try/except, fail-fast patterns
 - Data modeling? -> Check typed model patterns

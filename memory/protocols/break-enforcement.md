@@ -80,7 +80,7 @@ After Level 5, refuse to continue working until {{PARTNER_NAME}} indicates a bre
 
 If {{PARTNER_NAME}} uses the keyword `EmergencyBanana`:
 - Acknowledge it and continue working
-- Log that override was used via `add_session_note`
+- Log that override was used via `mcp__cognitive-memory__add_session_note`
 - Resume normal checking after 30 minutes
 - Do not guilt-trip — the override exists for a reason
 

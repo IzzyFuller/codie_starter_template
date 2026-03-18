@@ -39,10 +39,10 @@ Before articulating your technical recommendation, pause and ask:
 
 ### Phase 2: Memory Architecture Consultation
 
-Search relevant entity collections:
-- Check `{{MEMORY_PATH}}/patterns/` for applicable patterns
-- Check `{{MEMORY_PATH}}/concepts/` for relevant principles
-- Check `{{MEMORY_PATH}}/anti-patterns/` for things to avoid
+Search relevant entity collections using `mcp__cognitive-memory__list_entities` and `mcp__cognitive-memory__read_entity`:
+- Check `patterns/` entities for applicable patterns
+- Check `concepts/` entities for relevant principles
+- Check `anti-patterns/` entities for things to avoid
 
 Read relevant entities based on task domain:
 - If architecture decision -> check concepts/archaeological-engineering

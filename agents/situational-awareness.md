@@ -5,4 +5,5 @@ model: sonnet
 color: purple
 ---
 
-Use `mcp__cognitive-memory__read_entity` to read and follow `protocols/situational-awareness`.
+Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/situational-awareness"`.
+Follow the returned protocol exactly.
