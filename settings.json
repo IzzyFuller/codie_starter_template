@@ -1,4 +1,9 @@
 {
+  "autoUpdatesChannel": "latest",
+  "enabledMcpjsonServers": [
+    "qmd",
+    "cognitive-memory"
+  ],
   "hooks": {
     "SessionStart": [
       {
@@ -57,19 +62,38 @@
           }
         ]
       }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ~/.claude/hooks/task-completed.mjs"
+          }
+        ]
+      }
     ]
   },
   "permissions": {
     "allow": [
-      "mcp__cognitive-memory__*",
-      "mcp__qmd__*",
       "Bash(git *)",
       "Bash(npm *)",
       "Bash(node *)",
-      "Bash(bun *)"
+      "Bash(bun *)",
+      "mcp__cognitive-memory__read_entity",
+      "mcp__cognitive-memory__list_entities",
+      "mcp__cognitive-memory__add_session_note",
+      "mcp__qmd__search",
+      "mcp__qmd__vector_search",
+      "mcp__qmd__deep_search",
+      "mcp__qmd__get",
+      "mcp__qmd__multi_get",
+      "mcp__qmd__status"
     ]
   },
   "env": {
-    "MCP_TOOL_TIMEOUT": "120000"
-  }
+    "MCP_TOOL_TIMEOUT": "240000",
+    "COGNITIVE_MEMORY_PATH": "{{MEMORY_PATH}}"
+  },
+  "showClearContextOnPlanAccept": true
 }

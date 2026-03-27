@@ -1,7 +1,6 @@
 ---
 name: break-enforcement
-description: "Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: 'protocols/break-enforcement'`.
-  Follow the returned protocol exactly."
+description: "Enforces mandatory break schedule. Spawn at every user prompt. Prompt should include: current timestamp in ISO format."
 model: haiku
 color: red
 tools:

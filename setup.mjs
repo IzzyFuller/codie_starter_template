@@ -332,6 +332,7 @@ async function installMemorySeed() {
   copyDirWithSubstitutions(memorySrc, MEMORY_PATH, {
     '{{MEMORY_PATH}}': MEMORY_PATH,
     '{{PARTNER_NAME}}': PARTNER_NAME,
+    '{{ASSISTANT_NAME}}': PARTNER_NAME,
     '{{NAMESAKE_SECTION}}': namesakeSection,
   });
 

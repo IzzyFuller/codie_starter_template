@@ -5,6 +5,7 @@ model: sonnet
 color: purple
 tools:
   - Agent
+  - mcp__cognitive-memory__read_entity
 ---
 
 Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/end-of-day-ritual"`.

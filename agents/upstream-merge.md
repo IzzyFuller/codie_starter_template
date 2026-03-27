@@ -11,6 +11,7 @@ tools:
   - Glob
   - Grep
   - Agent
+  - mcp__cognitive-memory__read_entity
 ---
 
 Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/upstream-merge"`.

@@ -10,6 +10,7 @@ tools:
   - Bash
   - Glob
   - Grep
+  - mcp__cognitive-memory__read_entity
 ---
 
 Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/pre-commit-checks"`.
