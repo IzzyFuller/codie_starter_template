@@ -11,6 +11,7 @@ tools:
   - Glob
   - Grep
   - mcp__cognitive-memory__read_entity
+  - mcp__cognitive-memory__add_session_note
 ---
 
 Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/pre-commit-checks"`.

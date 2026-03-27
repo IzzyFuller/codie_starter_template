@@ -6,6 +6,7 @@ color: red
 tools:
   - mcp__cognitive-memory__read_entity
   - mcp__cognitive-memory__write_entity
+  - mcp__cognitive-memory__add_session_note
   - mcp__cognitive-memory__list_entities
   - Bash
 ---

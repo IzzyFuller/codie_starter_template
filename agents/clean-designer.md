@@ -9,6 +9,7 @@ tools:
   - Grep
   - mcp__cognitive-memory__read_entity
   - mcp__cognitive-memory__list_entities
+  - mcp__cognitive-memory__add_session_note
   - mcp__qmd__search
   - mcp__qmd__vector_search
   - mcp__qmd__deep_search
