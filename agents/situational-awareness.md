@@ -1,8 +1,11 @@
 ---
 name: situational-awareness
-description: "Reads context sources (context_anchors, current_session) in its own context window and returns a structured situational summary: what we're working on, where we left off, what to watch for. Identity is delivered via system prompt — this agent establishes working context only."
+description: "Establishes working context at session start. Spawn once per session before any other work. Prompt should include: today's date, session ID, and what the user is working on."
 model: sonnet
 color: purple
+tools:
+  - mcp__cognitive-memory__read_entity
+  - mcp__cognitive-memory__add_session_note
 ---
 
 Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/situational-awareness"`.

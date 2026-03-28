@@ -1,8 +1,11 @@
 ---
 name: break-enforcement
-description: "Checks session note timestamps against break-enforcement protocol to determine if a break reminder is needed. Returns escalation level instruction or nothing if no break is due. Runs as background agent on every user prompt."
+description: "Enforces mandatory break schedule. Spawn at every user prompt. Prompt should include: current timestamp in ISO format."
 model: haiku
 color: red
+tools:
+  - mcp__cognitive-memory__read_entity
+  - mcp__cognitive-memory__add_session_note
 ---
 
 Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/break-enforcement"`.

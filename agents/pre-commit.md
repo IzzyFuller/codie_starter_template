@@ -1,8 +1,17 @@
 ---
 name: pre-commit
-description: "Runs all pre-commit validation: semantic anti-pattern review against documented patterns in cognitive-memory, plus format/lint/test. Spawn before any git commit."
+description: "Runs all pre-commit validation including semantic anti-pattern review, format, lint, and test, and nothing else."
 model: sonnet
 color: red
+tools:
+  - Read
+  - Edit
+  - Write
+  - Bash
+  - Glob
+  - Grep
+  - mcp__cognitive-memory__read_entity
+  - mcp__cognitive-memory__add_session_note
 ---
 
 Call `mcp__cognitive-memory__read_entity` with parameter `entity_path: "protocols/pre-commit-checks"`.
