@@ -2,53 +2,55 @@
 
 ## Purpose
 
-Lightweight daily wrap-up that updates context anchors with current work focus. This is NOT a consolidation ritual -- it's a quick working memory update so the next conversation starts with accurate pointers.
+Orchestrate the two-phase end-of-day memory integration ritual. Both phases always run — there is no conditional logic.
+
+**Phase 1 — Deep Learn**: Consolidate session notes into structured entity memory (people, projects, concepts, patterns, anti-patterns). Executed by `deep-learn-agent`.
+
+**Phase 2 — Learn**: Review archived sessions and apply targeted updates to identity (`me`) and protocols. Executed by `learn-agent`.
 
 ## When to Use
 
-- End of work day when wrapping up
-- Before extended breaks
-- When switching between major projects
+- When collaborator explicitly asks to run the end-of-day ritual.
 
-**NOT for**: Entity creation, session integration, behavioral learning, philosophical synthesis. Those have their own protocols.
+## Orchestration Steps
 
-## Protocol Steps
+### Step 1: Spawn deep-learn-agent
 
-### Step 1: Review Today's Work
+Use the `Agent` tool to spawn `deep-learn-agent`. Do NOT set `run_in_background: true` — wait for it to complete before proceeding to Step 2.
 
-Quickly identify what was worked on today:
-- What projects were touched?
-- What entities were created or significantly updated?
-- What decisions were made?
-- Current state of in-progress work?
+```
+Agent tool:
+  subagent_type: "deep-learn-agent"
+  prompt: "Run the full deep learn sequence per protocols/deep-learn-protocol."
+```
 
-### Step 2: Read Current Context Anchors
+Wait for `deep-learn-agent` to return. Its completion output will include the path of the newly archived session (format: `session_archives/YYYY-MM-DD`). Extract that path.
 
-Read context_anchors via `mcp__cognitive-memory__read_entity` with `entity_path: "context_anchors"` to understand current state.
+### Step 2: Spawn learn-agent
 
-### Step 3: Determine Anchor Updates
+After `deep-learn-agent` confirms completion, spawn `learn-agent`. Pass the archived session path from Step 1.
 
-For each entity worked on today:
-1. **New to anchors?** -> Add to Current Focus
-2. **Already in Current Focus?** -> Update summary if relevance changed
-3. **Should move sections?** -> Current Focus -> Recent Work -> Background based on activity
-4. **Should be removed?** -> If not referenced in 2-3 weeks
+```
+Agent tool:
+  subagent_type: "learn-agent"
+  prompt: "Run the Learn protocol. The session archived in this ritual is at: session_archives/YYYY-MM-DD"
+```
 
-### Step 4: Update Context Anchors
+Wait for `learn-agent` to return.
 
-Write updated content preserving structure. Update "Last Updated" date.
+### Step 3: Confirm completion
 
-### Step 5: Verify Update
+Take a session note confirming both phases completed successfully.
 
-Read back to confirm updates persisted correctly.
-
-## Time Estimate
-
-5-10 minutes
+```
+add_session_note:
+  note_type: "context"
+  importance: "medium"
+  content: "[sid:xxxxxxxx] End-of-day ritual complete. Phase 1 (deep-learn-agent): done. Archived session: session_archives/YYYY-MM-DD. Phase 2 (learn-agent): done."
+```
 
 ## What This Protocol Does NOT Do
 
-- **Create/update entity files** -> Use Deep Learn
-- **Extract behavioral patterns** -> Use Learn
-
-This protocol ONLY updates working memory pointers.
+- Update context anchors directly (resetter handles this in Phase 1)
+- Write entity files directly (finders and learn-agent handle this)
+- Apply conditional logic based on session size or other factors
